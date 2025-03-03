@@ -10,37 +10,75 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-// This is an example so far, nothing fully implemented yet. 
+var collection *mongo.Collection
+
 func main() {
 	uri := "mongodb://localhost:27017/test_server"
-	// Use the SetServerAPIOptions() method to set the Stable API version to 1
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
-	// Create a new client and connect to the server
 	client, err := mongo.Connect(opts)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
 	defer func() {
 		if err = client.Disconnect(context.TODO()); err != nil {
-			panic(err)
+			log.Fatalf("Failed to disconnect from MongoDB: %v", err)
 		}
 	}()
-	// Send a ping to confirm a successful connection
-	var result bson.M
-	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Decode(&result); err != nil {
-		panic(err)
-	}
-	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
-	// Insert a document into the collection
-	collection := client.Database("test_db").Collection("test_collection")
-	doc := bson.D{{"name", "Test A"}}
+	collection = client.Database("test_db").Collection("test_collection")
+
+	// Perform CRUD operations
+	// createDocument(bson.D{{"name", "Test A"}})
+	// readDocuments()
+	// updateDocument(bson.D{{"name", "Test A"}}, bson.D{{"$set", bson.D{{"name", "Test B"}}}})
+	deleteDocument(bson.D{{"name", "Test B"}})
+}
+
+// Create a document
+func createDocument(doc bson.D) {
 	insertResult, err := collection.InsertOne(context.TODO(), doc)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to insert document: %v", err)
 	}
 	fmt.Println("Inserted a single document: ", insertResult.InsertedID)
 }
 
+// Read all documents
+func readDocuments() {
+	cursor, err := collection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		log.Fatalf("Failed to find documents: %v", err)
+	}
+	defer cursor.Close(context.TODO())
 
+	fmt.Println("Documents in the collection:")
+	for cursor.Next(context.TODO()) {
+		var doc bson.M
+		if err := cursor.Decode(&doc); err != nil {
+			log.Fatalf("Failed to decode document: %v", err)
+		}
+		fmt.Println(doc)
+	}
+	if err := cursor.Err(); err != nil {
+		log.Fatalf("Cursor error: %v", err)
+	}
+}
+
+// Update a document
+func updateDocument(filter bson.D, update bson.D) {
+	updateResult, err := collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatalf("Failed to update document: %v", err)
+	}
+	fmt.Printf("Matched %v documents and updated %v documents.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
+}
+
+// Delete a document
+func deleteDocument(filter bson.D) {
+	deleteResult, err := collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		log.Fatalf("Failed to delete document: %v", err)
+	}
+	fmt.Printf("Deleted %v documents.\n", deleteResult.DeletedCount)
+}
