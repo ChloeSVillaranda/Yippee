@@ -1,6 +1,6 @@
-module mongo_db_tests
+module yippee
 
-go 1.23.5
+go 1.23.3
 
 require go.mongodb.org/mongo-driver/v2 v2.1.0
 
