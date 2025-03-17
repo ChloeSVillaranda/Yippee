@@ -3,11 +3,12 @@
     import { faUser, faUserSlash } from '@fortawesome/free-solid-svg-icons';
     import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 
-    let name = 'world';
     let clientID: string;
     let clients: { id: string, icon: any }[] = [];
-    let socket: WebSocket;
+    let socket: WebSocket | null = null;
+    let inGame = false;  // Whether the user has "joined"
 
+    // Generate unique client ID
     if (!localStorage.getItem("clientID")) {
         clientID = "client_" + Date.now();
         localStorage.setItem("clientID", clientID);
@@ -15,25 +16,19 @@
         clientID = localStorage.getItem("clientID")!;
     }
 
+    // Connect WebSocket on mount
     function connectToServer() {
         socket = new WebSocket('ws://localhost:8080/ws');
 
         socket.onopen = () => {
-            console.log('Connected to server as ' + clientID);
-            socket.send(clientID);
+            console.log('Connected to server.');
         };
 
         socket.onmessage = (event) => {
             const message = JSON.parse(event.data);
-
-            if (message.type === 'new-client') {
-                // Check if the client already exists in the list
-                if (!clients.some(client => client.id === message.id)) {
-                    clients = [...clients, { id: message.id, icon: faUser }];
-                }
-            } else if (message.type === 'client-left') {
-                // Remove client from the list
-                clients = clients.filter(client => client.id !== message.id);
+            if (message.type === 'update-users') {
+                // Update client list dynamically
+                clients = message.ids.map(id => ({ id, icon: faUser }));
             }
         };
 
@@ -46,27 +41,39 @@
         };
     }
 
+    function joinGame() {
+        if (!inGame && socket) {
+            socket.send(JSON.stringify({ type: "join", id: clientID }));
+            inGame = true;
+        }
+    }
+
+    function leaveGame() {
+        if (inGame && socket) {
+            socket.send(JSON.stringify({ type: "leave", id: clientID }));
+            inGame = false;
+        }
+    }
+
     onMount(() => {
         connectToServer();
     });
 </script>
 
 <svelte:head>
-    <title>Home</title>
-    <meta name="description" content="Svelte demo app" />
+    <title>Jackbox-Style WebSocket</title>
 </svelte:head>
 
 <section>
-    <button on:click={connectToServer}>Connect to WebSocket Server</button>
-    
-    <input bind:value={name}>
+    <h1>Join the Game</h1>
+    <button on:click={joinGame} disabled={inGame}>Join</button>
+    <button on:click={leaveGame} disabled={!inGame}>Leave</button>
 
-    <h1>Hello {name}!</h1>
-
-    <div class="user-icons">
+    <div class="client-icons">
         {#each clients as client (client.id)}
             <div class="user-icon">
                 <FontAwesomeIcon icon={client.icon} />
+                <span>{client.id}</span>
             </div>
         {/each}
     </div>
@@ -76,26 +83,21 @@
     section {
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
     }
-
-    h1 {
-        width: 100%;
-        text-align: center;
-    }
-
-    .user-icons {
+    .client-icons {
         display: flex;
-        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
         margin-top: 20px;
     }
-
     .user-icon {
-        font-size: 24px;
+        margin: 10px;
+        display: flex;
+        align-items: center;
     }
-
     button {
+        margin: 5px;
         padding: 10px 20px;
         font-size: 16px;
         cursor: pointer;

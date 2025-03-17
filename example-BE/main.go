@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,9 +11,10 @@ import (
 )
 
 var (
-	clients   = make(map[*websocket.Conn]string) // Connected clients
-	broadcast = make(chan Message)               // Broadcast channel
-	mutex     = sync.Mutex{}                     // To prevent race conditions
+	clients   = make(map[*websocket.Conn]bool) // Active WebSocket connections
+	users     = make(map[string]bool)          // Users who "joined" the game
+	broadcast = make(chan Message)             // Broadcast channel
+	mutex     = sync.Mutex{}                   // Prevent race conditions
 )
 
 var upgrader = websocket.Upgrader{
@@ -21,15 +23,16 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-// Message defines the structure of messages sent to clients
+// Message structure
 type Message struct {
-	Type string `json:"type"`
-	ID   string `json:"id"`
+	Type string   `json:"type"`
+	ID   string   `json:"id,omitempty"`
+	IDs  []string `json:"ids,omitempty"` // List of all users in the game
 }
 
 // WebSocket handler
 func handleConnection(w http.ResponseWriter, r *http.Request) {
-	// Upgrade HTTP connection to WebSocket
+	// Upgrade HTTP to WebSocket
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("WebSocket upgrade error:", err)
@@ -37,48 +40,61 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	// Wait for the client to send their ID
-	_, clientID, err := conn.ReadMessage()
-	if err != nil {
-		log.Println("Error reading client ID:", err)
-		return
-	}
-
-	// Register the client
+	// Register WebSocket connection
 	mutex.Lock()
-	clients[conn] = string(clientID)
+	clients[conn] = true
 	mutex.Unlock()
 
-	log.Printf("Client %s connected\n", clientID)
+	log.Println("New WebSocket connection established.")
 
-	// Notify all clients about the new connection
-	broadcast <- Message{Type: "new-client", ID: string(clientID)}
-
-	// Listen for messages from the client
+	// Listen for messages
 	for {
-		_, _, err := conn.ReadMessage()
+		_, msgBytes, err := conn.ReadMessage()
 		if err != nil {
-			log.Printf("Client %s disconnected\n", clientID)
+			log.Println("WebSocket disconnected.")
 			mutex.Lock()
 			delete(clients, conn)
 			mutex.Unlock()
-
-			// Notify all clients about the disconnection
-			broadcast <- Message{Type: "client-left", ID: string(clientID)}
 			break
 		}
+
+		// Parse incoming message
+		var msg Message
+		err = json.Unmarshal(msgBytes, &msg)
+		if err != nil {
+			log.Println("Invalid message format.")
+			continue
+		}
+
+		mutex.Lock()
+		if msg.Type == "join" {
+			users[msg.ID] = true
+			broadcast <- Message{Type: "update-users", IDs: getUserList()}
+		} else if msg.Type == "leave" {
+			delete(users, msg.ID)
+			broadcast <- Message{Type: "update-users", IDs: getUserList()}
+		}
+		mutex.Unlock()
 	}
+}
+
+// Get all joined users
+func getUserList() []string {
+	userList := []string{}
+	for id := range users {
+		userList = append(userList, id)
+	}
+	return userList
 }
 
 func handleMessages() {
 	for {
 		msg := <-broadcast
-
 		mutex.Lock()
 		for client := range clients {
 			err := client.WriteJSON(msg)
 			if err != nil {
-				log.Printf("Error sending message: %v", err)
+				log.Println("Error sending message:", err)
 				client.Close()
 				delete(clients, client)
 			}
