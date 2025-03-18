@@ -11,10 +11,9 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-// Returns the factorial as an integer. any comments ontop will be apart?
-
+// Connect to a MongoDB server and returns a client instance.
 func connectToDatabase() (*mongo.Client, error) {
-	uri := "mongodb://localhost:27017"
+	uri := "mongodb://localhost:27017" // change uri to change server here
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
 
@@ -33,7 +32,7 @@ func connectToDatabase() (*mongo.Client, error) {
 	return client, nil
 }
 
-// Create a document
+// Insert a single document into a collection.
 func createDocument(collection *mongo.Collection, doc bson.D) {
 	insertResult, err := collection.InsertOne(context.TODO(), doc)
 	if err != nil {
@@ -42,7 +41,7 @@ func createDocument(collection *mongo.Collection, doc bson.D) {
 	fmt.Println("Inserted a single document: ", insertResult.InsertedID)
 }
 
-// Read all documents
+// Read all documents of a collection
 func readDocuments(collection *mongo.Collection) {
 	cursor, err := collection.Find(context.TODO(), bson.D{})
 	if err != nil {
@@ -63,7 +62,7 @@ func readDocuments(collection *mongo.Collection) {
 	}
 }
 
-// Update a document
+// Update a document in a collection
 func updateDocument(collection *mongo.Collection, filter bson.D, update bson.D) {
 	updateResult, err := collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
@@ -72,7 +71,7 @@ func updateDocument(collection *mongo.Collection, filter bson.D, update bson.D) 
 	fmt.Printf("Matched %v documents and updated %v documents.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
 }
 
-// Delete a document
+// Delete a document from a collection
 func deleteDocument(collection *mongo.Collection, filter bson.D) {
 	deleteResult, err := collection.DeleteOne(context.TODO(), filter)
 	if err != nil {

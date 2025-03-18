@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	"log"
+
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
+
+var Quiz_Collection *mongo.Collection
 
 func main() {
 	client, err := connectToDatabase()
@@ -16,11 +20,13 @@ func main() {
 		}
 	}()
 
-	collection := client.Database("test_db").Collection("test_collection")
+	Quiz_Collection = client.Database("yippee_db").Collection("quizzes")
 
+	createQuiz()
 	// Perform CRUD operations
-	// createDocument(collection, bson.D{{"name", "Test A"}})
-	readDocuments(collection)
+
+	// createDocument(Quiz_Collection, bson.D{{"name", "Test C"}})
+	// readDocuments(collection)
 	// updateDocument(bson.D{{"name", "Test A"}}, bson.D{{"$set", bson.D{{"name", "Test B"}}}})
 	// deleteDocument(bson.D{{"name", "Test B"}})
 }
