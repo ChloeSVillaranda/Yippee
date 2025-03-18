@@ -12,9 +12,9 @@ import (
 
 var (
 	clients   = make(map[*websocket.Conn]bool) // Active WebSocket connections
-	users     = make(map[string]bool)          // Users who "joined" the game
 	broadcast = make(chan Message)             // Broadcast channel
 	mutex     = sync.Mutex{}                   // Prevent race conditions
+	users     = make(map[string]string)
 )
 
 var upgrader = websocket.Upgrader{
@@ -25,14 +25,19 @@ var upgrader = websocket.Upgrader{
 
 // Message structure
 type Message struct {
-	Type string   `json:"type"`
-	ID   string   `json:"id,omitempty"`
-	IDs  []string `json:"ids,omitempty"` // List of all users in the game
+	Type     string `json:"type"`
+	ID       string `json:"id,omitempty"`
+	Username string `json:"username,omitempty"`
+	Users    []User `json:"users,omitempty"` // List of all users with usernames
+}
+
+type User struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
 }
 
 // WebSocket handler
 func handleConnection(w http.ResponseWriter, r *http.Request) {
-	// Upgrade HTTP to WebSocket
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("WebSocket upgrade error:", err)
@@ -40,14 +45,12 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	// Register WebSocket connection
 	mutex.Lock()
 	clients[conn] = true
 	mutex.Unlock()
 
 	log.Println("New WebSocket connection established.")
 
-	// Listen for messages
 	for {
 		_, msgBytes, err := conn.ReadMessage()
 		if err != nil {
@@ -58,7 +61,6 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		// Parse incoming message
 		var msg Message
 		err = json.Unmarshal(msgBytes, &msg)
 		if err != nil {
@@ -68,21 +70,21 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 
 		mutex.Lock()
 		if msg.Type == "join" {
-			users[msg.ID] = true
-			broadcast <- Message{Type: "update-users", IDs: getUserList()}
+			users[msg.ID] = msg.Username // Store the username
+			broadcast <- Message{Type: "update-users", Users: getUserList()}
 		} else if msg.Type == "leave" {
 			delete(users, msg.ID)
-			broadcast <- Message{Type: "update-users", IDs: getUserList()}
+			broadcast <- Message{Type: "update-users", Users: getUserList()}
 		}
 		mutex.Unlock()
 	}
 }
 
 // Get all joined users
-func getUserList() []string {
-	userList := []string{}
-	for id := range users {
-		userList = append(userList, id)
+func getUserList() []User {
+	userList := []User{}
+	for id, username := range users {
+		userList = append(userList, User{ID: id, Username: username})
 	}
 	return userList
 }
