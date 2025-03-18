@@ -70,10 +70,13 @@
 
 <section>
     <h1>Join the Game</h1>
-    <input type="text" bind:value={username} placeholder="Enter username" />
-    <button on:click={joinGame} disabled={inGame || username.trim() === ""}>Join</button>
-    <button on:click={leaveGame} disabled={!inGame}>Leave</button>
-
+    {#if !inGame}
+        <input type="text" bind:value={username} placeholder="Enter username" />
+        <button on:click={joinGame} disabled={inGame || username.trim() === ""}>Join</button>
+    {:else}
+        <button on:click={leaveGame} disabled={!inGame}>Leave</button>
+    {/if}
+    
     <div class="client-icons">
         {#each clients as client (client.id)}
             <div class="user-icon">
