@@ -15,6 +15,7 @@ var (
 	broadcast = make(chan Message)             // Broadcast channel
 	mutex     = sync.Mutex{}                   // Prevent race conditions
 	users     = make(map[string]string)
+	messages  = make(map[string]string) // Map of user IDs to their latest messages
 )
 
 var upgrader = websocket.Upgrader{
@@ -25,15 +26,17 @@ var upgrader = websocket.Upgrader{
 
 // Message structure
 type Message struct {
-	Type     string `json:"type"`
-	ID       string `json:"id,omitempty"`
-	Username string `json:"username,omitempty"`
-	Users    []User `json:"users,omitempty"` // List of all users with usernames
+	Type        string `json:"type"`
+	ID          string `json:"id,omitempty"`
+	Username    string `json:"username,omitempty"`
+	Users       []User `json:"users,omitempty"` // list of all users with usernames
+	Chatmessage string `json:"chatmessage,omitempty"`
 }
 
 type User struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
+	ID          string `json:"id"`
+	Username    string `json:"username"`
+	Chatmessage string `json:"chatmessage,omitempty"`
 }
 
 // WebSocket handler
@@ -75,16 +78,23 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 		} else if msg.Type == "leave" {
 			delete(users, msg.ID)
 			broadcast <- Message{Type: "update-users", Users: getUserList()}
+		} else if msg.Type == "chat-message" {
+			messages[msg.ID] = msg.Chatmessage
+			broadcast <- Message{Type: "send-message", Users: getUserList()}
 		}
 		mutex.Unlock()
 	}
 }
 
-// Get all joined users
+// Get all joined users and their messages
 func getUserList() []User {
 	userList := []User{}
 	for id, username := range users {
-		userList = append(userList, User{ID: id, Username: username})
+		userList = append(userList, User{
+			ID:          id,
+			Username:    username,
+			Chatmessage: messages[id], // Include the user's latest message
+		})
 	}
 	return userList
 }

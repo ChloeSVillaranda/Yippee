@@ -5,11 +5,12 @@
 
     let clientID: string;
     let username: string = "";
-    let clients: { id: string, username: string, icon: any }[] = [];
+    let chatmessage: string = "";
+    let clients: { id: string, username: string, chatmessage: string, icon: any }[] = [];
     let socket: WebSocket | null = null;
     let inGame = false;
 
-    // Generate unique client ID
+    // Generate unique client ID or retrieve from local storage
     if (!localStorage.getItem("clientID")) {
         clientID = "client_" + Date.now();
         localStorage.setItem("clientID", clientID);
@@ -26,10 +27,11 @@
 
         socket.onmessage = (event) => {
             const message = JSON.parse(event.data);
-            if (message.type === 'update-users') {
+            if (message.type === 'update-users' || message.type === 'send-message') {
                 clients = message.users.map(user => ({
                     id: user.id,
                     username: user.username,
+                    chatmessage: user.chatmessage || "",
                     icon: faUser
                 }));
             }
@@ -58,14 +60,20 @@
         }
     }
 
+    function sendMessage() {
+        if (inGame && socket && chatmessage.trim() !== "") {
+            socket.send(JSON.stringify({ type: "chat-message", id: clientID, chatmessage }));
+            chatmessage = ""; // Clear the input field after sending
+        }
+    }
+
     onMount(() => {
         connectToServer();
     });
-
 </script>
 
 <svelte:head>
-    <title>Jackbox-Style WebSocket</title>
+    <title>WebSocket Chat</title>
 </svelte:head>
 
 <section>
@@ -81,10 +89,18 @@
         {#each clients as client (client.id)}
             <div class="user-icon">
                 <FontAwesomeIcon icon={client.icon} />
-                <span>{client.username} ({client.id})</span>
+                <span>{client.username}</span>
+                {#if client.chatmessage}
+                    <p class="chat-message">{client.chatmessage}</p>
+                {/if}
             </div>
         {/each}
     </div>
+
+    {#if inGame} 
+        <input type="text" bind:value={chatmessage} placeholder="Enter message" />
+        <button on:click={sendMessage}>Send</button>
+    {/if}
 </section>
 
 <style>
@@ -107,7 +123,14 @@
     .user-icon {
         margin: 10px;
         display: flex;
+        flex-direction: column;
         align-items: center;
+        text-align: center;
+    }
+    .chat-message {
+        margin-top: 5px;
+        font-size: 14px;
+        color: gray;
     }
     button {
         margin: 5px;
