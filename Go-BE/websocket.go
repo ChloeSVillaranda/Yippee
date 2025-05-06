@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -105,10 +105,10 @@ func handleMessages() {
 	}
 }
 
-func main() {
-	http.HandleFunc("/ws", handleConnection)
-	go handleMessages()
+// func main() {
+// 	http.HandleFunc("/ws", handleConnection)
+// 	go handleMessages()
 
-	fmt.Println("WebSocket server running on ws://localhost:8080/ws")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
+// 	fmt.Println("WebSocket server running on ws://localhost:8080/ws")
+// 	log.Fatal(http.ListenAndServe(":8080", nil))
+// }

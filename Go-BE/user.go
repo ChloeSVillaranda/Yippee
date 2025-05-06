@@ -8,37 +8,37 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-// Lets user create a quiz in the database
-func createQuiz() {
-	fmt.Println("Creating a quiz")
-
-	// Define quiz details
-	quizDetails := bson.D{
-		{Key: "quizName", Value: "Test_Quiz"},
-		{Key: "quizDescription", Value: "This is a sample quiz description"},
-		{Key: "dateCreated", Value: time.Now()},
-		{Key: "quizQuestions", Value: bson.A{
-			bson.D{
-				{Key: "question", Value: "What is the capital of France?"},
-				{Key: "points", Value: 20},
-				{Key: "difficulty", Value: "Easy"},
-				{Key: "hint", Value: "Starts with letter 'P'"},
-				{Key: "category", Value: "Geography"},
-				{Key: "options", Value: bson.A{"Paris", "London", "Berlin", "Madrid"}},
-				{Key: "answer", Value: bson.A{1}},
-			},
-			bson.D{
-				{Key: "question", Value: "2 + 2 = 22"},
-				{Key: "points", Value: 10},
-				{Key: "correctAnswer", Value: false},
-			},
-		}},
-		{Key: "createdBy", Value: "Test_User"},
+// Helper function to create a quiz questions (multiple choice + true/false)
+func createQuestion(question string, points int, difficulty string, hint string, category string, options []string, answerIndex int) bson.D {
+	// Convert []string of options to bson.A
+	bsonOptions := bson.A{}
+	for _, option := range options {
+		bsonOptions = append(bsonOptions, option)
 	}
 
-	createDocument(Quiz_Collection, quizDetails)
+	return bson.D{
+		{Key: "question", Value: question},
+		{Key: "points", Value: points},
+		{Key: "difficulty", Value: difficulty},
+		{Key: "hint", Value: hint},
+		{Key: "category", Value: category},
+		{Key: "options", Value: bsonOptions},
+		{Key: "answer", Value: answerIndex},
+	}
 }
 
-// func hello {
-// 	// nothing
-// }
+func createQuiz(quizName string, quizDescription string, user string, quizQuestions []bson.D) {
+	fmt.Println("Creating a quiz")
+
+	// define quiz details
+	quizDetails := bson.D{
+		{Key: "quizName", Value: quizName},
+		{Key: "quizDescription", Value: quizDescription},
+		{Key: "dateCreated", Value: time.Now()},
+		{Key: "quizQuestions", Value: quizQuestions},
+		{Key: "createdBy", Value: user},
+	}
+
+	// save the quiz to the database
+	createDocument(Quiz_Collection, quizDetails)
+}
