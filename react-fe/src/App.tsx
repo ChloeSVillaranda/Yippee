@@ -2,6 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import CreateQuiz from "./pages/CreateQuiz"
 import Home from "./pages/Home";
+// import HostGame from "./pages/HostGame";
+import JoinGame from "./pages/JoinGame";
 
 function AppRoutes() {
   return (
@@ -12,9 +14,9 @@ function AppRoutes() {
         <Route path="/createquiz"
           element={<CreateQuiz />}/>
         {/* <Route path="/host"
-          element={<Host />}/>
+          element={<HostGame />}/> */}
         <Route path="/join"
-          element={<Join />}/> */}
+          element={<JoinGame />}/>
       </Routes>
     </>
   );

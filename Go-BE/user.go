@@ -9,7 +9,7 @@ import (
 )
 
 // Helper function to create a quiz questions (multiple choice + true/false)
-func createQuestion(question string, points int, difficulty string, hint string, category string, options []string, answerIndex int) bson.D {
+func createQuestion(question string, points int, difficulty int, hint string, category []string, options []string, answerIndex int) bson.D {
 	// Convert []string of options to bson.A
 	bsonOptions := bson.A{}
 	for _, option := range options {

@@ -67,6 +67,13 @@ export default function HomePage() {
           Reversed Message: {reversedMessage}
         </Typography>
       )}
+
+      <Button variant="contained">
+        Host Game
+      </Button>
+      <Button variant="contained">
+        Join Game
+      </Button>
     </>
   );
 }
