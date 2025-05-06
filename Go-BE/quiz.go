@@ -7,6 +7,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+
+	"github.com/gorilla/mux"
 )
 
 var Quiz_Collection *mongo.Collection
@@ -80,6 +82,8 @@ func enableCORS(next http.Handler) http.Handler {
 }
 
 func main() {
+	// connect to the database
+	// TODO: can extract into util function
 	client, err := connectToDatabase()
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
@@ -92,17 +96,20 @@ func main() {
 
 	Quiz_Collection = client.Database("yippee_db").Collection("quizzes")
 
-	// populateDbWithQuizzes()
+	// Initialize the router
+	r := mux.NewRouter()
 
-	// all rest apis here
-	mux := http.NewServeMux()
-	mux.HandleFunc("/api/create-quiz", createQuizHandler)
-	mux.HandleFunc("/api/get-quizzes", getQuizzesHandler)
+	// WebSocket endpoint
+	r.HandleFunc("/ws", handleWebSocket)
 
-	// wrap the ServeMux with the CORS middleware to enable cors
-	handler := enableCORS(mux)
+	// REST API endpoints
+	r.HandleFunc("/api/create-quiz", createQuizHandler).Methods("POST")
+	r.HandleFunc("/api/get-quizzes", getQuizzesHandler).Methods("GET")
 
-	// start the HTTP server
+	// Enable CORS middleware
+	handler := enableCORS(r)
+
+	// Start the HTTP server
 	port := "8080"
 	log.Printf("Starting server on port %s...", port)
 	if err := http.ListenAndServe(":"+port, handler); err != nil {

@@ -1,10 +1,15 @@
 import { Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 export default function HomePage() {
   const [message, setMessage] = useState("");
   const [reversedMessage, setReversedMessage] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
+
+  // used to navigate to different pages
+  let navigate = useNavigate();
 
   useEffect(() => {
     // Establish WebSocket connection
@@ -68,10 +73,10 @@ export default function HomePage() {
         </Typography>
       )}
 
-      <Button variant="contained">
+      <Button variant="contained" onClick={() => {navigate(`/host`)}}>
         Host Game
       </Button>
-      <Button variant="contained">
+      <Button variant="contained" onClick={() => {navigate(`/join`)}}>
         Join Game
       </Button>
     </>
