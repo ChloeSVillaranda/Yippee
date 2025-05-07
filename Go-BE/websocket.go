@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
 	"net/http"
 	"sync"
 
@@ -34,6 +35,7 @@ type Message struct {
 	QuizName string `json:"quizName,omitempty"`
 	Message  string `json:"message,omitempty"`
 	Error    string `json:"error,omitempty"`
+	Role     string `json:"role,omitempty"`
 }
 
 // Handle WebSocket connections
@@ -76,9 +78,23 @@ func handleCreateLobby(conn *websocket.Conn, data Message) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	// Create a new lobby
+	// create random room code 4-letters
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	var roomCode string
+	for {
+		roomCodeRunes := make([]rune, 4)
+		for i := range roomCodeRunes {
+			roomCodeRunes[i] = chars[rand.Intn(len(chars))]
+		}
+		roomCode = string(roomCodeRunes)
+
+		if _, exists := lobbies[roomCode]; !exists {
+			break
+		}
+	}
+
+	// create a new lobby
 	lobbies[data.RoomCode] = &Lobby{
-		RoomCode: data.RoomCode,
 		QuizName: data.QuizName,
 		Host:     conn,
 		Clients:  make(map[*websocket.Conn]bool),
@@ -86,11 +102,11 @@ func handleCreateLobby(conn *websocket.Conn, data Message) {
 
 	log.Printf("Lobby created: %+v\n", lobbies[data.RoomCode])
 
-	// Notify the host that the lobby was created
 	conn.WriteJSON(Message{
 		Action:   "createLobby",
 		Message:  "Lobby created successfully",
-		RoomCode: data.RoomCode,
+		RoomCode: string(roomCode),
+		Role:     "host",
 	})
 }
 
@@ -112,11 +128,12 @@ func handleJoinLobby(conn *websocket.Conn, data Message) {
 	lobby.Clients[conn] = true
 	log.Printf("Client joined lobby: %s\n", data.RoomCode)
 
-	// Notify the client that they joined successfully
+	// Notify the client that they joined successfully with their role
 	conn.WriteJSON(Message{
 		Action:   "joinLobby",
 		Message:  "Joined lobby successfully",
 		RoomCode: data.RoomCode,
+		Role:     "player", // Role is player for joiners
 	})
 
 	// Notify the host that a new client joined
