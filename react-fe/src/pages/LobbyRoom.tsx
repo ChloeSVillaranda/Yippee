@@ -1,48 +1,32 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
+import { getWebSocket } from "../stores/websocketSlice";
 import { useParams } from "react-router-dom";
 
 export default function LobbyRoom() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const [role, setRole] = useState<string | null>(null);
-  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080/ws");
+    const webSocket = getWebSocket();
 
-    ws.onopen = () => {
-      console.log(`Connected to room: ${roomCode}`);
+    if (webSocket) {
+      webSocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
 
-      // Send a message to join the lobby
-      ws.send(
-        JSON.stringify({
-          action: "joinLobby",
-          roomCode: roomCode,
-        })
-      );
-    };
+        if (data.role) {
+          setRole(data.role);
+        }
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+        console.log("Message from server:", data);
+      };
 
-      if (data.role) {
-        setRole(data.role);
-      }
-
-      console.log("Message from server:", data);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    setWebSocket(ws);
-
-    return () => {
-      ws.close();
-    };
-  }, [roomCode]);
+      webSocket.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
+    }
+  }, []);
 
   return (
     <Box sx={{ padding: 4 }}>

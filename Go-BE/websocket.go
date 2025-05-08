@@ -127,19 +127,26 @@ func handleJoinLobby(conn *websocket.Conn, data Message) {
 		return
 	}
 
-	// add the client to the lobby
-	lobby.Clients[conn] = true
-	log.Printf("Client joined lobby: %s\n", data.RoomCode)
+	// Determine the role of the joining connection
+	var role string
+	if lobby.Host == conn {
+		role = "host"
+	} else {
+		role = "player"
+		lobby.Clients[conn] = true // Add the client to the lobby
+		log.Printf("Client joined lobby: %s\n", data.RoomCode)
+	}
 
+	// Send the role back to the client
 	conn.WriteJSON(Message{
 		Action:   "joinLobby",
 		Message:  "Joined lobby successfully",
 		RoomCode: data.RoomCode,
-		Role:     "player", // anyone who joins with a code is a player
+		Role:     role,
 	})
 
-	// notify the host that a new client joined
-	if lobby.Host != nil {
+	// Notify the host that a new client joined (only if the joining connection is not the host)
+	if role == "player" && lobby.Host != nil {
 		lobby.Host.WriteJSON(Message{
 			Action:  "joinLobby",
 			Message: "A new player has joined the lobby",

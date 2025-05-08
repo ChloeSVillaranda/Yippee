@@ -1,14 +1,20 @@
 import { Box, Button, Typography } from "@mui/material";
+import { connect, disconnect } from "../stores/websocketSlice";
+import { useDispatch, useSelector } from "react-redux";
 
+import { RootState } from "../stores/store";
 import SelectQuiz from "../components/SelectQuiz";
+import { getWebSocket } from "../stores/websocketSlice";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 export default function HostGame() {
   const [selectedQuiz, setSelectedQuiz] = useState<string | null>(null);
   const [roomCode, setRoomCode] = useState<string | null>(null);
-  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
 
-  // select quiz for game
   const handleSelectQuiz = (quizName: string) => {
     setSelectedQuiz(quizName);
   };
@@ -18,36 +24,41 @@ export default function HostGame() {
       alert("Please select a quiz first!");
       return;
     }
-  
-    const ws = new WebSocket("ws://localhost:8080/ws");
-    ws.onopen = () => {
-      ws.send(
-        JSON.stringify({
-          action: "createLobby",
-          quizName: selectedQuiz,
-        })
-      );
-    };
-  
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log("Message from server:", data);
-  
-      if (data.roomCode) {
-        setRoomCode(data.roomCode);
-        window.location.href = `/${data.roomCode}`;
-      } else {
-        console.error("Room code not received from server:", data);
-      }
-    };
-  
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-  
-    setWebSocket(ws);
+
+    if (!isConnected) {
+      dispatch(connect("ws://localhost:8080/ws"));
+    }
+
+    const webSocket = getWebSocket();
+    if (webSocket) {
+      webSocket.onopen = () => {
+        webSocket.send(
+          JSON.stringify({
+            action: "createLobby",
+            quizName: selectedQuiz,
+          })
+        );
+      };
+
+      webSocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log("Message from server:", data);
+
+        if (data.roomCode) {
+          setRoomCode(data.roomCode);
+          navigate(`/${data.roomCode}`, { state: { role: "host" } });
+        } else {
+          console.error("Room code not received from server:", data);
+        }
+      };
+
+      webSocket.onclose = () => {
+        console.log("WebSocket connection closed");
+        dispatch(disconnect());
+      };
+    }
   };
-  
+
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom>
