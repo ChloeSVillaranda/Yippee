@@ -8,6 +8,7 @@ export default function HostGame() {
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
 
+  // select quiz for game
   const handleSelectQuiz = (quizName: string) => {
     setSelectedQuiz(quizName);
   };
@@ -20,24 +21,24 @@ export default function HostGame() {
   
     const ws = new WebSocket("ws://localhost:8080/ws");
     ws.onopen = () => {
-      const generatedRoomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-      setRoomCode(generatedRoomCode);
-  
       ws.send(
         JSON.stringify({
           action: "createLobby",
           quizName: selectedQuiz,
-          roomCode: generatedRoomCode,
         })
       );
-  
-      // Redirect to the room
-      window.location.href = `/${generatedRoomCode}`;
     };
   
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log("Message from server:", data);
+  
+      if (data.roomCode) {
+        setRoomCode(data.roomCode);
+        window.location.href = `/${data.roomCode}`;
+      } else {
+        console.error("Room code not received from server:", data);
+      }
     };
   
     ws.onclose = () => {
