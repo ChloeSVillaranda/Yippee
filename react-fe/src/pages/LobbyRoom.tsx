@@ -1,12 +1,14 @@
 import { Box, Button, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
 
+import { RootState } from "../stores/store";
 import { getWebSocket } from "../stores/websocketSlice";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function LobbyRoom() {
   const { roomCode } = useParams<{ roomCode: string }>();
-  const [role, setRole] = useState<string | null>(null);
+  const role = useSelector((state: RootState) => state.websocket.role); // Get role from Redux
 
   useEffect(() => {
     const webSocket = getWebSocket();
@@ -15,11 +17,7 @@ export default function LobbyRoom() {
       webSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
-        if (data.role) {
-          setRole(data.role);
-        }
-
-        console.log("Message from server:", data);
+        console.log("Message from server from LobbyRoom:", data);
       };
 
       webSocket.onclose = () => {

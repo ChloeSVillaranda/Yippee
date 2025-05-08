@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import { connect, disconnect } from "../stores/websocketSlice";
+import { connect, disconnect, setRole } from "../stores/websocketSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "../stores/store";
@@ -42,11 +42,12 @@ export default function HostGame() {
 
       webSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log("Message from server:", data);
+        console.log("Message from server from Host Game:", data);
 
         if (data.roomCode) {
           setRoomCode(data.roomCode);
-          navigate(`/${data.roomCode}`, { state: { role: "host" } });
+          dispatch(setRole("host")); // Set role as host in Redux
+          navigate(`/${data.roomCode}`);
         } else {
           console.error("Room code not received from server:", data);
         }

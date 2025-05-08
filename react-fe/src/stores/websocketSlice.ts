@@ -4,12 +4,14 @@ let webSocket: WebSocket | null = null; // Store WebSocket instance outside Redu
 
 interface WebSocketState {
   isConnected: boolean;
-  messages: any[]; // Store received messages
+  messages: any[];
+  role: string | null; // Add role to the state
 }
 
 const initialState: WebSocketState = {
   isConnected: false,
   messages: [],
+  role: null, // Initialize role as null
 };
 
 const websocketSlice = createSlice({
@@ -27,7 +29,11 @@ const websocketSlice = createSlice({
         webSocket.close();
         webSocket = null;
         state.isConnected = false;
+        state.role = null; // Reset role on disconnect
       }
+    },
+    setRole: (state, action: PayloadAction<string>) => {
+      state.role = action.payload; // Set the role
     },
     addMessage: (state, action: PayloadAction<any>) => {
       state.messages.push(action.payload);
@@ -35,7 +41,7 @@ const websocketSlice = createSlice({
   },
 });
 
-export const { connect, disconnect, addMessage } = websocketSlice.actions;
+export const { connect, disconnect, setRole, addMessage } = websocketSlice.actions;
 export default websocketSlice.reducer;
 
 // Export the WebSocket instance for use in components
