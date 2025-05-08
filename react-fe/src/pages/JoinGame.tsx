@@ -1,5 +1,9 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
+import { connect, disconnect, setRole } from "../stores/websocketSlice";
+import { useDispatch, useSelector } from "react-redux";
 
+import { RootState } from "../stores/store";
+import { getWebSocket } from "../stores/websocketSlice";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -7,6 +11,8 @@ export default function JoinGame() {
   const [roomCode, setRoomCode] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
 
   const handleJoinGame = () => {
     if (!roomCode.trim()) {
@@ -14,42 +20,51 @@ export default function JoinGame() {
       return;
     }
 
-    // Establish WebSocket connection
-    const ws = new WebSocket("ws://localhost:8080/ws");
+    // Establish WebSocket connection if not already connected
+    if (!isConnected) {
+      dispatch(connect("ws://localhost:8080/ws"));
+    }
 
-    ws.onopen = () => {
-      console.log("WebSocket connection established.");
+    const webSocket = getWebSocket();
+    if (webSocket) {
+      webSocket.onopen = () => {
+        console.log("WebSocket connection established.");
 
-      // Send joinLobby action to validate the room
-      ws.send(
-        JSON.stringify({
-          action: "validateRoom",
-          roomCode: roomCode,
-        })
-      );
-    };
+        // Send joinLobby action to validate the room
+        webSocket.send(
+          JSON.stringify({
+            action: "validateRoom",
+            roomCode: roomCode,
+          })
+        );
+      };
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      webSocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
 
-      if (data.error) {
-        // Handle error from the backend
-        setError(data.error);
-        ws.close();
-      } else if (data.message === "Room exists") {
-        // Redirect to the room as a player
-        navigate(`/room/${roomCode}?role=player`);
-      }
-    };
+        if (data.error) {
+          // Handle error from the backend
+          setError(data.error);
+          webSocket.close();
+          dispatch(disconnect());
+        } else if (data.message === "Room exists") {
+          // Set role as player in Redux and navigate to the room
+          dispatch(setRole("player"));
+          navigate(`/${roomCode}`);
+        }
+      };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      setError("Failed to connect to the server. Please try again.");
-    };
+      webSocket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        setError("Failed to connect to the server. Please try again.");
+        dispatch(disconnect());
+      };
 
-    ws.onclose = () => {
-      console.log("WebSocket connection closed.");
-    };
+      webSocket.onclose = () => {
+        console.log("WebSocket connection closed.");
+        dispatch(disconnect());
+      };
+    }
   };
 
   return (
