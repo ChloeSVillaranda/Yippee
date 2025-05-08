@@ -31,12 +31,14 @@ type Lobby struct {
 
 // Message structure
 type Message struct {
-	Action   string `json:"action"`
-	RoomCode string `json:"roomCode,omitempty"`
-	QuizName string `json:"quizName,omitempty"`
-	Message  string `json:"message,omitempty"`
-	Error    string `json:"error,omitempty"`
-	Role     string `json:"role,omitempty"`
+	Action   string   `json:"action"`
+	RoomCode string   `json:"roomCode,omitempty"`
+	QuizName string   `json:"quizName,omitempty"`
+	Message  string   `json:"message,omitempty"`
+	Error    string   `json:"error,omitempty"`
+	Role     string   `json:"role,omitempty"`
+	Players  []string `json:"players,omitempty"`
+	Host     string   `json:"host,omitempty"`
 }
 
 // Handle WebSocket connections
@@ -61,6 +63,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		// define all websocket commands
 		switch data.Action {
 		case "createLobby":
 			handleCreateLobby(conn, data)
@@ -78,7 +81,7 @@ func handleCreateLobby(conn *websocket.Conn, data Message) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	// create random room code (4 letters)
+	// Create random room code (4 letters)
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	var roomCode string
 	for {
@@ -94,7 +97,7 @@ func handleCreateLobby(conn *websocket.Conn, data Message) {
 	}
 	fmt.Println("The roomCode is defined as:", roomCode)
 
-	// create a new lobby room
+	// Create a new lobby room
 	lobbies[roomCode] = &Lobby{
 		RoomCode: roomCode,
 		QuizName: data.QuizName,
@@ -104,7 +107,7 @@ func handleCreateLobby(conn *websocket.Conn, data Message) {
 
 	log.Printf("Lobby created: %+v\n", lobbies[roomCode])
 
-	// send info back to client
+	// Send info back to client
 	conn.WriteJSON(Message{
 		Action:   "createLobby",
 		Message:  "Lobby created successfully",
@@ -113,7 +116,7 @@ func handleCreateLobby(conn *websocket.Conn, data Message) {
 	})
 }
 
-// joins an existing lobby by sending the room code
+// Joins an existing lobby by sending the room code
 func handleJoinLobby(conn *websocket.Conn, data Message) {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -137,7 +140,7 @@ func handleJoinLobby(conn *websocket.Conn, data Message) {
 		log.Printf("Client joined lobby: %s\n", data.RoomCode)
 	}
 
-	// Send the role back to the client
+	// Send the role back to the joining client
 	conn.WriteJSON(Message{
 		Action:   "joinLobby",
 		Message:  "Joined lobby successfully",
@@ -145,16 +148,44 @@ func handleJoinLobby(conn *websocket.Conn, data Message) {
 		Role:     role,
 	})
 
-	// Notify the host that a new client joined (only if the joining connection is not the host)
-	if role == "player" && lobby.Host != nil {
-		lobby.Host.WriteJSON(Message{
-			Action:  "joinLobby",
-			Message: "A new player has joined the lobby",
-		})
+	// Notify all clients (including the host) about the updated list of players
+	notifyLobbyClients(lobby)
+}
+
+// Notify all clients in the lobby about the current state of the lobby
+func notifyLobbyClients(lobby *Lobby) {
+	// Prepare the list of connected players
+	players := []string{}
+	for client := range lobby.Clients {
+		players = append(players, client.RemoteAddr().String())
+	}
+
+	// Include the host in the list
+	host := ""
+	if lobby.Host != nil {
+		host = lobby.Host.RemoteAddr().String()
+	}
+
+	// Broadcast the updated lobby state to all clients
+	message := Message{
+		Action:   "updateLobby",
+		Message:  "Lobby updated",
+		RoomCode: lobby.RoomCode,
+		QuizName: lobby.QuizName,
+		Players:  players,
+		Host:     host,
+	}
+
+	// Send the message to all clients
+	if lobby.Host != nil {
+		lobby.Host.WriteJSON(message)
+	}
+	for client := range lobby.Clients {
+		client.WriteJSON(message)
 	}
 }
 
-// handle room validation
+// Handle room validation
 func handleValidateRoom(conn *websocket.Conn, data Message) {
 	mutex.Lock()
 	defer mutex.Unlock()

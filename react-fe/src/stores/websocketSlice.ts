@@ -1,17 +1,17 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-let webSocket: WebSocket | null = null; // Store WebSocket instance outside Redux state
+let webSocket: WebSocket | null = null;
 
 interface WebSocketState {
   isConnected: boolean;
-  messages: any[];
-  role: string | null; // Add role to the state
+  messages: any[]; // Store received messages
+  role: string | null;
 }
 
 const initialState: WebSocketState = {
   isConnected: false,
   messages: [],
-  role: null, // Initialize role as null
+  role: null,
 };
 
 const websocketSlice = createSlice({
@@ -22,6 +22,29 @@ const websocketSlice = createSlice({
       if (!webSocket) {
         webSocket = new WebSocket(action.payload);
         state.isConnected = true;
+
+        // Set up global message listener
+        webSocket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          console.log("Message received:", data);
+
+          // Handle specific actions
+          if (data.action === "updateLobby") {
+            console.log("Lobby updated:", data);
+          }
+        };
+
+        webSocket.onclose = () => {
+          console.log("WebSocket connection closed.");
+          state.isConnected = false;
+          webSocket = null;
+        };
+
+        webSocket.onerror = (error) => {
+          console.error("WebSocket error:", error);
+          state.isConnected = false;
+          webSocket = null;
+        };
       }
     },
     disconnect: (state) => {
@@ -29,11 +52,10 @@ const websocketSlice = createSlice({
         webSocket.close();
         webSocket = null;
         state.isConnected = false;
-        state.role = null; // Reset role on disconnect
       }
     },
     setRole: (state, action: PayloadAction<string>) => {
-      state.role = action.payload; // Set the role
+      state.role = action.payload;
     },
     addMessage: (state, action: PayloadAction<any>) => {
       state.messages.push(action.payload);

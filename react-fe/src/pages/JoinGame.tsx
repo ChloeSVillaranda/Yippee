@@ -27,17 +27,18 @@ export default function JoinGame() {
 
     const webSocket = getWebSocket();
     if (webSocket) {
-      webSocket.onopen = () => {
-        console.log("WebSocket connection established.");
-
-        // Send joinLobby action to validate the room
-        webSocket.send(
-          JSON.stringify({
-            action: "validateRoom",
-            roomCode: roomCode,
-          })
-        );
-      };
+      if (webSocket.readyState === WebSocket.CONNECTING) {
+        // Wait for the WebSocket connection to open
+        webSocket.onopen = () => {
+          console.log("WebSocket connection established.");
+          sendJoinLobbyMessage(webSocket);
+        };
+      } else if (webSocket.readyState === WebSocket.OPEN) {
+        // If already open, send the joinLobby message
+        sendJoinLobbyMessage(webSocket);
+      } else {
+        setError("WebSocket connection is not available. Please try again.");
+      }
 
       webSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -47,24 +48,33 @@ export default function JoinGame() {
           setError(data.error);
           webSocket.close();
           dispatch(disconnect());
-        } else if (data.message === "Room exists") {
+        } else if (data.message === "Joined lobby successfully") {
           // Set role as player in Redux and navigate to the room
           dispatch(setRole("player"));
           navigate(`/${roomCode}`);
         }
       };
 
-      webSocket.onerror = (error) => {
-        console.error("WebSocket error:", error);
-        setError("Failed to connect to the server. Please try again.");
-        dispatch(disconnect());
-      };
-
       webSocket.onclose = () => {
         console.log("WebSocket connection closed.");
         dispatch(disconnect());
       };
+
+      webSocket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        setError("An error occurred with the WebSocket connection.");
+        dispatch(disconnect());
+      };
     }
+  };
+
+  const sendJoinLobbyMessage = (webSocket: WebSocket) => {
+    webSocket.send(
+      JSON.stringify({
+        action: "joinLobby",
+        roomCode: roomCode,
+      })
+    );
   };
 
   return (

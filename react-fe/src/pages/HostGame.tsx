@@ -24,14 +24,19 @@ export default function HostGame() {
       alert("Please select a quiz first!");
       return;
     }
-
+  
+    // Establish WebSocket connection if not already connected
     if (!isConnected) {
       dispatch(connect("ws://localhost:8080/ws"));
     }
-
+  
     const webSocket = getWebSocket();
     if (webSocket) {
+      // Wait for the WebSocket connection to open
       webSocket.onopen = () => {
+        console.log("WebSocket connection established.");
+  
+        // Send the createLobby message
         webSocket.send(
           JSON.stringify({
             action: "createLobby",
@@ -39,11 +44,11 @@ export default function HostGame() {
           })
         );
       };
-
+  
       webSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         console.log("Message from server from Host Game:", data);
-
+  
         if (data.roomCode) {
           setRoomCode(data.roomCode);
           dispatch(setRole("host")); // Set role as host in Redux
@@ -52,14 +57,14 @@ export default function HostGame() {
           console.error("Room code not received from server:", data);
         }
       };
-
+  
       webSocket.onclose = () => {
         console.log("WebSocket connection closed");
         dispatch(disconnect());
       };
     }
   };
-
+  
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom>
