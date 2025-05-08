@@ -9,6 +9,7 @@ import { useState } from "react";
 
 export default function JoinGame() {
   const [roomCode, setRoomCode] = useState("");
+  const [playerName, setPlayerName] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -17,6 +18,11 @@ export default function JoinGame() {
   const handleJoinGame = () => {
     if (!roomCode.trim()) {
       setError("Room code cannot be empty");
+      return;
+    }
+
+    if (!playerName.trim()) {
+      setError("Player name cannot be empty");
       return;
     }
 
@@ -73,6 +79,7 @@ export default function JoinGame() {
       JSON.stringify({
         action: "joinLobby",
         roomCode: roomCode,
+        playerName: playerName, // Include player name in the message
       })
     );
   };
@@ -82,6 +89,15 @@ export default function JoinGame() {
       <Typography variant="h4" gutterBottom>
         Join a Game
       </Typography>
+      <TextField
+        id="player-name"
+        label="Enter Your Name"
+        variant="outlined"
+        fullWidth
+        value={playerName}
+        onChange={(e) => setPlayerName(e.target.value)}
+        sx={{ marginBottom: 2 }}
+      />
       <TextField
         id="room-code"
         label="Enter Room Code"
