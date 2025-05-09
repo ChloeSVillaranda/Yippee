@@ -1,14 +1,24 @@
 import { Box, Button, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 
 import { RootState } from "../stores/store";
 import { getWebSocket } from "../stores/websocketSlice";
-import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+
+interface Player {
+  playerName: string;
+}
+
+interface Host {
+  hostName: string;
+}
 
 export default function LobbyRoom() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const role = useSelector((state: RootState) => state.websocket.role); // Get role from Redux
+  const [players, setPlayers] = useState<Player[]>([]); // State to store players
+  const [host, setHost] = useState<Host | null>(null); // State to store host
 
   useEffect(() => {
     const webSocket = getWebSocket();
@@ -18,6 +28,11 @@ export default function LobbyRoom() {
         const data = JSON.parse(event.data);
 
         console.log("Message from server from LobbyRoom:", data);
+
+        if (data.action === "updateLobby") {
+          setPlayers(data.players || []); // Update players list
+          setHost(data.host || null); // Update host
+        }
       };
 
       webSocket.onclose = () => {
@@ -31,6 +46,28 @@ export default function LobbyRoom() {
       <Typography variant="h4" gutterBottom>
         Room: {roomCode}
       </Typography>
+      {/* quiz displayed for players to see */}
+      <Typography variant="h5" gutterBottom>
+        Quiz: {host?.hostName || "Loading..."}
+      </Typography>
+      {/* host displayed */}
+      <Typography variant="h5" gutterBottom>
+        Host: {host?.hostName || "Loading..."}
+      </Typography>
+      <Typography variant="h6" gutterBottom>
+        Players:
+      </Typography>
+      <Box>
+        {players.length > 0 ? (
+          players.map((player, index) => (
+            <Typography key={index} variant="body1">
+              {player.playerName}
+            </Typography>
+          ))
+        ) : (
+          <Typography variant="body1">No players connected yet.</Typography>
+        )}
+      </Box>
       {role === "host" ? (
         <Box>
           <Typography variant="h5" gutterBottom>

@@ -1,5 +1,6 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { connect, disconnect, setRole } from "../stores/websocketSlice";
+import { executeWebSocketCommand, setupWebSocketHandlers } from "../util/websocketUtil";
 import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "../stores/store";
@@ -16,73 +17,54 @@ export default function JoinGame() {
   const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
 
   const handleJoinGame = () => {
+    // input room code
     if (!roomCode.trim()) {
       setError("Room code cannot be empty");
       return;
     }
 
+    // input player name
     if (!playerName.trim()) {
       setError("Player name cannot be empty");
       return;
     }
 
-    // Establish WebSocket connection if not already connected
+    // establish WebSocket connection if not already connected
     if (!isConnected) {
       dispatch(connect("ws://localhost:8080/ws"));
     }
 
-    const webSocket = getWebSocket();
-    if (webSocket) {
-      if (webSocket.readyState === WebSocket.CONNECTING) {
-        // Wait for the WebSocket connection to open
-        webSocket.onopen = () => {
-          console.log("WebSocket connection established.");
-          sendJoinLobbyMessage(webSocket);
-        };
-      } else if (webSocket.readyState === WebSocket.OPEN) {
-        // If already open, send the joinLobby message
-        sendJoinLobbyMessage(webSocket);
-      } else {
-        setError("WebSocket connection is not available. Please try again.");
-      }
+    // Execute the "createLobby" WebSocket command
+    executeWebSocketCommand(
+      "joinLobby",
+      { roomCode: roomCode, playerName: playerName },
+      (errorMessage) => setError(errorMessage) // Error callback
+    );
 
-      webSocket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
+    // Set up WebSocket event handlers
+    setupWebSocketHandlers(
+      (data) => {
+        console.log("Message from server for Join Game:", data);
 
-        if (data.error) {
-          // Handle error from the backend
-          setError(data.error);
-          webSocket.close();
-          dispatch(disconnect());
-        } else if (data.message === "Joined lobby successfully") {
-          // Set role as player in Redux and navigate to the room
-          dispatch(setRole("player"));
-          navigate(`/${roomCode}`);
+        if (data.roomCode) {
+          dispatch(setRole("player")); // set role as player in Redux
+          navigate(`/${data.roomCode}`);
+        } else {
+          setError("Could not connect to the server.");
+          console.error("Could not connect to the server:", data);
         }
-      };
-
-      webSocket.onclose = () => {
-        console.log("WebSocket connection closed.");
+      },
+      () => {
         dispatch(disconnect());
-      };
-
-      webSocket.onerror = (error) => {
-        console.error("WebSocket error:", error);
+      },
+      (error) => {
         setError("An error occurred with the WebSocket connection.");
         dispatch(disconnect());
-      };
-    }
+      }
+    );
+    
   };
 
-  const sendJoinLobbyMessage = (webSocket: WebSocket) => {
-    webSocket.send(
-      JSON.stringify({
-        action: "joinLobby",
-        roomCode: roomCode,
-        playerName: playerName, // Include player name in the message
-      })
-    );
-  };
 
   return (
     <Box sx={{ padding: 4, maxWidth: 400, margin: "0 auto", textAlign: "center" }}>

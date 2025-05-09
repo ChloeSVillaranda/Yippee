@@ -4,7 +4,7 @@ let webSocket: WebSocket | null = null;
 
 interface WebSocketState {
   isConnected: boolean;
-  messages: any[]; // Store received messages
+  messages: any[];
   role: string | null;
 }
 

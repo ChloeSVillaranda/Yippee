@@ -83,6 +83,8 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleJoinLobby(conn, data)
 		case "validateRoom":
 			handleValidateRoom(conn, data)
+		case "notifyLobby":
+			handleNotifyPlayers(conn, data)
 		default:
 			log.Println("Unknown action:", data.Action)
 		}
@@ -161,7 +163,7 @@ func handleJoinLobby(conn *websocket.Conn, data Message) {
 
 	// Include the host in the response
 	host := Host{
-		HostName: "Host", // Replace with actual host name if available
+		HostName: data.PlayerName, // Use the actual host name if available
 	}
 
 	// Send the role back to the joining client and who is in the lobby
@@ -208,6 +210,24 @@ func notifyLobbyClients(lobby *Lobby) {
 	for client := range lobby.Clients {
 		client.WriteJSON(message)
 	}
+}
+
+// Handle notifying all players in a lobby
+func handleNotifyPlayers(conn *websocket.Conn, data Message) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	lobby, exists := lobbies[data.RoomCode]
+	if !exists {
+		conn.WriteJSON(Message{
+			Action: "notifyLobby",
+			Error:  "Lobby not found",
+		})
+		return
+	}
+
+	// Notify all clients (including the host) about the updated list of players
+	notifyLobbyClients(lobby)
 }
 
 // Handle room validation
