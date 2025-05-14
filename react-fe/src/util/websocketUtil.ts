@@ -80,7 +80,7 @@ const callCommandFunction = (
   const commandMap: Record<string, Function> = {
     createLobby: sendCreateLobbyMessage,
     joinLobby: sendJoinLobbyMessage,
-    notifyPlayers: sendLobbyMessage,
+    sendLobbyMessage: sendLobbyMessage,
   };
 
   const commandFunction = commandMap[command];

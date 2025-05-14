@@ -29,6 +29,7 @@ const websocketSlice = createSlice({
           console.log("Message received:", data);
 
           // Handle specific actions
+          // TODO: can probably remove??
           if (data.action === "updateLobby") {
             console.log("Lobby updated:", data);
           }

@@ -1,5 +1,7 @@
 // this file stores all of the different types of WebSocket message functions that will be used to make certain calls to the backend.
 
+import { Player } from "../stores/types";
+
 /**
  * Create a new lobby.
  * @param webSocket - The WebSocket connection.
@@ -29,13 +31,20 @@ export const sendCreateLobbyMessage = (
 export const sendJoinLobbyMessage = (
   webSocket: WebSocket,
   roomCode: string,
-  playerName: string
+  player: Player,
 ) => {
+  console.log(
+    JSON.stringify({
+      action: "joinLobby",
+      roomCode: roomCode,
+      player: player,
+    })
+  )
   webSocket.send(
     JSON.stringify({
       action: "joinLobby",
       roomCode: roomCode,
-      playerName: playerName,
+      player: player,
     })
   );
 };
@@ -50,15 +59,17 @@ export const sendJoinLobbyMessage = (
 export const sendLobbyMessage = (
   webSocket: WebSocket,
   roomCode: string,
-  senderName: string,
   message: string
 ) => {
+  const player: Player{playerMessage: message}
+  console.log(
+
+  )
   webSocket.send(
     JSON.stringify({
-      action: "notifyPlayers",
+      action: "sendLobbyMessage",
       roomCode: roomCode,
-      senderName: senderName,
-      message: message,
+      playerMessage: message,
     })
   );
 };

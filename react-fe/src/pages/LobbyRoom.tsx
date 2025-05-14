@@ -1,20 +1,11 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
+import { Host, Player } from "../stores/types";
+import { executeWebSocketCommand, setupWebSocketHandlers } from "../util/websocketUtil";
 import { useEffect, useState } from "react";
 
 import { RootState } from "../stores/store";
-import { setupWebSocketHandlers } from "../util/websocketUtil";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-
-interface Player {
-  playerName: string;
-  playerMessage: string;
-}
-
-interface Host {
-  hostName: string;
-  hostMessage: string;
-}
 
 export default function LobbyRoom() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -22,6 +13,7 @@ export default function LobbyRoom() {
   const [players, setPlayers] = useState<Player[]>([]); // state to store players
   const [host, setHost] = useState<Host | null>(null); // state to store host
   const [lobbyMessage, setLobbyMessage] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // set up WebSocket event handlers
@@ -50,7 +42,12 @@ export default function LobbyRoom() {
         console.log("can not be set empty");
         return;
     }
-    
+    // execute the "createLobby" WebSocket command
+    executeWebSocketCommand(
+        "sendLobbyMessage",
+        { roomCode: roomCode, playerMessage: lobbyMessage },
+        (errorMessage) => setError(errorMessage) // Error callback
+    );
   }
 
   return (
@@ -83,6 +80,11 @@ export default function LobbyRoom() {
           <Typography variant="body1">No players connected yet.</Typography>
         )}
       </Box>
+      {error && (
+        <Typography color="error" sx={{ marginBottom: 2 }}>
+          {error}
+        </Typography>
+      )}
       {role === "host" ? (
         <Box>
           <Typography variant="h5" gutterBottom>
@@ -107,7 +109,7 @@ export default function LobbyRoom() {
         </Box>
         {/* TODO: add restrictions on the messages you can send*/}
         <TextField id="message" label="Type Message" variant="outlined" fullWidth value={lobbyMessage} 
-        onChange={(e) => setLobbyMessage(e.target.value.toUpperCase())} sx={{ marginBottom: 2 }}/>
+        onChange={(e) => setLobbyMessage(e.target.value)} sx={{ marginBottom: 2 }}/>
         <Button variant="contained" color="primary" onClick={handleSendMessage} fullWidth>
             Send Message
         </Button>

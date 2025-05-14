@@ -2,6 +2,7 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { disconnect, setRole } from "../stores/websocketSlice";
 import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
 
+import { Player } from "../stores/types";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -28,10 +29,16 @@ export default function JoinGame() {
       return;
     }
 
+    // Create a Player object
+    const player: Player = {
+      playerName: playerName,
+      playerMessage: "", // Default message is empty
+    };
+
     // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
       "joinLobby",
-      { roomCode: roomCode, playerName: playerName },
+      { roomCode: roomCode, player: player },
       (errorMessage) => setError(errorMessage) // Error callback
     );
 

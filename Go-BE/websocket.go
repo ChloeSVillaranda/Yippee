@@ -31,21 +31,21 @@ type Lobby struct {
 
 // Message structure
 type Message struct {
-	Action     string   `json:"action"`
-	RoomCode   string   `json:"roomCode,omitempty"`
-	QuizName   string   `json:"quizName,omitempty"`
-	Message    string   `json:"message,omitempty"`
-	Error      string   `json:"error,omitempty"`
-	Role       string   `json:"role,omitempty"`
-	PlayerName string   `json:"playerName,omitempty"`
-	Players    []Player `json:"players,omitempty"`
-	Host       Host     `json:"host,omitempty"`
+	Action   string   `json:"action"`
+	RoomCode string   `json:"roomCode,omitempty"`
+	QuizName string   `json:"quizName,omitempty"`
+	Message  string   `json:"message,omitempty"`
+	Error    string   `json:"error,omitempty"`
+	Role     string   `json:"role,omitempty"`
+	Players  []Player `json:"players,omitempty"`
+	Player   Player   `json:"player,omitempty"`
+	Host     Host     `json:"host,omitempty"`
 }
 
 // Player structure
 type Player struct {
 	PlayerName    string `json:"playerName"`
-	PlayerMessage string `json:"playerMessage,omitempty"`
+	PlayerMessage string `json:"playerMessage"`
 }
 
 // Host structure
@@ -85,9 +85,9 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleJoinLobby(conn, data)
 		case "validateRoom":
 			handleValidateRoom(conn, data)
-		case "notifyLobby": // need to fix, call this to let the joined
-			// user know who has already joined the lobby
-			handleNotifyPlayers(conn, data)
+		// case "notifyLobby": // need to fix, call this to let the joined
+		// 	// user know who has already joined the lobby
+		// 	handleNotifyPlayers(conn, data)
 		case "sendLobbyMessage":
 			handleSendLobbyMessage(conn, data)
 		default:
@@ -156,8 +156,12 @@ func handleJoinLobby(conn *websocket.Conn, data Message) {
 		role = "host"
 	} else {
 		role = "player"
-		lobby.Clients[conn] = Player{PlayerName: data.PlayerName} // Add the client to the lobby
-		log.Printf("Client joined lobby: %s with name: %s\n", data.RoomCode, data.PlayerName)
+		// Add the player to the lobby's clients map
+		lobby.Clients[conn] = Player{
+			PlayerName:    data.Player.PlayerName,
+			PlayerMessage: data.Player.PlayerMessage, // Default is empty if not provided
+		}
+		log.Printf("Client joined lobby: %s with name: %s\n", data.RoomCode, data.Player.PlayerName)
 	}
 
 	// Prepare the list of connected players
@@ -168,7 +172,7 @@ func handleJoinLobby(conn *websocket.Conn, data Message) {
 
 	// Include the host in the response
 	host := Host{
-		HostName: data.PlayerName, // Use the actual host name if available
+		HostName: lobby.Host.RemoteAddr().String(), // Use the host's connection address or name
 	}
 
 	// Send the role back to the joining client and who is in the lobby
