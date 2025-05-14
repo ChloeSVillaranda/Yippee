@@ -1,10 +1,9 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { connect, disconnect, setRole } from "../stores/websocketSlice";
-import { executeWebSocketCommand, setupWebSocketHandlers } from "../util/websocketUtil";
-import { useDispatch, useSelector } from "react-redux";
+import { disconnect, setRole } from "../stores/websocketSlice";
+import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
 
-import { RootState } from "../stores/store";
 import SelectQuiz from "../components/SelectQuiz";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -15,7 +14,7 @@ export default function HostGame() {
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
+  useCheckConnection();
 
   const handleSelectQuiz = (quizName: string) => {
     setSelectedQuiz(quizName);
@@ -32,11 +31,6 @@ export default function HostGame() {
     if (!selectedQuiz) {
       setError("Please select a quiz first!");
       return;
-    }
-
-    // Establish WebSocket connection if not already connected
-    if (!isConnected) {
-      dispatch(connect("ws://localhost:8080/ws"));
     }
 
     // Execute the "createLobby" WebSocket command

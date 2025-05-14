@@ -44,12 +44,14 @@ type Message struct {
 
 // Player structure
 type Player struct {
-	PlayerName string `json:"playerName"`
+	PlayerName    string `json:"playerName"`
+	PlayerMessage string `json:"playerMessage,omitempty"`
 }
 
 // Host structure
 type Host struct {
-	HostName string `json:"hostName"`
+	HostName    string `json:"hostName"`
+	HostMessage string `json:"playerMessage,omitempty"`
 }
 
 // Handle WebSocket connections
@@ -83,8 +85,11 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleJoinLobby(conn, data)
 		case "validateRoom":
 			handleValidateRoom(conn, data)
-		case "notifyLobby":
+		case "notifyLobby": // need to fix, call this to let the joined
+			// user know who has already joined the lobby
 			handleNotifyPlayers(conn, data)
+		case "sendLobbyMessage":
+			handleSendLobbyMessage(conn, data)
 		default:
 			log.Println("Unknown action:", data.Action)
 		}
@@ -275,4 +280,67 @@ func removeConnectionFromLobby(conn *websocket.Conn) {
 			return
 		}
 	}
+}
+
+// Notify all clients in the lobby about the current state of the lobby
+func sendMessageToLobby(lobby *Lobby) {
+	// Prepare the list of connected players
+	players := []Player{}
+	for _, player := range lobby.Clients {
+		players = append(players, player)
+	}
+
+	// Include the host in the response
+	host := Host{
+		HostName: "Host", // Replace with actual host name if available
+	}
+
+	// Broadcast the updated lobby state to all clients
+	message := Message{
+		Action:  "sendLobbyMessage",
+		Message: "Message from person sent to the lobby",
+		Players: players,
+		Host:    host,
+	}
+
+	// Send the message to all clients
+	if lobby.Host != nil {
+		lobby.Host.WriteJSON(message)
+	}
+	for client := range lobby.Clients {
+		client.WriteJSON(message)
+	}
+}
+
+func handleSendLobbyMessage(conn *websocket.Conn, data Message) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	lobby, exists := lobbies[data.RoomCode]
+	if !exists {
+		conn.WriteJSON(Message{
+			Action: "sendLobbyMessage",
+			Error:  "Lobby not found",
+		})
+		return
+	}
+
+	// Find the player in the lobby
+	player, exists := lobby.Clients[conn]
+	if !exists {
+		conn.WriteJSON(Message{
+			Action: "updatePlayerMessage",
+			Error:  "Player not found in the lobby",
+		})
+		return
+	}
+
+	// Update the player's message
+	player.PlayerMessage = data.Message
+	lobby.Clients[conn] = player // Update the map with the modified player
+
+	log.Printf("Updated message for player %s in lobby %s: %s\n", player.PlayerName, data.RoomCode, data.Message)
+
+	// notify all clients in the lobby about the updated state
+	notifyLobbyClients(lobby)
 }

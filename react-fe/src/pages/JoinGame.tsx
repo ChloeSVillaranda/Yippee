@@ -1,10 +1,8 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { connect, disconnect, setRole } from "../stores/websocketSlice";
-import { executeWebSocketCommand, setupWebSocketHandlers } from "../util/websocketUtil";
-import { useDispatch, useSelector } from "react-redux";
+import { disconnect, setRole } from "../stores/websocketSlice";
+import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
 
-import { RootState } from "../stores/store";
-import { getWebSocket } from "../stores/websocketSlice";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -14,7 +12,8 @@ export default function JoinGame() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
+  useCheckConnection();
+
 
   const handleJoinGame = () => {
     // input room code
@@ -29,19 +28,14 @@ export default function JoinGame() {
       return;
     }
 
-    // establish WebSocket connection if not already connected
-    if (!isConnected) {
-      dispatch(connect("ws://localhost:8080/ws"));
-    }
-
-    // Execute the "createLobby" WebSocket command
+    // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
       "joinLobby",
       { roomCode: roomCode, playerName: playerName },
       (errorMessage) => setError(errorMessage) // Error callback
     );
 
-    // Set up WebSocket event handlers
+    // set up WebSocket event handlers
     setupWebSocketHandlers(
       (data) => {
         console.log("Message from server for Join Game:", data);
@@ -62,7 +56,6 @@ export default function JoinGame() {
         dispatch(disconnect());
       }
     );
-    
   };
 
 
@@ -86,7 +79,7 @@ export default function JoinGame() {
         variant="outlined"
         fullWidth
         value={roomCode}
-        onChange={(e) => setRoomCode(e.target.value.toUpperCase())} // Convert to uppercase
+        onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
         sx={{ marginBottom: 2 }}
       />
       {error && (

@@ -1,10 +1,26 @@
+import { connect, disconnect, setRole } from "../stores/websocketSlice";
 import {
   sendCreateLobbyMessage,
   sendJoinLobbyMessage,
   sendLobbyMessage,
 } from "./websocketMessages";
+import { useDispatch, useSelector } from "react-redux";
 
+import { RootState } from "../stores/store";
 import { getWebSocket } from "../stores/websocketSlice";
+
+/**
+ * Checks if there is a websocket connection to the backend.
+ * Create a connection if non-existent
+ */
+export const useCheckConnection = () => {
+  const dispatch = useDispatch();
+  const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
+  // Establish WebSocket connection if not already connected
+  if (!isConnected) {
+    dispatch(connect("ws://localhost:8080/ws"));
+  }
+}
 
 /**
  * Executes a WebSocket command by automatically retrieving the WebSocket instance
@@ -45,6 +61,7 @@ export const executeWebSocketCommand = (
     }
   }
 };
+
 
 /**
  * Calls the respective WebSocket message function based on the command.

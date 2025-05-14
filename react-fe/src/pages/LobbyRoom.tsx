@@ -1,45 +1,57 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import { RootState } from "../stores/store";
-import { getWebSocket } from "../stores/websocketSlice";
+import { setupWebSocketHandlers } from "../util/websocketUtil";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 interface Player {
   playerName: string;
+  playerMessage: string;
 }
 
 interface Host {
   hostName: string;
+  hostMessage: string;
 }
 
 export default function LobbyRoom() {
   const { roomCode } = useParams<{ roomCode: string }>();
-  const role = useSelector((state: RootState) => state.websocket.role); // Get role from Redux
-  const [players, setPlayers] = useState<Player[]>([]); // State to store players
-  const [host, setHost] = useState<Host | null>(null); // State to store host
+  const role = useSelector((state: RootState) => state.websocket.role); // get role from Redux
+  const [players, setPlayers] = useState<Player[]>([]); // state to store players
+  const [host, setHost] = useState<Host | null>(null); // state to store host
+  const [lobbyMessage, setLobbyMessage] = useState("");
 
   useEffect(() => {
-    const webSocket = getWebSocket();
-
-    if (webSocket) {
-      webSocket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        console.log("Message from server from LobbyRoom:", data);
+    // set up WebSocket event handlers
+    setupWebSocketHandlers(
+        (data) => {
+        console.log("Message from server for Lobby Game:", data);
 
         if (data.action === "updateLobby") {
-          setPlayers(data.players || []); // Update players list
+        setPlayers(data.players || []); // Update players list
           setHost(data.host || null); // Update host
+        } else {
+            console.error("Could not connect to the server:", data);
         }
-      };
-
-      webSocket.onclose = () => {
-        console.log("WebSocket connection closed");
-      };
-    }
+        },
+        () => {
+        },
+        (error) => {
+        }
+    );
+    
   }, []);
+
+  const handleSendMessage = () => {
+    // send a message to be displayed to the lobby
+    if (!lobbyMessage.trim()) {
+        console.log("can not be set empty");
+        return;
+    }
+    
+  }
 
   return (
     <Box sx={{ padding: 4 }}>
@@ -60,9 +72,12 @@ export default function LobbyRoom() {
       <Box>
         {players.length > 0 ? (
           players.map((player, index) => (
-            <Typography key={index} variant="body1">
-              {player.playerName}
-            </Typography>
+            <>
+        <Typography key={index} variant="body1">
+            {player.playerName}
+            {player.playerMessage && `: ${player.playerMessage}`}
+        </Typography>
+            </>
           ))
         ) : (
           <Typography variant="body1">No players connected yet.</Typography>
@@ -81,6 +96,7 @@ export default function LobbyRoom() {
           </Button>
         </Box>
       ) : role === "player" ? (
+        <>
         <Box>
           <Typography variant="h5" gutterBottom>
             Player View
@@ -89,6 +105,13 @@ export default function LobbyRoom() {
             You are a player. Wait for the host to start the game.
           </Typography>
         </Box>
+        {/* TODO: add restrictions on the messages you can send*/}
+        <TextField id="message" label="Type Message" variant="outlined" fullWidth value={lobbyMessage} 
+        onChange={(e) => setLobbyMessage(e.target.value.toUpperCase())} sx={{ marginBottom: 2 }}/>
+        <Button variant="contained" color="primary" onClick={handleSendMessage} fullWidth>
+            Send Message
+        </Button>
+        </>
       ) : (
         <Typography variant="body1">Loading...</Typography>
       )}
