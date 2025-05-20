@@ -55,16 +55,13 @@ const websocketSlice = createSlice({
         state.isConnected = false;
       }
     },
-    setRole: (state, action: PayloadAction<string>) => {
-      state.role = action.payload;
-    },
     addMessage: (state, action: PayloadAction<any>) => {
       state.messages.push(action.payload);
     },
   },
 });
 
-export const { connect, disconnect, setRole, addMessage } = websocketSlice.actions;
+export const { connect, disconnect, addMessage } = websocketSlice.actions;
 export default websocketSlice.reducer;
 
 // Export the WebSocket instance for use in components

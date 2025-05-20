@@ -1,8 +1,9 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { disconnect, setRole } from "../stores/websocketSlice";
 import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
 
 import SelectQuiz from "../components/SelectQuiz";
+import { disconnect } from "../stores/websocketSlice";
+import { setRole } from "../stores/gameSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
