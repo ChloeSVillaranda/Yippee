@@ -76,6 +76,7 @@ export default function LobbyRoom() {
       {/* host displayed */}
       <Typography variant="h5" gutterBottom>
         Host: {clientsInLobby.find((user) => user.userRole === "host")?.userName || "Loading..."}
+        {clientsInLobby.find((user) => user.userRole === "host")?.userMessage && `: ${clientsInLobby.find((user) => user.userRole === "host")?.userMessage}`}
       </Typography>
       <Typography variant="h6" gutterBottom>
         Players:
@@ -94,6 +95,12 @@ export default function LobbyRoom() {
           <Typography variant="body1">No players connected yet.</Typography>
         )}
       </Box>
+        {/* TODO: add restrictions on the messages you can send*/}
+        <TextField id="message" label="Type Message" variant="outlined" fullWidth value={lobbyMessage} 
+          onChange={(e) => setLobbyMessage(e.target.value)} sx={{ marginBottom: 2 }}/>
+        <Button variant="contained" color="primary" onClick={handleSendMessage} fullWidth>
+            Send Message
+        </Button>
       {error && (
         <Typography color="error" sx={{ marginBottom: 2 }}>
           {error}
@@ -121,12 +128,6 @@ export default function LobbyRoom() {
             You are a player. Wait for the host to start the game.
           </Typography>
         </Box>
-        {/* TODO: add restrictions on the messages you can send*/}
-        <TextField id="message" label="Type Message" variant="outlined" fullWidth value={lobbyMessage} 
-        onChange={(e) => setLobbyMessage(e.target.value)} sx={{ marginBottom: 2 }}/>
-        <Button variant="contained" color="primary" onClick={handleSendMessage} fullWidth>
-            Send Message
-        </Button>
         </>
       ) : (
         <Typography variant="body1">Loading...</Typography>
