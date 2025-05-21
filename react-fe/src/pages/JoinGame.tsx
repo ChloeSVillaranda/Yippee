@@ -60,7 +60,7 @@ export default function JoinGame() {
         if (data.roomCode) {
           // receive from backend who is already in the lobby, so update that 
           // before entering the lobby room
-          upsertClientsInLobby(data.clientsInLobby);
+          dispatch(upsertClientsInLobby(data.clientsInLobby));
           navigate(`/${data.roomCode}`);
         } else {
           console.error("Could not connect to the server:", data);

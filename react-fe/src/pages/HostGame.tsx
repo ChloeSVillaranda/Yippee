@@ -1,6 +1,6 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
-import { setRole, setUserName } from "../stores/gameSlice";
+import { setRole, setUserName, upsertClientsInLobby } from "../stores/gameSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "../stores/store";
@@ -60,6 +60,7 @@ export default function HostGame() {
         console.log("Message from server from Host Game:", data);
 
         if (data.roomCode) {
+          dispatch(upsertClientsInLobby([user]));
           navigate(`/${data.roomCode}`);
         } else {
           setError("Room code not received from server.");

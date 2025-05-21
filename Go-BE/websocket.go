@@ -164,11 +164,18 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 
 	log.Printf("Client joined lobby: %s with name: %s\n", data.RoomCode, data.User.UserName)
 
-	// send the quiz details back to the client
+	// prepare the list of connected players by typecasting it first
+	connectedClients := []User{}
+	for _, client := range lobby.ClientsInLobby {
+		connectedClients = append(connectedClients, client)
+	}
+
+	// send the quiz details back to the client + who is already connected
 	conn.WriteJSON(MessageResponse{
 		MessageToClient: "Joined lobby successfully",
 		Quiz:            "TODO: return quiz details", //TODO return quiz details
 		RoomCode:        data.RoomCode,
+		ClientsInLobby:  connectedClients,
 	})
 
 	// notify all clients about the updated list of players
