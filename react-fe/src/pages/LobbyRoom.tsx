@@ -1,11 +1,12 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { executeWebSocketCommand, setupWebSocketHandlers } from "../util/websocketUtil";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
+import { MessageResponse } from "../stores/types";
 import { RootState } from "../stores/store";
 import { upsertClientsInLobby } from "../stores/gameSlice";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 export default function LobbyRoom() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -13,17 +14,18 @@ export default function LobbyRoom() {
   const userDetails = useSelector((state: RootState) => state.game.user); // get current user details from Redux
   const [lobbyMessage, setLobbyMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
-
+  const dispatch = useDispatch();
+  
   useEffect(() => {
     // set up WebSocket event handlers
     setupWebSocketHandlers(
         (data) => {
-        console.log("Message from server for Lobby Game:", data);
-
-        if (data.messageToClient === "Lobby Update") { // TODO: there is probably a better way to handle this
-          upsertClientsInLobby(data.clientsInLobby); // update the lobby
+        console.log("Message from server for Lobby Game:", data as MessageResponse);
+        
+        if(data.messageToClient == "Lobby updated") {
+          dispatch(upsertClientsInLobby(data.clientsInLobby));
         } else {
-          console.error("Could not connect to the server:", data);
+          console.error("Issue with updating the clients in lobby")
         }
         },
         () => {
@@ -32,7 +34,7 @@ export default function LobbyRoom() {
         }
     );
     
-  }, []);
+  }, [clientsInLobby]);
 
   const handleSendMessage = () => {
     // send a message to be displayed to the lobby

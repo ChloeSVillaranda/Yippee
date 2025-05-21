@@ -5,6 +5,7 @@ import {
 } from "./websocketMessages";
 import { useDispatch, useSelector } from "react-redux";
 
+import { MessageResponse } from "../stores/types";
 import { RootState } from "../stores/store";
 import { connect } from "../stores/websocketSlice";
 import { getWebSocket } from "../stores/websocketSlice";
@@ -118,7 +119,7 @@ export const setupWebSocketHandlers = (
 
   if (webSocket) {
     webSocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      const data = JSON.parse(event.data) as MessageResponse;
       onMessage(data);
     };
 

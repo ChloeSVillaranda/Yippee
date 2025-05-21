@@ -3,6 +3,7 @@ import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } f
 import { setRole, setUserName, upsertClientsInLobby } from "../stores/gameSlice";
 import { useDispatch, useSelector } from "react-redux";
 
+import { MessageResponse } from "../stores/types";
 import { RootState } from "../stores/store";
 import { disconnect } from "../stores/websocketSlice";
 import { useNavigate } from "react-router-dom";
@@ -30,20 +31,31 @@ export default function JoinGame() {
       return;
     }
 
+    // update the redux
     dispatch(setUserName(playerName));
     dispatch(setRole("player"));
+
+
+    // TODO: figure out how to use the updated state instead of creating an object to pass 
+    const user = {
+      userName: playerName,
+      userRole: "player",
+      userMessage: "",
+      points: 0,
+    };
+
 
     // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
       "joinLobby",
-      { roomCode: roomCode, player: playerDetails },
+      { roomCode: roomCode, player: user },
       (errorMessage) => setError(errorMessage)
     );
 
     // set up WebSocket event handlers
     setupWebSocketHandlers(
       (data) => {
-        console.log("Message from server for Join Game:", data);
+        console.log("Message from server for Join Game:", data as MessageResponse);
 
         if (data.roomCode) {
           // receive from backend who is already in the lobby, so update that 
@@ -51,7 +63,6 @@ export default function JoinGame() {
           upsertClientsInLobby(data.clientsInLobby);
           navigate(`/${data.roomCode}`);
         } else {
-          setError("Could not connect to the server.");
           console.error("Could not connect to the server:", data);
         }
       },

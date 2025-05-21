@@ -43,7 +43,7 @@ type MessageRequest struct {
 type MessageResponse struct {
 	// Quiz            Quiz   `json:"quiz,omitempty"`  // TODO: figure out how to send back the quiz from DB
 	RoomCode        string `json:"roomCode,omitempty"`
-	MessageToClient string `json:"message"`         // TODO: can remove if stable?
+	MessageToClient string `json:"messageToClient"` // TODO: can remove if stable?
 	Quiz            string `json:"quiz,omitempty"`  // TODO: remove, temporarily a string
 	Error           string `json:"error,omitempty"` // send error back to client if any
 	ClientsInLobby  []User `json:"clientsInLobby,omitempty"`
@@ -163,13 +163,6 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 	}
 
 	log.Printf("Client joined lobby: %s with name: %s\n", data.RoomCode, data.User.UserName)
-
-	// Prepare the list of connected players to send back to the client
-	clientsInLobby := []User{}
-
-	for _, client := range lobby.ClientsInLobby {
-		clientsInLobby = append(clientsInLobby, client)
-	}
 
 	// send the quiz details back to the client
 	conn.WriteJSON(MessageResponse{

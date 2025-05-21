@@ -36,13 +36,22 @@ export default function HostGame() {
       return;
     }
 
+    // update redux
     dispatch(setUserName(hostName));
     dispatch(setRole("host"));
+
+    // TODO: figure out how to use the updated state instead of creating an object to pass 
+    const user = {
+      userName: hostName,
+      userRole: "host",
+      userMessage: "",
+      points: 0,
+    };
 
     // send request to create a lobby
     executeWebSocketCommand(
       "createLobby",
-      { quizName: selectedQuiz, user: hostDetails },
+      { quizName: selectedQuiz, user: user }, // TODO: pass state instead of the user
       (errorMessage) => setError(errorMessage) // Error callback
     );
 
