@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 
 export default function LobbyRoom() {
   const { roomCode } = useParams<{ roomCode: string }>();
-  const role = useSelector((state: RootState) => state.websocket.role); // get role from Redux
+  const role = useSelector((state: RootState) => state.game.user.userRole); // get role from Redux
   const [players, setPlayers] = useState<Player[]>([]); // state to store players
   const [host, setHost] = useState<Host | null>(null); // state to store host
   const [lobbyMessage, setLobbyMessage] = useState("");
@@ -42,6 +42,7 @@ export default function LobbyRoom() {
         console.log("can not be set empty");
         return;
     }
+    console.log("sent the message: ", lobbyMessage)
     // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
         "sendLobbyMessage",

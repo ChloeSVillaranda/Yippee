@@ -59,17 +59,13 @@ export const sendJoinLobbyMessage = (
 export const sendLobbyMessage = (
   webSocket: WebSocket,
   roomCode: string,
-  message: string
+  playerMessage: string,
 ) => {
-  const player: Player{playerMessage: message}
-  console.log(
-
-  )
   webSocket.send(
     JSON.stringify({
       action: "sendLobbyMessage",
       roomCode: roomCode,
-      playerMessage: message,
+      playerMessage: playerMessage,
     })
   );
 };

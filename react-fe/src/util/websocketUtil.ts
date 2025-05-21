@@ -1,4 +1,3 @@
-import { connect, disconnect, setRole } from "../stores/websocketSlice";
 import {
   sendCreateLobbyMessage,
   sendJoinLobbyMessage,
@@ -7,6 +6,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "../stores/store";
+import { connect } from "../stores/websocketSlice";
 import { getWebSocket } from "../stores/websocketSlice";
 
 /**
