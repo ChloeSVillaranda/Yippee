@@ -1,9 +1,9 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
+import { MessageResponse, User } from "../stores/types";
 import { executeWebSocketCommand, setupWebSocketHandlers } from "../util/websocketUtil";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
-import { MessageResponse } from "../stores/types";
 import { RootState } from "../stores/store";
 import { upsertClientsInLobby } from "../stores/gameSlice";
 import { useParams } from "react-router-dom";
@@ -42,13 +42,25 @@ export default function LobbyRoom() {
         console.log("can not be set empty");
         return;
     }
+
+    // update the user details with the message sent
+    const user = {
+      userName: userDetails.userName,
+      userRole: userDetails.userRole,
+      userMessage: lobbyMessage,
+      points: 0,
+    } as User;
+        
     console.log("sent the message: ", lobbyMessage)
+
     // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
         "sendLobbyMessage",
-        { roomCode: roomCode, playerMessage: lobbyMessage },
+        { roomCode: roomCode, user: user },
         (errorMessage) => setError(errorMessage) // Error callback
     );
+    // reset the message to be blank
+    setLobbyMessage("")
   }
 
   return (

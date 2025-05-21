@@ -1,9 +1,9 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
+import { MessageRequest, MessageResponse, User } from "../stores/types";
 import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
 import { setRole, setUserName, upsertClientsInLobby } from "../stores/gameSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-import { MessageResponse } from "../stores/types";
 import { RootState } from "../stores/store";
 import { disconnect } from "../stores/websocketSlice";
 import { useNavigate } from "react-router-dom";
@@ -42,8 +42,7 @@ export default function JoinGame() {
       userRole: "player",
       userMessage: "",
       points: 0,
-    };
-
+    } as User;
 
     // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
@@ -57,7 +56,7 @@ export default function JoinGame() {
       (data) => {
         console.log("Message from server for Join Game:", data as MessageResponse);
 
-        if (data.roomCode) {
+        if (data.roomCode) { // TODO: this ran like 3 times so figure why that happened
           // receive from backend who is already in the lobby, so update that 
           // before entering the lobby room
           dispatch(upsertClientsInLobby(data.clientsInLobby));
