@@ -1,17 +1,16 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Host, Player } from "../stores/types";
 import { executeWebSocketCommand, setupWebSocketHandlers } from "../util/websocketUtil";
 import { useEffect, useState } from "react";
 
 import { RootState } from "../stores/store";
+import { upsertClientsInLobby } from "../stores/gameSlice";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function LobbyRoom() {
   const { roomCode } = useParams<{ roomCode: string }>();
-  const role = useSelector((state: RootState) => state.game.user.userRole); // get role from Redux
-  const [players, setPlayers] = useState<Player[]>([]); // state to store players
-  const [host, setHost] = useState<Host | null>(null); // state to store host
+  const clientsInLobby = useSelector((state: RootState) => state.game.clientsInLobby); // get the clientsInLobby from Redux
+  const userDetails = useSelector((state: RootState) => state.game.user); // get current user details from Redux
   const [lobbyMessage, setLobbyMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -21,11 +20,10 @@ export default function LobbyRoom() {
         (data) => {
         console.log("Message from server for Lobby Game:", data);
 
-        if (data.action === "updateLobby") {
-        setPlayers(data.players || []); // Update players list
-          setHost(data.host || null); // Update host
+        if (data.messageToClient === "Lobby Update") { // TODO: there is probably a better way to handle this
+          upsertClientsInLobby(data.clientsInLobby); // update the lobby
         } else {
-            console.error("Could not connect to the server:", data);
+          console.error("Could not connect to the server:", data);
         }
         },
         () => {
@@ -57,26 +55,27 @@ export default function LobbyRoom() {
         Room: {roomCode}
       </Typography>
       {/* quiz displayed for players to see */}
+      {/* TODO: set it properly to the quiz instead of the host name! */}
       <Typography variant="h5" gutterBottom>
-        Quiz: {host?.hostName || "Loading..."}
+        Quiz: {clientsInLobby.find((user) => user.userRole === "host")?.userName || "Loading..."}
       </Typography>
       {/* host displayed */}
       <Typography variant="h5" gutterBottom>
-        Host: {host?.hostName || "Loading..."}
+        Host: {clientsInLobby.find((user) => user.userRole === "host")?.userName || "Loading..."}
       </Typography>
       <Typography variant="h6" gutterBottom>
         Players:
       </Typography>
       <Box>
-        {players.length > 0 ? (
-          players.map((player, index) => (
-            <>
-        <Typography key={index} variant="body1">
-            {player.playerName}
-            {player.playerMessage && `: ${player.playerMessage}`}
-        </Typography>
-            </>
-          ))
+        {clientsInLobby.length > 0 ? (
+          clientsInLobby
+            .filter((user) => user.userRole === "player") // Filter only players
+            .map((player, index) => (
+              <Typography key={index} variant="body1">
+                {player.userName}
+                {player.userMessage && `: ${player.userMessage}`}
+              </Typography>
+            ))
         ) : (
           <Typography variant="body1">No players connected yet.</Typography>
         )}
@@ -86,7 +85,7 @@ export default function LobbyRoom() {
           {error}
         </Typography>
       )}
-      {role === "host" ? (
+      {userDetails.userRole === "host" ? (
         <Box>
           <Typography variant="h5" gutterBottom>
             Host View
@@ -98,7 +97,7 @@ export default function LobbyRoom() {
             Start Game
           </Button>
         </Box>
-      ) : role === "player" ? (
+      ) : userDetails.userRole === "player" ? (
         <>
         <Box>
           <Typography variant="h5" gutterBottom>

@@ -1,23 +1,17 @@
 // this file stores all of the different types of WebSocket message functions that will be used to make certain calls to the backend.
 
-import { Player } from "../stores/types";
+import { User } from "../stores/types";
 
-/**
- * Create a new lobby.
- * @param webSocket - The WebSocket connection.
- * @param quizName - The name of the quiz to be hosted.
- * @param hostName - The name of the host creating the lobby.
- */
 export const sendCreateLobbyMessage = (
   webSocket: WebSocket,
-  quizName: string,
-  hostName: string
+  quizName: string, // TODO: should not be a string later
+  user: User
 ) => {
   webSocket.send(
     JSON.stringify({
       action: "createLobby",
       quizName: quizName,
-      hostName: hostName,
+      user: user
     })
   );
 };
@@ -26,25 +20,18 @@ export const sendCreateLobbyMessage = (
  * Join an existing lobby.
  * @param webSocket - The WebSocket connection.
  * @param roomCode - The room code to join.
- * @param playerName - The name of the player joining the lobby.
+ * @param user - The user.
  */
 export const sendJoinLobbyMessage = (
   webSocket: WebSocket,
   roomCode: string,
-  player: Player,
+  user: User,
 ) => {
-  console.log(
-    JSON.stringify({
-      action: "joinLobby",
-      roomCode: roomCode,
-      player: player,
-    })
-  )
   webSocket.send(
     JSON.stringify({
       action: "joinLobby",
       roomCode: roomCode,
-      player: player,
+      user: user,
     })
   );
 };
@@ -59,13 +46,13 @@ export const sendJoinLobbyMessage = (
 export const sendLobbyMessage = (
   webSocket: WebSocket,
   roomCode: string,
-  playerMessage: string,
+  user: User,
 ) => {
   webSocket.send(
     JSON.stringify({
       action: "sendLobbyMessage",
       roomCode: roomCode,
-      playerMessage: playerMessage,
+      user: user,
     })
   );
 };

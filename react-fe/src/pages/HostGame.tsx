@@ -1,20 +1,22 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
+import { setRole, setUserName } from "../stores/gameSlice";
+import { useDispatch, useSelector } from "react-redux";
 
+import { RootState } from "../stores/store";
 import SelectQuiz from "../components/SelectQuiz";
 import { disconnect } from "../stores/websocketSlice";
-import { setRole } from "../stores/gameSlice";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 export default function HostGame() {
-  const [hostName, setHostName] = useState<string>(""); // Host name input
+  const [hostName, setHostName] = useState<string>(""); // host name input
   const [selectedQuiz, setSelectedQuiz] = useState<string | null>(null);
-  const [roomCode, setRoomCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const hostDetails = useSelector((state: RootState) => state.game.user); // get current host details from Redux
+
   useCheckConnection();
 
   const handleSelectQuiz = (quizName: string) => {
@@ -22,33 +24,33 @@ export default function HostGame() {
   };
 
   const handleHostGame = () => {
-    // Validate host name
+    // input host name
     if (!hostName.trim()) {
       setError("Host name cannot be empty!");
       return;
     }
 
-    // Validate selected quiz
+    // select quiz
     if (!selectedQuiz) {
       setError("Please select a quiz first!");
       return;
     }
 
-    // Execute the "createLobby" WebSocket command
+    dispatch(setUserName(hostName));
+    dispatch(setRole("host"));
+
+    // send request to create a lobby
     executeWebSocketCommand(
       "createLobby",
-      { quizName: selectedQuiz, hostName: hostName },
+      { quizName: selectedQuiz, user: hostDetails },
       (errorMessage) => setError(errorMessage) // Error callback
     );
 
-    // Set up WebSocket event handlers
     setupWebSocketHandlers(
       (data) => {
         console.log("Message from server from Host Game:", data);
 
         if (data.roomCode) {
-          setRoomCode(data.roomCode);
-          dispatch(setRole("host")); // set role as host in Redux
           navigate(`/${data.roomCode}`);
         } else {
           setError("Room code not received from server.");
@@ -98,11 +100,6 @@ export default function HostGame() {
       >
         Host Game
       </Button>
-      {roomCode && (
-        <Typography variant="h5" sx={{ marginTop: 2 }}>
-          Room Code: {roomCode}
-        </Typography>
-      )}
     </Box>
   );
 }

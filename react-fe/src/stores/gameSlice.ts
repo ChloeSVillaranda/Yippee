@@ -3,8 +3,8 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { User } from "./types"; 
 
 interface GameState {
-    user: User
-    players: User[];
+    user: User // own user
+    clientsInLobby: User[];
 }
 
 const initialState = {
@@ -14,7 +14,7 @@ const initialState = {
         userRole: "",
         points: 0, 
     }, 
-    players: []
+    clientsInLobby: []
 } satisfies GameState as GameState
 
 const gameSlice = createSlice({
@@ -34,10 +34,11 @@ const gameSlice = createSlice({
             state.user.userRole = action.payload;
         },
         // upsert players
-        upsertPlayers: (state, action: PayloadAction<User[]>) => {
-            state.players = action.payload;
-        },    }
+        upsertClientsInLobby: (state, action: PayloadAction<User[]>) => {
+            state.clientsInLobby = action.payload;
+        },    
+    }
 })
 
-export const { setUserName, setRole, setMessage, upsertPlayers} = gameSlice.actions
+export const { setUserName, setRole, setMessage, upsertClientsInLobby} = gameSlice.actions
 export default gameSlice.reducer

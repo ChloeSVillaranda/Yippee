@@ -1,10 +1,10 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
+import { setRole, setUserName, upsertClientsInLobby } from "../stores/gameSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Player } from "../stores/types";
+import { RootState } from "../stores/store";
 import { disconnect } from "../stores/websocketSlice";
-import { setRole } from "../stores/gameSlice";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -12,10 +12,10 @@ export default function JoinGame() {
   const [roomCode, setRoomCode] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [error, setError] = useState("");
+  const playerDetails = useSelector((state: RootState) => state.game.user); // get player details from Redux
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useCheckConnection();
-
 
   const handleJoinGame = () => {
     // input room code
@@ -30,17 +30,14 @@ export default function JoinGame() {
       return;
     }
 
-    // Create a Player object
-    const player: Player = {
-      playerName: playerName,
-      playerMessage: "", // Default message is empty
-    };
+    dispatch(setUserName(playerName));
+    dispatch(setRole("player"));
 
     // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
       "joinLobby",
-      { roomCode: roomCode, player: player },
-      (errorMessage) => setError(errorMessage) // Error callback
+      { roomCode: roomCode, player: playerDetails },
+      (errorMessage) => setError(errorMessage)
     );
 
     // set up WebSocket event handlers
@@ -49,7 +46,9 @@ export default function JoinGame() {
         console.log("Message from server for Join Game:", data);
 
         if (data.roomCode) {
-          dispatch(setRole("player")); // set role as player in Redux
+          // receive from backend who is already in the lobby, so update that 
+          // before entering the lobby room
+          upsertClientsInLobby(data.clientsInLobby);
           navigate(`/${data.roomCode}`);
         } else {
           setError("Could not connect to the server.");
@@ -65,7 +64,6 @@ export default function JoinGame() {
       }
     );
   };
-
 
   return (
     <Box sx={{ padding: 4, maxWidth: 400, margin: "0 auto", textAlign: "center" }}>

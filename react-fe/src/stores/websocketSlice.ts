@@ -4,14 +4,10 @@ let webSocket: WebSocket | null = null;
 
 interface WebSocketState {
   isConnected: boolean;
-  messages: any[];
-  role: string | null;
 }
 
 const initialState: WebSocketState = {
   isConnected: false,
-  messages: [],
-  role: null,
 };
 
 const websocketSlice = createSlice({
@@ -23,16 +19,10 @@ const websocketSlice = createSlice({
         webSocket = new WebSocket(action.payload);
         state.isConnected = true;
 
-        // Set up global message listener
+        // set up global message listener
         webSocket.onmessage = (event) => {
           const data = JSON.parse(event.data);
           console.log("Message received:", data);
-
-          // Handle specific actions
-          // TODO: can probably remove??
-          if (data.action === "updateLobby") {
-            console.log("Lobby updated:", data);
-          }
         };
 
         webSocket.onclose = () => {
@@ -55,14 +45,11 @@ const websocketSlice = createSlice({
         state.isConnected = false;
       }
     },
-    addMessage: (state, action: PayloadAction<any>) => {
-      state.messages.push(action.payload);
-    },
   },
 });
 
-export const { connect, disconnect, addMessage } = websocketSlice.actions;
+export const { connect, disconnect } = websocketSlice.actions;
 export default websocketSlice.reducer;
-
-// Export the WebSocket instance for use in components
+ 
+// export the WebSocket instance for use in components
 export const getWebSocket = () => webSocket;
