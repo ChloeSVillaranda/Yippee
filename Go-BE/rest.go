@@ -3,7 +3,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
+	"reflect"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -12,8 +15,8 @@ import (
 type Quiz struct {
 	QuizName        string          `json:"quizName"`
 	QuizDescription string          `json:"quizDescription"`
-	CreatedBy       string          `json:"user"`
-	QuizQuestions   []QuizQuestions `json:"questions"`
+	CreatedBy       string          `json:"createdBy"`
+	QuizQuestions   []QuizQuestions `json:"quizQuestions"`
 }
 
 type QuizQuestions struct {
@@ -78,6 +81,7 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 
 	// parse the results into a slice of quizzes
 	var quizzes []Quiz
+
 	for cursor.Next(r.Context()) {
 		var quiz bson.M
 		if err := cursor.Decode(&quiz); err != nil {
@@ -85,8 +89,9 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// map the BSON data to the Quiz struct
 		var parsedQuiz Quiz
+		parsedQuiz.QuizQuestions = []QuizQuestions{}
+
 		if quizName, ok := quiz["quizName"].(string); ok {
 			parsedQuiz.QuizName = quizName
 		}
@@ -97,40 +102,15 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 			parsedQuiz.CreatedBy = user
 		}
 
-		// map the quizQuestions field
-		if quizQuestions, ok := quiz["quizQuestions"].([]interface{}); ok {
-			for _, q := range quizQuestions {
-				if qMap, ok := q.(map[string]interface{}); ok {
-					question := QuizQuestions{}
+		log.Println("attempting to look through the quiz questions")
 
-					// Safely map nested fields
-					if questionText, ok := qMap["question"].(string); ok {
-						question.Question = questionText
-					}
-					if points, ok := qMap["points"].(float64); ok {
-						question.Points = int(points)
-					}
-					if difficulty, ok := qMap["difficulty"].(float64); ok {
-						question.Difficulty = int(difficulty)
-					}
-					if hint, ok := qMap["hint"].(string); ok {
-						question.Hint = hint
-					}
-					if category, ok := qMap["category"].([]interface{}); ok {
-						question.Category = toStringSlice(category)
-					}
-					if options, ok := qMap["options"].([]interface{}); ok {
-						question.Options = toStringSlice(options)
-					}
-					if answer, ok := qMap["answer"].(float64); ok {
-						question.Answer = int(answer)
-					} else if answerInt, ok := qMap["answer"].(int); ok {
-						question.Answer = answerInt
-					}
+		// parse quizQuestions
+		if questions, ok := quiz["quizQuestions"]; ok {
+			log.Println("found the quizQuestions")
 
-					parsedQuiz.QuizQuestions = append(parsedQuiz.QuizQuestions, question)
-				}
-			}
+			// parsedQuestions := parseQuizQuestions(questions)
+			parseQuizQuestions(questions)
+
 		}
 
 		quizzes = append(quizzes, parsedQuiz)
@@ -145,6 +125,17 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 	// Return the quizzes as JSON
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(quizzes)
+}
+
+func parseQuizQuestions(quizQuestions interface{}) {
+	switch reflect.TypeOf(quizQuestions).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(quizQuestions)
+
+		for i := 0; i < s.Len(); i++ {
+			fmt.Println(s.Index(i))
+		}
+	}
 }
 
 // Helper function to convert []interface{} to []string

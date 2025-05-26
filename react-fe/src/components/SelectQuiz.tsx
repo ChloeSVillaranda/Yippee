@@ -4,6 +4,7 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 import Carousel from 'react-multi-carousel';
+import { Quiz } from '../stores/types';
 
 const responsive = {
   superLargeDesktop: {
@@ -24,23 +25,8 @@ const responsive = {
   },
 };
 
-type Quiz = {
-  quizName: string;
-  quizDescription: string;
-  user: string;
-  questions: {
-    question: string;
-    points: number;
-    difficulty: number;
-    hint: string;
-    category: string[];
-    options: string[];
-    answer: number;
-  }[];
-};
-
 type SelectQuizProps = {
-  onSelectQuiz: (quizName: string) => void;
+  onSelectQuiz: (quiz: Quiz) => void;
 };
 
 export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
@@ -56,6 +42,7 @@ export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
           throw new Error("Failed to fetch quizzes");
         }
         const data = await response.json();
+        console.log("received the response: ", data)
         setQuizzes(data);
       } catch (error) {
         console.error("Error fetching quizzes:", error);
@@ -89,8 +76,8 @@ export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
                   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
                 },
               }}
-              onClick={() => onSelectQuiz(quiz.quizName)}
-            >
+              onClick={() => onSelectQuiz(quiz)}
+            > 
               <Typography variant="h6" gutterBottom>
                 {quiz.quizName}
               </Typography>

@@ -1,3 +1,4 @@
+// this file for now stores all the interfaces
 // TODO: might need to add back the player and the host because each has different actions
 // object interface stores
 // export interface Player {
@@ -10,6 +11,21 @@
 //     hostMessage: string;
 // }
 
+type Quiz = { // TODO: move to types.ts later?
+    quizName: string;
+    quizDescription: string;
+    user: string;
+    questions: {
+      question: string;
+      points: number;
+      difficulty: number;
+      hint: string;
+      category: string[];
+      options: string[];
+      answer: number;
+    }[];
+  };
+  
 interface User {
     userName: string;
     userMessage: string;
@@ -32,4 +48,4 @@ interface MessageResponse {
     clientsInLobby: User[] | undefined;
 }
 
-export type { User , MessageRequest, MessageResponse}
+export type { Quiz, User , MessageRequest, MessageResponse}

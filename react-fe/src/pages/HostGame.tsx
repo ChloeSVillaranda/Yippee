@@ -3,6 +3,7 @@ import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } f
 import { setRole, setUserName, upsertClientsInLobby } from "../stores/gameSlice";
 import { useDispatch, useSelector } from "react-redux";
 
+import { Quiz } from "../stores/types";
 import { RootState } from "../stores/store";
 import SelectQuiz from "../components/SelectQuiz";
 import { disconnect } from "../stores/websocketSlice";
@@ -11,7 +12,7 @@ import { useState } from "react";
 
 export default function HostGame() {
   const [hostName, setHostName] = useState<string>(""); // host name input
-  const [selectedQuiz, setSelectedQuiz] = useState<string | null>(null);
+  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -19,8 +20,8 @@ export default function HostGame() {
 
   useCheckConnection();
 
-  const handleSelectQuiz = (quizName: string) => {
-    setSelectedQuiz(quizName);
+  const handleSelectQuiz = (quiz: Quiz) => {
+    setSelectedQuiz(quiz);
   };
 
   const handleHostGame = () => {
@@ -51,7 +52,7 @@ export default function HostGame() {
     // send request to create a lobby
     executeWebSocketCommand(
       "createLobby",
-      { quizName: selectedQuiz, user: user }, // TODO: pass state instead of the user
+      { quiz: selectedQuiz, user: user }, // TODO: pass state instead of the user
       (errorMessage) => setError(errorMessage) // Error callback
     );
 
@@ -94,7 +95,7 @@ export default function HostGame() {
       <SelectQuiz onSelectQuiz={handleSelectQuiz} />
       {selectedQuiz && (
         <Typography variant="h6" gutterBottom>
-          Selected Quiz: {selectedQuiz}
+          Selected Quiz: {selectedQuiz.quizName}
         </Typography>
       )}
       {error && (
