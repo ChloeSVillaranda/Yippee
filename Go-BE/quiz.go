@@ -103,7 +103,7 @@ func main() {
 	r.HandleFunc("/ws", handleWebSocket)
 
 	// REST API endpoints
-	r.HandleFunc("/api/create-quiz", createQuizHandler).Methods("POST")
+	// r.HandleFunc("/api/create-quiz", createQuizHandler).Methods("POST")
 	r.HandleFunc("/api/get-quizzes", getQuizzesHandler).Methods("GET")
 
 	// Enable CORS middleware
