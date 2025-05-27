@@ -104,8 +104,8 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO: place in helper function file
-func parseQuizQuestions(questionsToParse interface{}) []QuizQuestions {
-	var questionsParsed []QuizQuestions
+func parseQuizQuestions(questionsToParse interface{}) []QuizQuestion {
+	var questionsParsed []QuizQuestion
 
 	// try to convert to bson.a
 	questions, ok := questionsToParse.(bson.A)
@@ -129,7 +129,7 @@ func parseQuizQuestions(questionsToParse interface{}) []QuizQuestions {
 			continue
 		}
 
-		var q QuizQuestions
+		var q QuizQuestion
 
 		if val, ok := qMap["question"]; ok {
 			if str, ok := val.(string); ok {

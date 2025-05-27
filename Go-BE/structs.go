@@ -4,13 +4,13 @@ package main
 import "github.com/gorilla/websocket"
 
 type Quiz struct {
-	QuizName        string          `json:"quizName"`
-	QuizDescription string          `json:"quizDescription"`
-	CreatedBy       string          `json:"createdBy"`
-	QuizQuestions   []QuizQuestions `json:"quizQuestions"`
+	QuizName        string         `json:"quizName"`
+	QuizDescription string         `json:"quizDescription"`
+	CreatedBy       string         `json:"createdBy"`
+	QuizQuestions   []QuizQuestion `json:"quizQuestions"`
 }
 
-type QuizQuestions struct {
+type QuizQuestion struct {
 	Question   string   `bson:"question"`
 	Points     int      `bson:"points"`
 	Difficulty int      `bson:"difficulty"`
@@ -20,11 +20,18 @@ type QuizQuestions struct {
 	Answer     int      `bson:"answer"`
 }
 
-// Lobby structure
+// lobby structure
 type Lobby struct {
 	RoomCode       string                   `json:"-"`
 	Quiz           Quiz                     `json:"quiz"`
 	ClientsInLobby map[*websocket.Conn]User `json:"-"` // Map of clients to their player info
+	Status         string                   `json:"-"` //TODO: make an enum of Not Started, In-Progress, Finished
+	Game           Game                     `json:"-"`
+}
+
+// game structure, has settings
+type Game struct {
+	CurrentQuestion QuizQuestion `json:"currentQuestion"`
 }
 
 // Message structure
@@ -43,6 +50,7 @@ type MessageResponse struct {
 	Quiz            Quiz   `json:"quiz,omitempty"`  // TODO: remove, temporarily a string
 	Error           string `json:"error,omitempty"` // send error back to client if any
 	ClientsInLobby  []User `json:"clientsInLobby,omitempty"`
+	LobbyStatus     string `json:"lobbyStatus,omitempty"`
 }
 
 type User struct {
