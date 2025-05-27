@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
 import { RootState } from "../stores/store";
-import { upsertClientsInLobby } from "../stores/gameSlice";
+import { gameActions } from "../stores/gameSlice";
 import { useParams } from "react-router-dom";
 
 export default function LobbyRoom() {
@@ -23,7 +23,7 @@ export default function LobbyRoom() {
         console.log("Message from server for Lobby Game:", data as MessageResponse);
         
         if(data.messageToClient == "Lobby updated") {
-          dispatch(upsertClientsInLobby(data.clientsInLobby));
+          dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
         } else {
           console.error("Issue with updating the clients in lobby")
         }

@@ -125,23 +125,19 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 func parseQuizQuestions(questionsToParse interface{}) []QuizQuestions {
 	var questionsParsed []QuizQuestions
 
-	// First try to convert to primitive.A (BSON array)
+	// try to convert to bson.a
 	questions, ok := questionsToParse.(bson.A)
 	if !ok {
 		log.Printf("Warning: quizQuestions type: %T", questionsToParse)
 		return questionsParsed
 	}
 
-	for i, question := range questions {
-		// Add debug logging
-		log.Printf("Processing question %d, type: %T", i, question)
-
+	for _, question := range questions {
 		var qMap bson.M
 		switch v := question.(type) {
 		case bson.M:
 			qMap = v
 		case bson.D:
-			// Convert bson.D to bson.M manually
 			qMap = make(bson.M)
 			for _, elem := range v {
 				qMap[elem.Key] = elem.Value
@@ -152,9 +148,7 @@ func parseQuizQuestions(questionsToParse interface{}) []QuizQuestions {
 		}
 
 		var q QuizQuestions
-		// ...rest of the function remains the same...
 
-		// More robust type conversions
 		if val, ok := qMap["question"]; ok {
 			if str, ok := val.(string); ok {
 				q.Question = str

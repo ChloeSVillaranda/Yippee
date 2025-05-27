@@ -1,16 +1,16 @@
 // this file stores all of the different types of WebSocket message functions that will be used to make certain calls to the backend.
 
-import { User } from "../stores/types";
+import { Quiz, User } from "../stores/types";
 
 export const sendCreateLobbyMessage = (
   webSocket: WebSocket,
-  quizName: string, // TODO: should not be a string later
+  quiz: Quiz, // TODO: should not be a string later
   user: User
 ) => {
   webSocket.send(
     JSON.stringify({
       action: "createLobby",
-      quizName: quizName,
+      quiz: quiz,
       user: user
     })
   );

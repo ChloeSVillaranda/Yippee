@@ -1,11 +1,11 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { MessageRequest, MessageResponse, User } from "../stores/types";
 import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
-import { setRole, setUserName, upsertClientsInLobby } from "../stores/gameSlice";
 import { useDispatch, useSelector } from "react-redux";
 
+import { MessageResponse } from "../stores/types";
 import { RootState } from "../stores/store";
 import { disconnect } from "../stores/websocketSlice";
+import { gameActions } from "../stores/gameSlice";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -13,12 +13,12 @@ export default function JoinGame() {
   const [roomCode, setRoomCode] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [error, setError] = useState("");
-  const playerDetails = useSelector((state: RootState) => state.game.user); // get player details from Redux
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const player = useSelector((state: RootState) => state.game.user); // get player details from Redux
   useCheckConnection();
 
-  const handleJoinGame = () => {
+  const handleJoinGame = async () => {
     // input room code
     if (!roomCode.trim()) {
       setError("Room code cannot be empty");
@@ -31,10 +31,8 @@ export default function JoinGame() {
       return;
     }
 
-    // update the redux
-    dispatch(setUserName(playerName));
-    dispatch(setRole("player"));
-
+    dispatch(gameActions.setUserName(playerName))
+    dispatch(gameActions.setRole("player"))
 
     // TODO: figure out how to use the updated state instead of creating an object to pass 
     const user = {
@@ -42,7 +40,7 @@ export default function JoinGame() {
       userRole: "player",
       userMessage: "",
       points: 0,
-    } as User;
+    };
 
     // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
@@ -59,7 +57,8 @@ export default function JoinGame() {
         if (data.roomCode) { // TODO: this ran like 3 times so figure why that happened
           // receive from backend who is already in the lobby, so update that 
           // before entering the lobby room
-          dispatch(upsertClientsInLobby(data.clientsInLobby));
+          dispatch(gameActions.setQuiz(data.quiz))
+          dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
           navigate(`/${data.roomCode}`);
         } else {
           console.error("Could not connect to the server:", data);

@@ -1,10 +1,11 @@
 // this slice handles the state of a game
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { User } from "./types"; 
+import { Quiz, User } from "./types"; 
 
 interface GameState {
     user: User // own user
     clientsInLobby: User[];
+    quiz: Quiz | undefined; 
 }
 
 const initialState = {
@@ -14,7 +15,8 @@ const initialState = {
         userRole: "",
         points: 0, 
     }, 
-    clientsInLobby: []
+    clientsInLobby: [], 
+    quiz: undefined, 
 } satisfies GameState as GameState
 
 const gameSlice = createSlice({
@@ -29,16 +31,19 @@ const gameSlice = createSlice({
         setRole: (state, action: PayloadAction<string>) => {
             state.user.userRole = action.payload;
         },
+        setQuiz: (state, action: PayloadAction<Quiz>) => {
+            state.quiz = action.payload; 
+        },
         // send a message
         setMessage: (state, action: PayloadAction<string>) => {
-            state.user.userRole = action.payload;
+            state.user.userMessage = action.payload;
         },
         // upsert players
         upsertClientsInLobby: (state, action: PayloadAction<User[]>) => {
             state.clientsInLobby = action.payload;
-        },    
+        },
     }
 })
-
-export const { setUserName, setRole, setMessage, upsertClientsInLobby} = gameSlice.actions
+// export const { setUserName, setRole, setMessage, upsertClientsInLobby, setQuiz} = gameSlice.actions
+export const { ...gameActions } = gameSlice.actions
 export default gameSlice.reducer

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -23,10 +22,8 @@ var (
 
 // Lobby structure
 type Lobby struct {
-	// TODO: implement quiz instead of quiz name
-	// QuizName Quiz                  `json:"quiz"`
 	RoomCode       string                   `json:"-"`
-	QuizName       string                   `json:"quizName"`
+	Quiz           Quiz                     `json:"quiz"`
 	ClientsInLobby map[*websocket.Conn]User `json:"-"` // Map of clients to their player info
 }
 
@@ -36,15 +33,14 @@ type MessageRequest struct {
 	Action   string `json:"action"` // requested action client wants to carry out
 	User     User   `json:"user"`   // user who makes the request
 	RoomCode string `json:"roomCode,omitempty"`
-	QuizName string `json:"quizName,omitempty"` // TODO: need to send the quiz id for the backend to retrieve from dB
+	Quiz     Quiz   `json:"quiz,omitempty"` // TODO: need to send the quiz id for the backend to retrieve from dB
 }
 
 // Json responses (sent by server to client)
 type MessageResponse struct {
-	// Quiz            Quiz   `json:"quiz,omitempty"`  // TODO: figure out how to send back the quiz from DB
 	RoomCode        string `json:"roomCode,omitempty"`
 	MessageToClient string `json:"messageToClient"` // TODO: can remove if stable?
-	Quiz            string `json:"quiz,omitempty"`  // TODO: remove, temporarily a string
+	Quiz            Quiz   `json:"quiz,omitempty"`  // TODO: remove, temporarily a string
 	Error           string `json:"error,omitempty"` // send error back to client if any
 	ClientsInLobby  []User `json:"clientsInLobby,omitempty"`
 }
@@ -114,13 +110,12 @@ func handleCreateLobby(conn *websocket.Conn, data MessageRequest) {
 		}
 	}
 
-	fmt.Println("The roomCode is defined as:", roomCode)
+	log.Println("Created a new room:", roomCode)
 
 	// create a new lobby
 	lobbies[roomCode] = &Lobby{
-		RoomCode: roomCode,
-		// TODO: quiz should be a field
-		QuizName:       data.QuizName,
+		RoomCode:       roomCode,
+		Quiz:           data.Quiz,
 		ClientsInLobby: make(map[*websocket.Conn]User),
 	}
 
@@ -136,7 +131,7 @@ func handleCreateLobby(conn *websocket.Conn, data MessageRequest) {
 	// Send info back to the host
 	conn.WriteJSON(MessageResponse{
 		MessageToClient: "Lobby created successfully",
-		Quiz:            "TODO: return quiz details", //TODO return quiz details
+		Quiz:            lobbies[roomCode].Quiz,
 		RoomCode:        roomCode,
 	})
 }
@@ -173,7 +168,7 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 	// send the quiz details back to the client + who is already connected
 	conn.WriteJSON(MessageResponse{
 		MessageToClient: "Joined lobby successfully",
-		Quiz:            "TODO: return quiz details", //TODO return quiz details
+		Quiz:            lobby.Quiz, //TODO return quiz details
 		RoomCode:        data.RoomCode,
 		ClientsInLobby:  connectedClients,
 	})

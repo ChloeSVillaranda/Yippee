@@ -1,14 +1,25 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
-import { setRole, setUserName, upsertClientsInLobby } from "../stores/gameSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Quiz } from "../stores/types";
 import { RootState } from "../stores/store";
 import SelectQuiz from "../components/SelectQuiz";
 import { disconnect } from "../stores/websocketSlice";
+import { gameActions } from "../stores/gameSlice";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+
+// import { setQuiz, setRole, setUserName, upsertClientsInLobby } from "../stores/gameSlice";
+
+
+
+
+
+
+
+
+
 
 export default function HostGame() {
   const [hostName, setHostName] = useState<string>(""); // host name input
@@ -16,7 +27,7 @@ export default function HostGame() {
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const hostDetails = useSelector((state: RootState) => state.game.user); // get current host details from Redux
+  // const host = useSelector((state: RootState) => state.game.user); // get host details from Redux
 
   useCheckConnection();
 
@@ -24,7 +35,7 @@ export default function HostGame() {
     setSelectedQuiz(quiz);
   };
 
-  const handleHostGame = () => {
+  const handleHostGame = async () => {
     // input host name
     if (!hostName.trim()) {
       setError("Host name cannot be empty!");
@@ -37,9 +48,9 @@ export default function HostGame() {
       return;
     }
 
-    // update redux
-    dispatch(setUserName(hostName));
-    dispatch(setRole("host"));
+    // update redux state
+    dispatch(gameActions.setUserName(hostName));
+    dispatch(gameActions.setRole("host"));
 
     // TODO: figure out how to use the updated state instead of creating an object to pass 
     const user = {
@@ -49,11 +60,10 @@ export default function HostGame() {
       points: 0,
     };
 
-    // send request to create a lobby
     executeWebSocketCommand(
       "createLobby",
-      { quiz: selectedQuiz, user: user }, // TODO: pass state instead of the user
-      (errorMessage) => setError(errorMessage) // Error callback
+      { quiz: selectedQuiz, user: user },
+      (errorMessage) => setError(errorMessage)
     );
 
     setupWebSocketHandlers(
@@ -61,7 +71,8 @@ export default function HostGame() {
         console.log("Message from server from Host Game:", data);
 
         if (data.roomCode) {
-          dispatch(upsertClientsInLobby([user]));
+          dispatch(gameActions.setQuiz(selectedQuiz));
+          dispatch(gameActions.upsertClientsInLobby([user]));
           navigate(`/${data.roomCode}`);
         } else {
           setError("Room code not received from server.");

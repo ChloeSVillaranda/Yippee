@@ -11,7 +11,7 @@
 //     hostMessage: string;
 // }
 
-type Quiz = { // TODO: move to types.ts later?
+export type Quiz = {
     quizName: string;
     quizDescription: string;
     user: string;
@@ -26,26 +26,24 @@ type Quiz = { // TODO: move to types.ts later?
     }[];
   };
   
-interface User {
+export type User = {
     userName: string;
     userMessage: string;
     userRole: string; 
     points: number;
 }
 
-interface MessageRequest {
+export type MessageRequest = {
     action: string; 
     user: User;
     roomCode: string | undefined; 
-    quizName: string | undefined;
+    quiz: Quiz | undefined;
 }
 
-interface MessageResponse {
+export type MessageResponse = {
     messageToClient: string;
     roomCode: string | undefined;
-    quiz: string | undefined;
+    quiz: Quiz | undefined;
     error: string | undefined;
     clientsInLobby: User[] | undefined;
 }
-
-export type { Quiz, User , MessageRequest, MessageResponse}
