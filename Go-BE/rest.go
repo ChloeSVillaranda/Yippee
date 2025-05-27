@@ -3,10 +3,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"reflect"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -20,13 +18,13 @@ type Quiz struct {
 }
 
 type QuizQuestions struct {
-	Question   string   `json:"question"`
-	Points     int      `json:"points"`
-	Difficulty int      `json:"difficulty"`
-	Hint       string   `json:"hint"`
-	Category   []string `json:"category"`
-	Options    []string `json:"options"`
-	Answer     int      `json:"answer"`
+	Question   string   `bson:"question"`
+	Points     int      `bson:"points"`
+	Difficulty int      `bson:"difficulty"`
+	Hint       string   `bson:"hint"`
+	Category   []string `bson:"category"`
+	Options    []string `bson:"options"`
+	Answer     int      `bson:"answer"`
 }
 
 // REST endpoint to create a quiz
@@ -84,13 +82,13 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 
 	for cursor.Next(r.Context()) {
 		var quiz bson.M
+		log.Printf("Raw quiz document: %+v", quiz)
 		if err := cursor.Decode(&quiz); err != nil {
 			http.Error(w, "Failed to parse quiz", http.StatusInternalServerError)
 			return
 		}
 
 		var parsedQuiz Quiz
-		parsedQuiz.QuizQuestions = []QuizQuestions{}
 
 		if quizName, ok := quiz["quizName"].(string); ok {
 			parsedQuiz.QuizName = quizName
@@ -106,11 +104,7 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 
 		// parse quizQuestions
 		if questions, ok := quiz["quizQuestions"]; ok {
-			log.Println("found the quizQuestions")
-
-			// parsedQuestions := parseQuizQuestions(questions)
-			parseQuizQuestions(questions)
-
+			parsedQuiz.QuizQuestions = parseQuizQuestions(questions)
 		}
 
 		quizzes = append(quizzes, parsedQuiz)
@@ -127,15 +121,95 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(quizzes)
 }
 
-func parseQuizQuestions(quizQuestions interface{}) {
-	switch reflect.TypeOf(quizQuestions).Kind() {
-	case reflect.Slice:
-		s := reflect.ValueOf(quizQuestions)
+// TODO: place in helper function file
+func parseQuizQuestions(questionsToParse interface{}) []QuizQuestions {
+	var questionsParsed []QuizQuestions
 
-		for i := 0; i < s.Len(); i++ {
-			fmt.Println(s.Index(i))
-		}
+	// First try to convert to primitive.A (BSON array)
+	questions, ok := questionsToParse.(bson.A)
+	if !ok {
+		log.Printf("Warning: quizQuestions type: %T", questionsToParse)
+		return questionsParsed
 	}
+
+	for i, question := range questions {
+		// Add debug logging
+		log.Printf("Processing question %d, type: %T", i, question)
+
+		var qMap bson.M
+		switch v := question.(type) {
+		case bson.M:
+			qMap = v
+		case bson.D:
+			// Convert bson.D to bson.M manually
+			qMap = make(bson.M)
+			for _, elem := range v {
+				qMap[elem.Key] = elem.Value
+			}
+		default:
+			log.Printf("Warning: question type %T cannot be converted to bson.M", question)
+			continue
+		}
+
+		var q QuizQuestions
+		// ...rest of the function remains the same...
+
+		// More robust type conversions
+		if val, ok := qMap["question"]; ok {
+			if str, ok := val.(string); ok {
+				q.Question = str
+			}
+		}
+
+		if val, ok := qMap["points"]; ok {
+			switch v := val.(type) {
+			case int32:
+				q.Points = int(v)
+			case int64:
+				q.Points = int(v)
+			case int:
+				q.Points = v
+			}
+		}
+
+		if val, ok := qMap["difficulty"]; ok {
+			switch v := val.(type) {
+			case int32:
+				q.Difficulty = int(v)
+			case int64:
+				q.Difficulty = int(v)
+			case int:
+				q.Difficulty = v
+			}
+		}
+
+		if val, ok := qMap["hint"].(string); ok {
+			q.Hint = val
+		}
+
+		if val, ok := qMap["category"].(bson.A); ok {
+			q.Category = toStringSlice(val)
+		}
+
+		if val, ok := qMap["options"].(bson.A); ok {
+			q.Options = toStringSlice(val)
+		}
+
+		if val, ok := qMap["answer"]; ok {
+			switch v := val.(type) {
+			case int32:
+				q.Answer = int(v)
+			case int64:
+				q.Answer = int(v)
+			case int:
+				q.Answer = v
+			}
+		}
+
+		questionsParsed = append(questionsParsed, q)
+	}
+
+	return questionsParsed
 }
 
 // Helper function to convert []interface{} to []string
