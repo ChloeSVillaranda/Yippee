@@ -9,24 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-// Struct to parse data
-type Quiz struct {
-	QuizName        string          `json:"quizName"`
-	QuizDescription string          `json:"quizDescription"`
-	CreatedBy       string          `json:"createdBy"`
-	QuizQuestions   []QuizQuestions `json:"quizQuestions"`
-}
-
-type QuizQuestions struct {
-	Question   string   `bson:"question"`
-	Points     int      `bson:"points"`
-	Difficulty int      `bson:"difficulty"`
-	Hint       string   `bson:"hint"`
-	Category   []string `bson:"category"`
-	Options    []string `bson:"options"`
-	Answer     int      `bson:"answer"`
-}
-
 // REST endpoint to create a quiz
 func createQuizHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {

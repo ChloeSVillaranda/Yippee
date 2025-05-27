@@ -10,17 +10,6 @@ import { gameActions } from "../stores/gameSlice";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-// import { setQuiz, setRole, setUserName, upsertClientsInLobby } from "../stores/gameSlice";
-
-
-
-
-
-
-
-
-
-
 export default function HostGame() {
   const [hostName, setHostName] = useState<string>(""); // host name input
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);

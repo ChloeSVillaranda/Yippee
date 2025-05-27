@@ -1,4 +1,4 @@
-// contains all the functions a user is able to do (ex. create/update/delete quiz)
+// contains all the functions a user is able to do to mongodb (ex. create/update/delete quiz)
 package main
 
 import (
