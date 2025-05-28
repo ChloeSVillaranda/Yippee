@@ -57,7 +57,6 @@ export default function JoinGame() {
         if (data.lobby.roomCode) { // TODO: this ran like 3 times so figure why that happened
           // receive from backend who is already in the lobby, so update that 
           // before entering the lobby room
-          dispatch(gameActions.setQuiz(data.lobby.quiz))
           dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
           navigate(`/${data.lobby.roomCode}`);
         } else {

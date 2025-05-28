@@ -15,16 +15,24 @@ export type Quiz = {
     quizName: string;
     quizDescription: string;
     user: string;
-    questions: {
-      question: string;
-      points: number;
-      difficulty: number;
-      hint: string;
-      category: string[];
-      options: string[];
-      answer: number;
-    }[];
-  };
+    questions: QuizQuestion[];
+};
+
+export type QuizQuestion = {
+  question: string;
+  points: number;
+  difficulty: number;
+  hint: string;
+  category: string[];
+  options: string[];
+  answer: number;
+}
+
+export type GameSettings = {
+  enableMessages: boolean; 
+  showMessagesDuringGame: boolean;
+  showLeaderboard: boolean; 
+}
   
 export type User = {
     userName: string;

@@ -51,6 +51,8 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleJoinLobby(conn, data)
 		case "sendLobbyMessage":
 			handleSendLobbyMessage(conn, data)
+		case "startGame":
+			handleStartGame(conn, data)
 		default:
 			log.Println("Unknown action:", data.Action)
 		}
@@ -82,9 +84,11 @@ func handleCreateLobby(conn *websocket.Conn, data MessageRequest) {
 
 	// create a new lobby
 	lobbies[roomCode] = &Lobby{
-		RoomCode:       roomCode,
-		Quiz:           data.Quiz,
-		ClientsInLobby: make(map[*websocket.Conn]User),
+		RoomCode:        roomCode,
+		Quiz:            data.Quiz,
+		ClientsInLobby:  make(map[*websocket.Conn]User),
+		Status:          "Waiting",
+		CurrentQuestion: data.Quiz.QuizQuestions[0], // TODO: if shuffled (in settings), the current question will be different
 	}
 
 	// add host as part of ClientsInLobby
@@ -99,10 +103,12 @@ func handleCreateLobby(conn *websocket.Conn, data MessageRequest) {
 	// send info back to the host
 	conn.WriteJSON(MessageResponse{
 		MessageToClient: "Lobby created successfully",
-		Lobby: Lobby{
-			RoomCode: roomCode,
-			Quiz:     lobbies[roomCode].Quiz,
-		},
+		// Lobby: Lobby{
+		// 	RoomCode: roomCode,
+		// 	Quiz:     lobbies[roomCode].Quiz,
+		// 	Status:   lobbies[roomCode].Status,
+		// },
+		Lobby: *lobbies[roomCode], // send back the created lobby information
 	})
 }
 
@@ -138,11 +144,8 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 	// send the quiz details back to the client + who is already connected
 	conn.WriteJSON(MessageResponse{
 		MessageToClient: "Joined lobby successfully",
-		Lobby: Lobby{
-			Quiz:     lobby.Quiz,
-			RoomCode: data.RoomCode,
-		},
-		ClientsInLobby: connectedClients,
+		Lobby:           *lobby,
+		ClientsInLobby:  connectedClients,
 	})
 
 	// notify all clients about the updated list of players
@@ -226,4 +229,45 @@ func handleSendLobbyMessage(conn *websocket.Conn, data MessageRequest) {
 
 	// notify all clients in the lobby about the updated state
 	notifyLobbyClients(lobby)
+}
+
+// handler for dealing when a host starts a game
+func handleStartGame(conn *websocket.Conn, data MessageRequest) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	// check if the lobby exists
+	lobby, exists := lobbies[data.RoomCode]
+	if !exists {
+		conn.WriteJSON(MessageResponse{
+			Error: "Lobby not found",
+		})
+		return
+	}
+
+	// check if user exists in lobby and is the host
+	user, exists := lobby.ClientsInLobby[conn]
+	if !exists || user.UserRole != "host" {
+		conn.WriteJSON(MessageResponse{
+			Error: "Only the host can start the game",
+		})
+		return
+	}
+
+	// update lobby status
+	lobby.Status = "In-Progress"
+	log.Printf("Game started in lobby: %s by host: %s\n", data.RoomCode, user.UserName)
+
+	// update lobby in the global map
+	lobbies[data.RoomCode] = lobby
+
+	// Notify all clients in the lobby that the game has started
+	message := MessageResponse{
+		MessageToClient: "Game start",
+		Lobby:           *lobby,
+	}
+
+	for client := range lobby.ClientsInLobby {
+		client.WriteJSON(message)
+	}
 }

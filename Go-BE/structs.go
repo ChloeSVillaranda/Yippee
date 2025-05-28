@@ -1,7 +1,11 @@
 // this file contains all the structs used throughout the project
 package main
 
-import "github.com/gorilla/websocket"
+import (
+	"time"
+
+	"github.com/gorilla/websocket"
+)
 
 type Quiz struct {
 	QuizName        string         `json:"quizName"`
@@ -22,19 +26,22 @@ type QuizQuestion struct {
 
 // lobby structure
 type Lobby struct {
-	RoomCode        string                   `json:"roomCode, omitempty"`
-	Quiz            Quiz                     `json:"quiz, omitempty"`
-	ClientsInLobby  map[*websocket.Conn]User `json:"-"`                 // won't ever be sent to the FE
-	Status          string                   `json:"status, omitempty"` //TODO: make an enum of Not Started, In-Progress, Finished
-	Settings        Settings                 `json:"settings, omitempty"`
-	CurrentQuestion QuizQuestion             `json:"currentQuestion, omitempty"`
+	RoomCode        string                   `json:"roomCode,omitempty"`
+	Quiz            Quiz                     `json:"-"`
+	ClientsInLobby  map[*websocket.Conn]User `json:"-"`                // won't ever be sent to the FE
+	Status          string                   `json:"status,omitempty"` //TODO: make an enum of Not Started, In-Progress, Finished
+	Settings        Settings                 `json:"settings,omitempty"`
+	CurrentQuestion QuizQuestion             `json:"currentQuestion,omitempty"`
+	Timer           *time.Timer              `json:"-"`                       // keep timer on backend
+	TimeRemaining   int                      `json:"timeRemaining,omitempty"` // send remaining time to clients
 }
 
 type Settings struct {
-	QuestionTime           int  `json:"questionTime, omitempty"` // TODO: figure out if infinite should be set to 0
+	QuestionTime           int  `json:"questionTime,omitempty"` // TODO: figure out if infinite should be set to 0 and if the timer should be kept on backend
 	EnableMessages         bool `json:"enableMessages"`
 	ShowMessagesDuringGame bool `json:"showMessagesDuringGame"`
 	ShowLeaderboard        bool `json:"showLeaderboard"`
+	ShuffleQuestions       bool `json:"-"`
 }
 
 // Message structure

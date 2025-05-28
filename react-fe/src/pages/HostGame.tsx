@@ -60,7 +60,6 @@ export default function HostGame() {
         console.log("Message from server from Host Game:", data);
 
         if (data.lobby.roomCode) {
-          dispatch(gameActions.setQuiz(selectedQuiz));
           dispatch(gameActions.upsertClientsInLobby([user]));
           navigate(`/${data.lobby.roomCode}`);
         } else {
