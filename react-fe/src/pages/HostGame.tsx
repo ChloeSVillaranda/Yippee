@@ -59,10 +59,10 @@ export default function HostGame() {
       (data) => {
         console.log("Message from server from Host Game:", data);
 
-        if (data.roomCode) {
+        if (data.lobby.roomCode) {
           dispatch(gameActions.setQuiz(selectedQuiz));
           dispatch(gameActions.upsertClientsInLobby([user]));
-          navigate(`/${data.roomCode}`);
+          navigate(`/${data.lobby.roomCode}`);
         } else {
           setError("Room code not received from server.");
           console.error("Room code not received from server:", data);

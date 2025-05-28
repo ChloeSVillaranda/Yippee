@@ -54,12 +54,12 @@ export default function JoinGame() {
       (data) => {
         console.log("Message from server for Join Game:", data as MessageResponse);
 
-        if (data.roomCode) { // TODO: this ran like 3 times so figure why that happened
+        if (data.lobby.roomCode) { // TODO: this ran like 3 times so figure why that happened
           // receive from backend who is already in the lobby, so update that 
           // before entering the lobby room
-          dispatch(gameActions.setQuiz(data.quiz))
+          dispatch(gameActions.setQuiz(data.lobby.quiz))
           dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
-          navigate(`/${data.roomCode}`);
+          navigate(`/${data.lobby.roomCode}`);
         } else {
           console.error("Could not connect to the server:", data);
         }
