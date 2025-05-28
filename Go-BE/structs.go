@@ -27,11 +27,20 @@ type Lobby struct {
 	ClientsInLobby map[*websocket.Conn]User `json:"-"` // Map of clients to their player info
 	Status         string                   `json:"-"` //TODO: make an enum of Not Started, In-Progress, Finished
 	Game           Game                     `json:"-"`
+	Settings       Settings                 `json:"settings"`
 }
 
-// game structure, has settings
+// game structure
 type Game struct {
 	CurrentQuestion QuizQuestion `json:"currentQuestion"`
+	GameSettings    Settings     `json:"gameSettings"`
+}
+
+type Settings struct {
+	QuestionTime           int  `json:"questionTime, omitempty"`
+	EnableMessages         bool `json:"enableMessages"`
+	ShowMessagesDuringGame bool `json:"showMessagesDuringGame"`
+	ShowLeaderboard        bool `json:"showLeaderboard, omitempty"`
 }
 
 // Message structure
