@@ -18,7 +18,8 @@ function AppRoutes() {
           element={<HostGame />}/>
         <Route path="/join"
           element={<JoinGame />}/>
-        <Route path="/:roomCode" element={<LobbyRoom />} />
+        {/* TODO: make the :/roomCode protected so that you need to be a player/host to enter it */}
+        <Route path="/:roomCode" element={<LobbyRoom />} /> 
       </Routes>
     </>
   );

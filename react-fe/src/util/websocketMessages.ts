@@ -76,7 +76,7 @@ export const startGameMessage = (
 ) => {
   webSocket.send(
     JSON.stringify({
-      action: "sendLobbyMessage",
+      action: "startGame",
       roomCode: roomCode,
       user: user,
     })

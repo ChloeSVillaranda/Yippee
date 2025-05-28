@@ -8,6 +8,7 @@ interface GameState {
     // quiz: Quiz | undefined; 
     gameSettings: GameSettings | undefined;
     currentQuestion: QuizQuestion | undefined;  
+    gameStatus: string | undefined;
 }
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
     clientsInLobby: [], 
     gameSettings: undefined,
     currentQuestion: undefined, 
+    gameStatus: undefined,
 } satisfies GameState as GameState
 
 const gameSlice = createSlice({
@@ -47,7 +49,10 @@ const gameSlice = createSlice({
         },
         setCurrentQuestion: (state, action: PayloadAction<QuizQuestion>) => {
             state.currentQuestion = action.payload;
-        }
+        },
+        setGameStatus: (state, action: PayloadAction<string>) => {
+            state.gameStatus = action.payload;
+        },
     }
 })
 

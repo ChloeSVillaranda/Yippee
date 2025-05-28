@@ -4,6 +4,8 @@ import { executeWebSocketCommand, setupWebSocketHandlers } from "../util/websock
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
+import HostGameView from "./HostGameView";
+import PlayerGameView from "./PlayerGameView";
 import { RootState } from "../stores/store";
 import { gameActions } from "../stores/gameSlice";
 import { useParams } from "react-router-dom";
@@ -15,7 +17,8 @@ export default function LobbyRoom() {
   const [lobbyMessage, setLobbyMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
-  
+  const lobbyStatus = useSelector((state: RootState) => state.game.gameStatus);
+
   useEffect(() => {
     // set up WebSocket event handlers
     setupWebSocketHandlers(
@@ -24,7 +27,10 @@ export default function LobbyRoom() {
         
         if(data.messageToClient == "Lobby updated") {
           dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
-        } else {
+        } else if(data.messageToClient == "Game start") {
+          dispatch(gameActions.setGameStatus(data.lobby.status))
+        }
+        else {
           console.error("Issue with updating the clients in lobby")
         }
         },
@@ -51,13 +57,11 @@ export default function LobbyRoom() {
       points: 0,
     } as User;
         
-    console.log("sent the message: ", lobbyMessage)
-
     // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
         "sendLobbyMessage",
         { roomCode: roomCode, user: user },
-        (errorMessage) => setError(errorMessage) // Error callback
+        (errorMessage) => setError(errorMessage)
     );
     // reset the message to be blank
     setLobbyMessage("")
@@ -65,12 +69,11 @@ export default function LobbyRoom() {
 
   const handleStartGame = () => {
     // TODO: ensure that there is at least one player
-
     console.log("Starting the Game")
     executeWebSocketCommand(
         "startGame",
         { roomCode: roomCode, user: userDetails },
-        (errorMessage) => setError(errorMessage) // Error callback
+        (errorMessage) => setError(errorMessage)
     );
   }
 
@@ -125,7 +128,7 @@ export default function LobbyRoom() {
           <Typography variant="body1">
             You are the host. Manage the game and start the quiz.
           </Typography>
-          <Button variant="contained" color="primary" sx={{ marginTop: 2 }}>
+          <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={handleStartGame}>
             Start Game
           </Button>
         </Box>
