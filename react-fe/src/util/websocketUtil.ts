@@ -1,8 +1,5 @@
-import {
-  sendCreateLobbyMessage,
-  sendJoinLobbyMessage,
-  sendLobbyMessage,
-} from "./websocketMessages";
+import * as wsMessage from "./websocketMessages";
+
 import { useDispatch, useSelector } from "react-redux";
 
 import { MessageResponse } from "../stores/types";
@@ -79,9 +76,10 @@ const callCommandFunction = (
 ) => {
     // commands to send to the backend
   const commandMap: Record<string, Function> = {
-    createLobby: sendCreateLobbyMessage,
-    joinLobby: sendJoinLobbyMessage,
-    sendLobbyMessage: sendLobbyMessage,
+    createLobby: wsMessage.sendCreateLobbyMessage,
+    joinLobby: wsMessage.sendJoinLobbyMessage,
+    sendLobbyMessage: wsMessage.sendLobbyMessage,
+    startGame: wsMessage.startGameMessage,
   };
 
   const commandFunction = commandMap[command];

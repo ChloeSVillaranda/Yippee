@@ -2,9 +2,15 @@
 
 import { Quiz, User } from "../stores/types";
 
+/**
+ * Creates a Lobby
+ * @param webSocket - The WebSocket connection.
+ * @param quiz - The quiz that the game will be using.
+ * @param user - The host requesting to make a lobby. 
+ */
 export const sendCreateLobbyMessage = (
   webSocket: WebSocket,
-  quiz: Quiz, // TODO: should not be a string later
+  quiz: Quiz,
   user: User
 ) => {
   webSocket.send(
@@ -20,7 +26,7 @@ export const sendCreateLobbyMessage = (
  * Join an existing lobby.
  * @param webSocket - The WebSocket connection.
  * @param roomCode - The room code to join.
- * @param user - The user.
+ * @param user - The player joining the lobby.
  */
 export const sendJoinLobbyMessage = (
   webSocket: WebSocket,
@@ -40,10 +46,30 @@ export const sendJoinLobbyMessage = (
  * Sends a message to be sent to the lobby.
  * @param webSocket - The WebSocket connection.
  * @param roomCode - The room code.
- * @param senderName - Name of the sender
- * @param message - The message that is being send.
+ * @param user - User sending the message.
  */
 export const sendLobbyMessage = (
+  webSocket: WebSocket,
+  roomCode: string,
+  user: User,
+) => {
+  webSocket.send(
+    JSON.stringify({
+      action: "sendLobbyMessage",
+      roomCode: roomCode,
+      user: user,
+    })
+  );
+};
+
+
+/**
+ * Sends a request to the backend to start the game
+ * @param webSocket - The WebSocket connection.
+ * @param roomCode - The room code.
+ * @param user - User (Host only).
+ */
+export const startGameMessage = (
   webSocket: WebSocket,
   roomCode: string,
   user: User,

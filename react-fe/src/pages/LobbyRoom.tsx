@@ -63,6 +63,17 @@ export default function LobbyRoom() {
     setLobbyMessage("")
   }
 
+  const handleStartGame = () => {
+    // TODO: ensure that there is at least one player
+
+    console.log("Starting the Game")
+    executeWebSocketCommand(
+        "startGame",
+        { roomCode: roomCode, user: userDetails },
+        (errorMessage) => setError(errorMessage) // Error callback
+    );
+  }
+
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom>
