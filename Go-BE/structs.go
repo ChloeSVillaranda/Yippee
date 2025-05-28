@@ -22,25 +22,19 @@ type QuizQuestion struct {
 
 // lobby structure
 type Lobby struct {
-	RoomCode       string                   `json:"-"`
-	Quiz           Quiz                     `json:"quiz"`
-	ClientsInLobby map[*websocket.Conn]User `json:"-"` // Map of clients to their player info
-	Status         string                   `json:"-"` //TODO: make an enum of Not Started, In-Progress, Finished
-	Game           Game                     `json:"-"`
-	Settings       Settings                 `json:"settings"`
-}
-
-// game structure
-type Game struct {
-	CurrentQuestion QuizQuestion `json:"currentQuestion"`
-	GameSettings    Settings     `json:"gameSettings"`
+	RoomCode        string                   `json:"roomCode, omitempty"`
+	Quiz            Quiz                     `json:"quiz, omitempty"`
+	ClientsInLobby  map[*websocket.Conn]User `json:"-"`                 // won't ever be sent to the FE
+	Status          string                   `json:"status, omitempty"` //TODO: make an enum of Not Started, In-Progress, Finished
+	Settings        Settings                 `json:"settings, omitempty"`
+	CurrentQuestion QuizQuestion             `json:"currentQuestion, omitempty"`
 }
 
 type Settings struct {
-	QuestionTime           int  `json:"questionTime, omitempty"`
+	QuestionTime           int  `json:"questionTime, omitempty"` // TODO: figure out if infinite should be set to 0
 	EnableMessages         bool `json:"enableMessages"`
 	ShowMessagesDuringGame bool `json:"showMessagesDuringGame"`
-	ShowLeaderboard        bool `json:"showLeaderboard, omitempty"`
+	ShowLeaderboard        bool `json:"showLeaderboard"`
 }
 
 // Message structure
@@ -54,12 +48,10 @@ type MessageRequest struct {
 
 // Json responses (sent by server to client)
 type MessageResponse struct {
-	RoomCode        string `json:"roomCode,omitempty"`
 	MessageToClient string `json:"messageToClient"` // TODO: can remove if stable?
-	Quiz            Quiz   `json:"quiz,omitempty"`  // TODO: remove, temporarily a string
 	Error           string `json:"error,omitempty"` // send error back to client if any
+	Lobby           Lobby  `json:"lobby,omitempty"`
 	ClientsInLobby  []User `json:"clientsInLobby,omitempty"`
-	LobbyStatus     string `json:"lobbyStatus,omitempty"`
 }
 
 type User struct {

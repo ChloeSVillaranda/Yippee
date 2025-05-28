@@ -99,8 +99,10 @@ func handleCreateLobby(conn *websocket.Conn, data MessageRequest) {
 	// send info back to the host
 	conn.WriteJSON(MessageResponse{
 		MessageToClient: "Lobby created successfully",
-		Quiz:            lobbies[roomCode].Quiz,
-		RoomCode:        roomCode,
+		Lobby: Lobby{
+			RoomCode: roomCode,
+			Quiz:     lobbies[roomCode].Quiz,
+		},
 	})
 }
 
@@ -136,9 +138,11 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 	// send the quiz details back to the client + who is already connected
 	conn.WriteJSON(MessageResponse{
 		MessageToClient: "Joined lobby successfully",
-		Quiz:            lobby.Quiz, //TODO return quiz details
-		RoomCode:        data.RoomCode,
-		ClientsInLobby:  connectedClients,
+		Lobby: Lobby{
+			Quiz:     lobby.Quiz,
+			RoomCode: data.RoomCode,
+		},
+		ClientsInLobby: connectedClients,
 	})
 
 	// notify all clients about the updated list of players
