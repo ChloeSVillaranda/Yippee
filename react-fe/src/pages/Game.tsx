@@ -1,6 +1,5 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { MessageResponse, User } from "../stores/types";
-import { executeWebSocketCommand, setupWebSocketHandlers } from "../util/websocketUtil";
+import { MessageResponse, QuizQuestion, User } from "../stores/types";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
@@ -9,7 +8,7 @@ import LobbyRoomView from "../components/LobbyRoomView";
 import PlayerGameView from "../components/PlayerGameView";
 import { RootState } from "../stores/store";
 import { gameActions } from "../stores/gameSlice";
-import { useParams } from "react-router-dom";
+import { setupWebSocketHandlers } from "../util/websocketUtil";
 
 export default function LobbyRoom() {
   const userDetails = useSelector((state: RootState) => state.game.user); // get current user details from Redux
@@ -26,6 +25,7 @@ export default function LobbyRoom() {
           dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
         } else if(data.messageToClient == "Game start") {
           dispatch(gameActions.setGameStatus(data.lobby.status))
+          dispatch(gameActions.setCurrentQuestion(data.lobby.currentQuestion as QuizQuestion))
         }
         else {
           console.error("Issue with updating the clients in lobby")

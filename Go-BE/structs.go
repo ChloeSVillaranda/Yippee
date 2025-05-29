@@ -15,13 +15,13 @@ type Quiz struct {
 }
 
 type QuizQuestion struct {
-	Question   string   `bson:"question"`
-	Points     int      `bson:"points"`
-	Difficulty int      `bson:"difficulty"`
-	Hint       string   `bson:"hint"`
-	Category   []string `bson:"category"`
-	Options    []string `bson:"options"`
-	Answer     int      `bson:"answer"`
+	Question   string   `json:"question"`
+	Points     int      `json:"points"`
+	Difficulty int      `json:"difficulty"`
+	Hint       string   `json:"hint"`
+	Category   []string `json:"category"`
+	Options    []string `json:"options"`
+	Answer     int      `json:"answer"`
 }
 
 // lobby structure
