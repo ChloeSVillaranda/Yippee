@@ -60,6 +60,7 @@ export default function JoinGame() {
           dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
           dispatch(gameActions.setGameSettings(data.lobby.settings));
           dispatch(gameActions.setGameStatus(data.lobby.status))
+          dispatch(gameActions.setRoomCode(data.lobby.roomCode))
           navigate(`/${data.lobby.roomCode}`);
         } else {
           console.error("Could not connect to the server:", data);

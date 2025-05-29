@@ -61,6 +61,10 @@ export default function HostGame() {
 
         if (data.lobby.roomCode) {
           dispatch(gameActions.upsertClientsInLobby([user]));
+          dispatch(gameActions.setRoomCode(data.lobby.roomCode))
+          // TODO: add settings later
+          // dispatch(gameActions.setGameSettings(data.lobby.settings));
+          dispatch(gameActions.setGameStatus("Waiting"))
           navigate(`/${data.lobby.roomCode}`);
         } else {
           setError("Room code not received from server.");

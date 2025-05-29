@@ -3,12 +3,13 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { GameSettings, QuizQuestion, User } from "./types"; 
 
 interface GameState {
-    user: User // own user
+    user: User; // own user
+    roomCode: string;
     clientsInLobby: User[];
     // quiz: Quiz | undefined; 
     gameSettings: GameSettings | undefined;
     currentQuestion: QuizQuestion | undefined;  
-    gameStatus: string | undefined;
+    gameStatus: string;
 }
 
 const initialState = {
@@ -18,10 +19,11 @@ const initialState = {
         userRole: "",
         points: 0, 
     }, 
+    roomCode: "", 
     clientsInLobby: [], 
     gameSettings: undefined,
     currentQuestion: undefined, 
-    gameStatus: undefined,
+    gameStatus: "",
 } satisfies GameState as GameState
 
 const gameSlice = createSlice({
@@ -32,6 +34,9 @@ const gameSlice = createSlice({
         setUserName: (state, action: PayloadAction<string>) => {
             state.user.userName = action.payload;
         }, 
+        setRoomCode: (state, action: PayloadAction<string>) => {
+            state.roomCode = action.payload;
+        },         
         // set the user role 
         setRole: (state, action: PayloadAction<string>) => {
             state.user.userRole = action.payload;

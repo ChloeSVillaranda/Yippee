@@ -4,7 +4,7 @@ import CreateQuiz from "./pages/CreateQuiz"
 import Home from "./pages/Home";
 import HostGame from "./pages/HostGame";
 import JoinGame from "./pages/JoinGame";
-import LobbyRoom from "./pages/LobbyRoom";
+import LobbyRoom from "./pages/Game";
 
 function AppRoutes() {
   return (

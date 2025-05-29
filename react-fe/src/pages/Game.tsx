@@ -12,11 +12,7 @@ import { gameActions } from "../stores/gameSlice";
 import { useParams } from "react-router-dom";
 
 export default function LobbyRoom() {
-  const { roomCode } = useParams<{ roomCode: string }>();
-  const clientsInLobby = useSelector((state: RootState) => state.game.clientsInLobby); // get the clientsInLobby from Redux
   const userDetails = useSelector((state: RootState) => state.game.user); // get current user details from Redux
-  const [lobbyMessage, setLobbyMessage] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const lobbyStatus = useSelector((state: RootState) => state.game.gameStatus);
 
@@ -41,58 +37,25 @@ export default function LobbyRoom() {
         }
     );
     
-  }, [clientsInLobby]);
-
-  const handleSendMessage = () => {
-    // send a message to be displayed to the lobby
-    if (!lobbyMessage.trim()) {
-        console.log("can not be set empty");
-        return;
-    }
-
-    // update the user details with the message sent
-    const user = {
-      userName: userDetails.userName,
-      userRole: userDetails.userRole,
-      userMessage: lobbyMessage,
-      points: 0,
-    } as User;
-        
-    // execute the "createLobby" WebSocket command
-    executeWebSocketCommand(
-        "sendLobbyMessage",
-        { roomCode: roomCode, user: user },
-        (errorMessage) => setError(errorMessage)
-    );
-    // reset the message to be blank
-    setLobbyMessage("")
-  }
-
-  const handleStartGame = () => {
-    // TODO: ensure that there is at least one player
-    console.log("Starting the Game")
-    executeWebSocketCommand(
-        "startGame",
-        { roomCode: roomCode, user: userDetails },
-        (errorMessage) => setError(errorMessage)
-    );
-  }
+  }, [dispatch]);
 
   return (
     <>
     {lobbyStatus === "Waiting" ? (
       <LobbyRoomView />
-
     ) : lobbyStatus === "In-Progress" ? (
-      <HostGameView />
-
+      userDetails.userRole === "host" ? (
+        <HostGameView />
+      ) : (
+        <PlayerGameView />
+      )
     ) : lobbyStatus === "Finished" ? (
       <Box>
+        {/* TODO: implement a leaderboard */}
           <Typography variant="h5" gutterBottom>
             Game has ended.
           </Typography>
       </Box>
-
     ) : (
       // TODO: handle case where there is no lobbyStatus
       <Box>

@@ -1,27 +1,73 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 
+import { RootState } from "../stores/store";
+import { User } from "../stores/types";
+import { executeWebSocketCommand } from "../util/websocketUtil";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+
 export default function LobbyRoomView() {
+  const game = useSelector((state: RootState) => state.game); // get the clientsInLobby from Redux
+  const [lobbyMessage, setLobbyMessage] = useState("");
+  const userDetails = useSelector((state: RootState) => state.game.user); // get current user details from Redux
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSendMessage = () => {
+    // send a message to be displayed to the lobby
+    if (!lobbyMessage.trim()) {
+        console.log("can not be set empty");
+        return;
+    }
+
+    // update the user details with the message sent
+    const user = {
+      userName: userDetails.userName,
+      userRole: userDetails.userRole,
+      userMessage: lobbyMessage,
+      points: 0,
+    } as User;
+        
+    // execute the "createLobby" WebSocket command
+    executeWebSocketCommand(
+        "sendLobbyMessage",
+        { roomCode: game.roomCode, user: user },
+        (errorMessage) => setError(errorMessage)
+    );
+    // reset the message to be blank
+    setLobbyMessage("")
+  }
+
+  const handleStartGame = () => {
+    // TODO: ensure that there is at least one player
+    console.log("Starting the Game")
+    executeWebSocketCommand(
+        "startGame",
+        { roomCode: game.roomCode, user: userDetails },
+        (errorMessage) => setError(errorMessage)
+    );
+  }
+
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Room: {roomCode}
+        Room: {game.roomCode}
       </Typography>
       {/* quiz displayed for players to see */}
       {/* TODO: set it properly to the quiz instead of the host name! */}
       <Typography variant="h5" gutterBottom>
-        Quiz: {clientsInLobby.find((user) => user.userRole === "host")?.userName || "Loading..."}
+        Quiz: {game.clientsInLobby.find((user) => user.userRole === "host")?.userName || "Loading..."}
       </Typography>
       {/* host displayed */}
       <Typography variant="h5" gutterBottom>
-        Host: {clientsInLobby.find((user) => user.userRole === "host")?.userName || "Loading..."}
-        {clientsInLobby.find((user) => user.userRole === "host")?.userMessage && `: ${clientsInLobby.find((user) => user.userRole === "host")?.userMessage}`}
+        Host: {game.clientsInLobby.find((user) => user.userRole === "host")?.userName || "Loading..."}
+        {game.clientsInLobby.find((user) => user.userRole === "host")?.userMessage && `: ${game.clientsInLobby.find((user) => user.userRole === "host")?.userMessage}`}
       </Typography>
       <Typography variant="h6" gutterBottom>
         Players:
       </Typography>
       <Box>
-        {clientsInLobby.length > 0 ? (
-          clientsInLobby
+        {game.clientsInLobby.length > 0 ? (
+          game.clientsInLobby
             .filter((user) => user.userRole === "player") // Filter only players
             .map((player, index) => (
               <Typography key={index} variant="body1">
