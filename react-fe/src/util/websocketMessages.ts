@@ -104,3 +104,23 @@ export const submitAnswer = (
     })
   );
 };
+
+/**
+ * Moves onto the next question
+ * @param webSocket - The WebSocket connection.
+ * @param roomCode - The room code.
+ * @param user - User (Host only).
+ */
+export const nextQuestion = (
+  webSocket: WebSocket,
+  roomCode: string,
+  user: User,
+) => {
+  webSocket.send(
+    JSON.stringify({
+      action: "nextQuestion",
+      roomCode: roomCode,
+      user: user,
+    })
+  );
+};

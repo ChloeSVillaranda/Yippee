@@ -1,10 +1,20 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
 import { RootState } from "../stores/store";
+import { executeWebSocketCommand } from "../util/websocketUtil";
 import { useSelector } from "react-redux";
 
 export default function HostGameView() {
   const game = useSelector((state: RootState) => state.game);
+
+  const handleNextQuestion = () => {
+    console.log("Moving onto the next question")
+    executeWebSocketCommand(
+      "nextQuestion",
+      { roomCode: game.roomCode, user: game.user},
+      (errorMessage) => console.log(errorMessage)
+    );
+  }
 
   return (
     <>
@@ -23,6 +33,9 @@ export default function HostGameView() {
           ))
         }
       </Box>
+      <Button onClick={handleNextQuestion}>
+        Next Question
+      </Button>
     </>
   );
 }

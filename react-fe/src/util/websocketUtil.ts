@@ -81,6 +81,7 @@ const callCommandFunction = (
     sendLobbyMessage: wsMessage.sendLobbyMessage,
     startGame: wsMessage.startGameMessage,
     submitAnswer: wsMessage.submitAnswer,
+    nextQuestion: wsMessage.nextQuestion,
   };
 
   const commandFunction = commandMap[command];

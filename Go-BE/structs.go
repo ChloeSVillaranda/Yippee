@@ -26,14 +26,15 @@ type QuizQuestion struct {
 
 // lobby structure
 type Lobby struct {
-	RoomCode        string                   `json:"roomCode,omitempty"`
-	Quiz            Quiz                     `json:"-"`
-	ClientsInLobby  map[*websocket.Conn]User `json:"-"`                // won't ever be sent to the FE
-	Status          string                   `json:"status,omitempty"` //TODO: make an enum of Not Started, In-Progress, Finished
-	Settings        Settings                 `json:"settings,omitempty"`
-	CurrentQuestion QuizQuestion             `json:"currentQuestion,omitempty"`
-	Timer           *time.Timer              `json:"-"`                       // keep timer on backend
-	TimeRemaining   int                      `json:"timeRemaining,omitempty"` // send remaining time to clients
+	RoomCode             string                   `json:"roomCode,omitempty"`
+	Quiz                 Quiz                     `json:"-"`
+	ClientsInLobby       map[*websocket.Conn]User `json:"-"`                // won't ever be sent to the FE
+	Status               string                   `json:"status,omitempty"` //TODO: make an enum of Not Started, In-Progress, Finished
+	Settings             Settings                 `json:"settings,omitempty"`
+	CurrentQuestionIndex int                      `json:"currentQuestionIndex,omitempty"`
+	CurrentQuestion      QuizQuestion             `json:"currentQuestion,omitempty"`
+	Timer                *time.Timer              `json:"-"`                       // keep timer on backend
+	TimeRemaining        int                      `json:"timeRemaining,omitempty"` // send remaining time to clients
 }
 
 type Settings struct {
