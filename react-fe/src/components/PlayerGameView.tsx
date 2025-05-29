@@ -7,12 +7,12 @@ import { useState } from "react";
 
 export default function PlayerGameView() {
   const game = useSelector((state: RootState) => state.game);
+  const [submittedAnswer, setSubmittedAnswer] = useState(false)
 
   // send to backend player answer
   const handleSubmitAnswer = (index: number) => {
-    
-    
     console.log("Submitted answer:", index)
+    setSubmittedAnswer(true)
 
     executeWebSocketCommand(
       "submitAnswer",
@@ -29,15 +29,23 @@ export default function PlayerGameView() {
       <Typography variant="h5" gutterBottom>
         Quiz: {game.currentQuestion?.question}
       </Typography>
-      <Box>
-        {Array.isArray(game.currentQuestion?.options) && 
-          game.currentQuestion?.options.map((option, index) => (
-            <Button key={index} onClick={() => handleSubmitAnswer(index)}>
-              {option}
-            </Button>
-          ))
-        }
-      </Box>
+      {submittedAnswer ?
+        // show that answer has already been submitted 
+        <Typography variant="h5" gutterBottom>
+          Answer Submitted
+        </Typography> 
+      :
+        // else: show the options
+        <Box>
+          {Array.isArray(game.currentQuestion?.options) && 
+            game.currentQuestion?.options.map((option, index) => (
+              <Button key={index} onClick={() => handleSubmitAnswer(index)}>
+                {option}
+              </Button>
+            ))
+          }
+        </Box>
+    }
     </>
   );
 }
