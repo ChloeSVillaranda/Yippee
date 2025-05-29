@@ -80,6 +80,7 @@ const callCommandFunction = (
     joinLobby: wsMessage.sendJoinLobbyMessage,
     sendLobbyMessage: wsMessage.sendLobbyMessage,
     startGame: wsMessage.startGameMessage,
+    submitAnswer: wsMessage.submitAnswer,
   };
 
   const commandFunction = commandMap[command];

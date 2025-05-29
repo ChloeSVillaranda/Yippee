@@ -50,7 +50,8 @@ type MessageRequest struct {
 	Action   string `json:"action"` // requested action client wants to carry out
 	User     User   `json:"user"`   // user who makes the request
 	RoomCode string `json:"roomCode,omitempty"`
-	Quiz     Quiz   `json:"quiz,omitempty"` // TODO: need to send the quiz id for the backend to retrieve from dB
+	Quiz     Quiz   `json:"quiz,omitempty"`   // TODO: need to send the quiz id for the backend to retrieve from dB
+	Answer   int    `json:"answer,omitempty"` // plays submit an int as an answer to a question
 }
 
 // Json responses (sent by server to client)

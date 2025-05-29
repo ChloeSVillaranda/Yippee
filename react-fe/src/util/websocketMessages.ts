@@ -64,7 +64,7 @@ export const sendLobbyMessage = (
 
 
 /**
- * Sends a request to the backend to start the game
+ * Sends a request to the backend to start the game.
  * @param webSocket - The WebSocket connection.
  * @param roomCode - The room code.
  * @param user - User (Host only).
@@ -79,6 +79,28 @@ export const startGameMessage = (
       action: "startGame",
       roomCode: roomCode,
       user: user,
+    })
+  );
+};
+
+/**
+ * Submits an answer and sends it to the backend.
+ * @param webSocket - The WebSocket connection.
+ * @param roomCode - The room code.
+ * @param user - User (Host only).
+ */
+export const submitAnswer = (
+  webSocket: WebSocket,
+  roomCode: string,
+  user: User,
+  answer: number, 
+) => {
+  webSocket.send(
+    JSON.stringify({
+      action: "submitAnswer",
+      roomCode: roomCode,
+      user: user,
+      answer: answer
     })
   );
 };

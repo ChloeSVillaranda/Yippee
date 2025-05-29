@@ -53,6 +53,8 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleSendLobbyMessage(conn, data)
 		case "startGame":
 			handleStartGame(conn, data)
+		case "submitAnswer":
+			handleSubmitAnswer(conn, data)
 		default:
 			log.Println("Unknown action:", data.Action)
 		}
@@ -270,4 +272,37 @@ func handleStartGame(conn *websocket.Conn, data MessageRequest) {
 	for client := range lobby.ClientsInLobby {
 		client.WriteJSON(message)
 	}
+}
+
+// handler for dealing with answers
+func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	// check if the lobby exists
+	lobby, exists := lobbies[data.RoomCode]
+	if !exists {
+		conn.WriteJSON(MessageResponse{
+			Error: "Lobby not found",
+		})
+		return
+	}
+
+	// check if user exists in lobby and is a player
+	user, exists := lobby.ClientsInLobby[conn]
+	if !exists || user.UserRole != "player" {
+		conn.WriteJSON(MessageResponse{
+			Error: "Player unable to submit answer",
+		})
+		return
+	}
+
+	if data.Answer == lobby.CurrentQuestion.Answer {
+		user.Points += 1
+	}
+
+	// update the lobby with the updated points
+	lobbies[data.RoomCode].ClientsInLobby[conn] = user
+
+	notifyLobbyClients(lobbies[data.RoomCode])
 }
