@@ -22,7 +22,7 @@ export default function LobbyRoom() {
         console.log("Message from server for Lobby Game:", data as MessageResponse);
         
         if(data.messageToClient == "Lobby updated") {
-          dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
+          dispatch(gameActions.upsertClientsInLobby(data.lobby.clientsInLobby));
         } else if(data.messageToClient == "Game start") {
           dispatch(gameActions.setGameStatus(data.lobby.status))
           dispatch(gameActions.setCurrentQuestion(data.lobby.currentQuestion as QuizQuestion))
