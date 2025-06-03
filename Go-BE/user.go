@@ -8,35 +8,30 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-// Helper function to create a quiz questions (multiple choice + true/false)
-func createQuestion(question string, points int, difficulty int, hint string, category []string, options []string, answerIndex int) bson.D {
-	// Convert []string of options to bson.A
-	bsonOptions := bson.A{}
-	for _, option := range options {
-		bsonOptions = append(bsonOptions, option)
-	}
-
-	return bson.D{
-		{Key: "question", Value: question},
-		{Key: "points", Value: points},
-		{Key: "difficulty", Value: difficulty},
-		{Key: "hint", Value: hint},
-		{Key: "category", Value: category},
-		{Key: "options", Value: bsonOptions},
-		{Key: "answer", Value: answerIndex},
+// helper function to create a quiz questions (multiple choice + true/false)
+func createQuestion(question string, points int, difficulty int, hint string, category []string, incorrectAnswers []string, correctAnswers []string, typeOfQuestion string) bson.M {
+	return bson.M{
+		"question":         question,
+		"points":           points,
+		"difficulty":       difficulty,
+		"hint":             hint,
+		"category":         category,
+		"incorrectAnswers": incorrectAnswers,
+		"correctAnswers":   correctAnswers,
+		"type":             typeOfQuestion,
 	}
 }
 
-func createQuiz(quizName string, quizDescription string, user string, quizQuestions []bson.D) {
+func createQuiz(quizName string, quizDescription string, user string, quizQuestions []bson.M) {
 	fmt.Println("Creating a quiz")
 
 	// define quiz details
-	quizDetails := bson.D{
-		{Key: "quizName", Value: quizName},
-		{Key: "quizDescription", Value: quizDescription},
-		{Key: "dateCreated", Value: time.Now()},
-		{Key: "quizQuestions", Value: quizQuestions},
-		{Key: "createdBy", Value: user},
+	quizDetails := bson.M{
+		"quizName":        quizName,
+		"quizDescription": quizDescription,
+		"dateCreated":     time.Now(),
+		"quizQuestions":   quizQuestions,
+		"createdBy":       user,
 	}
 
 	// save the quiz to the database

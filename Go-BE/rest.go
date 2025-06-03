@@ -9,40 +9,40 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-// REST endpoint to create a quiz
-func createQuizHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
+// // REST endpoint to create a quiz
+// func createQuizHandler(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method != http.MethodPost {
+// 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+// 		return
+// 	}
 
-	var quiz Quiz
-	err := json.NewDecoder(r.Body).Decode(&quiz)
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
+// 	var quiz Quiz
+// 	err := json.NewDecoder(r.Body).Decode(&quiz)
+// 	if err != nil {
+// 		http.Error(w, "Invalid request body", http.StatusBadRequest)
+// 		return
+// 	}
 
-	// Convert QuizQuestions to []bson.D
-	var quizQuestions []bson.D
-	for _, question := range quiz.QuizQuestions {
-		quizQuestions = append(quizQuestions, bson.D{
-			{Key: "question", Value: question.Question},
-			{Key: "points", Value: question.Points},
-			{Key: "difficulty", Value: question.Difficulty},
-			{Key: "hint", Value: question.Hint},
-			{Key: "category", Value: question.Category},
-			{Key: "options", Value: question.Options},
-			{Key: "answer", Value: question.Answer},
-		})
-	}
+// 	// Convert QuizQuestions to []bson.D
+// 	var quizQuestions []bson.D
+// 	for _, question := range quiz.QuizQuestions {
+// 		quizQuestions = append(quizQuestions, bson.D{
+// 			{Key: "question", Value: question.Question},
+// 			{Key: "points", Value: question.Points},
+// 			{Key: "difficulty", Value: question.Difficulty},
+// 			{Key: "hint", Value: question.Hint},
+// 			{Key: "category", Value: question.Category},
+// 			{Key: "options", Value: question.Options},
+// 			{Key: "answer", Value: question.Answer},
+// 		})
+// 	}
 
-	// Call the createQuiz function
-	createQuiz(quiz.QuizName, quiz.QuizDescription, quiz.CreatedBy, quizQuestions)
+// 	// Call the createQuiz function
+// 	createQuiz(quiz.QuizName, quiz.QuizDescription, quiz.CreatedBy, quizQuestions)
 
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Quiz created successfully"))
-}
+// 	w.WriteHeader(http.StatusCreated)
+// 	w.Write([]byte("Quiz created successfully"))
+// }
 
 // REST endpoint to get all quizzes
 func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {

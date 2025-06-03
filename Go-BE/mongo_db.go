@@ -33,7 +33,7 @@ func connectToDatabase() (*mongo.Client, error) {
 }
 
 // Insert a single document into a collection.
-func createDocument(collection *mongo.Collection, doc bson.D) {
+func createDocument(collection *mongo.Collection, doc bson.M) {
 	insertResult, err := collection.InsertOne(context.TODO(), doc)
 	if err != nil {
 		log.Fatalf("Failed to insert document: %v", err)
@@ -43,7 +43,7 @@ func createDocument(collection *mongo.Collection, doc bson.D) {
 
 // Read all documents of a collection
 func readDocuments(collection *mongo.Collection) {
-	cursor, err := collection.Find(context.TODO(), bson.D{})
+	cursor, err := collection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		log.Fatalf("Failed to find documents: %v", err)
 	}

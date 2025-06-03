@@ -14,15 +14,16 @@ import (
 var Quiz_Collection *mongo.Collection
 
 func populateDbWithQuizzes() {
-	quizQuestionsForQuiz1 := []bson.D{
+	quizQuestionsForQuiz1 := []bson.M{
 		createQuestion(
 			"What is the capital of France?",
 			20,
 			2,
 			"Starts with letter 'P'",
 			[]string{"Geography"},
-			[]string{"Paris", "London", "Berlin", "Madrid"},
-			0,
+			[]string{"London", "Berlin", "Madrid"},
+			[]string{"Paris"},
+			"multiple_choice",
 		),
 		createQuestion(
 			"2 + 2 = 22",
@@ -30,22 +31,24 @@ func populateDbWithQuizzes() {
 			2,
 			"",
 			[]string{"Math"},
-			[]string{"True", "False"},
-			1,
+			[]string{"True"},
+			[]string{"False"},
+			"true_false",
 		),
 	}
 
 	createQuiz("Quiz1", "test to see if this will work", "test_user", quizQuestionsForQuiz1)
 
-	quizQuestionsForQuiz2 := []bson.D{
+	quizQuestionsForQuiz2 := []bson.M{
 		createQuestion(
 			"What is the capital of Spain?",
 			20,
 			2,
-			"Starts with letter 'P'",
+			"Starts with letter 'M'",
 			[]string{"Geography"},
-			[]string{"Paris", "London", "Berlin", "Madrid"},
-			3,
+			[]string{"Paris", "London", "Berlin"},
+			[]string{"Madrid"},
+			"multiple_choice",
 		),
 		createQuestion(
 			"2 + 2 = 4",
@@ -53,13 +56,13 @@ func populateDbWithQuizzes() {
 			2,
 			"",
 			[]string{"Math"},
-			[]string{"True", "False"},
-			1,
+			[]string{"False"},
+			[]string{"True"},
+			"true_false",
 		),
 	}
 
 	createQuiz("Quiz2", "test to see if this will work", "test_user2", quizQuestionsForQuiz2)
-
 }
 
 // enable cors
@@ -95,6 +98,7 @@ func main() {
 	}()
 
 	Quiz_Collection = client.Database("yippee_db").Collection("quizzes")
+	populateDbWithQuizzes()
 
 	// Initialize the router
 	r := mux.NewRouter()
@@ -116,9 +120,4 @@ func main() {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 
-	// CRUD operations examples here
-	// createDocument(Quiz_Collection, bson.D{{"name", "Test C"}})
-	// readDocuments(collection)
-	// updateDocument(bson.D{{"name", "Test A"}}, bson.D{{"$set", bson.D{{"name", "Test B"}}}})
-	// deleteDocument(bson.D{{"name", "Test B"}})
 }
