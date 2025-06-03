@@ -226,16 +226,36 @@ func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
 		return
 	}
 
-	// check if user exists in lobby and is a host
+	// check if user exists in lobby and is a host (fixed role check)
 	user, exists := lobby.ClientsInLobby[conn]
-	if !exists || user.UserRole != "player" {
+	if !exists || user.UserRole != "host" {
 		conn.WriteJSON(MessageResponse{
-			Error: "Player unable to submit answer",
+			Error: "Only host can advance to next question",
 		})
 		return
 	}
 
-	// update lobby in the global map
+	// check if we've reached the end of questions
+	if lobby.CurrentQuestionIndex >= len(lobby.Quiz.QuizQuestions)-1 {
+		lobby.Status = "Completed"
+		lobbies[data.RoomCode] = lobby
+		notifyAllClientsInRoom(lobby, "Game completed")
+		return
+	}
+
+	// advance to next question by incrementing the current question index
+	lobby.CurrentQuestionIndex++
+	lobby.CurrentQuestion = lobby.Quiz.QuizQuestions[lobby.CurrentQuestionIndex]
+
+	// Reset all players' submitted status for the new question
+	// for client, clientData := range lobby.ClientsInLobby {
+	// 	if clientData.UserRole == "player" {
+	// 		clientData.HasSubmitted = false
+	// 		lobby.ClientsInLobby[client] = clientData
+	// 	}
+	// }
+
+	// Update lobby in global map
 	lobbies[data.RoomCode] = lobby
 
 	notifyAllClientsInRoom(lobby, "Next question")
