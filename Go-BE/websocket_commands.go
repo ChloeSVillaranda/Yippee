@@ -98,22 +98,15 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 	})
 
 	// notify all clients about the updated list of players
-	notifyLobbyClients(lobby)
+	notifyAllClientsInRoom(lobby, "Lobby updated")
 }
 
-// notify all clients in the lobby about the current state of the lobby
-// aka if user joins or points gets updated
-func notifyLobbyClients(lobby *Lobby) {
-	// prepare the list of connected players by typecasting it first
-	connectedClients := []User{}
-	for _, client := range lobby.ClientsInLobby {
-		connectedClients = append(connectedClients, client)
-	}
-
-	// broadcast the updated lobby state to all clients
+// send a message to all clients in a room
+func notifyAllClientsInRoom(lobby *Lobby, messageToSendOut string) {
+	// Notify all clients in the lobby that the game has started
 	message := MessageResponse{
-		MessageToClient: "Lobby updated",
-		ClientsInLobby:  connectedClients,
+		MessageToClient: messageToSendOut,
+		Lobby:           *lobby,
 	}
 
 	for client := range lobby.ClientsInLobby {
@@ -150,7 +143,7 @@ func handleSendLobbyMessage(conn *websocket.Conn, data MessageRequest) {
 	log.Printf("Player %s sent message: %s\n", data.User.UserName, data.User.UserMessage)
 
 	// notify all clients in the lobby about the updated state
-	notifyLobbyClients(lobby)
+	notifyAllClientsInRoom(lobby, "Lobby updated")
 }
 
 // handler for dealing when a host starts a game
@@ -183,15 +176,7 @@ func handleStartGame(conn *websocket.Conn, data MessageRequest) {
 	// update lobby in the global map
 	lobbies[data.RoomCode] = lobby
 
-	// Notify all clients in the lobby that the game has started
-	message := MessageResponse{
-		MessageToClient: "Game start",
-		Lobby:           *lobby,
-	}
-
-	for client := range lobby.ClientsInLobby {
-		client.WriteJSON(message)
-	}
+	notifyAllClientsInRoom(lobby, "Game start")
 }
 
 // handler for dealing with answers
@@ -224,7 +209,7 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 	// update the lobby with the updated points
 	lobbies[data.RoomCode].ClientsInLobby[conn] = user
 
-	notifyLobbyClients(lobbies[data.RoomCode])
+	notifyAllClientsInRoom(lobbies[data.RoomCode], "Lobby updated")
 }
 
 // handler for dealing with answers
@@ -253,13 +238,5 @@ func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
 	// update lobby in the global map
 	lobbies[data.RoomCode] = lobby
 
-	// Notify all clients in the lobby that the game has started
-	message := MessageResponse{
-		MessageToClient: "Game start",
-		Lobby:           *lobby,
-	}
-
-	for client := range lobby.ClientsInLobby {
-		client.WriteJSON(message)
-	}
+	notifyAllClientsInRoom(lobby, "Next question")
 }

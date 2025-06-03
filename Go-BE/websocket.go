@@ -83,7 +83,7 @@ func removeConnectionFromLobby(conn *websocket.Conn) {
 			log.Printf("Client disconnected from lobby: %s", roomCode)
 
 			// Notify remaining clients about the updated lobby state
-			notifyLobbyClients(lobby)
+			notifyAllClientsInRoom(lobby, "Lobby updated")
 			return
 		}
 	}
