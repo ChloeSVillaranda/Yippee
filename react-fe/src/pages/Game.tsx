@@ -28,6 +28,10 @@ export default function LobbyRoom() {
         } else if(data.messageToClient == "Game start") {
           dispatch(gameActions.setGameStatus(data.lobby.status))
           dispatch(gameActions.setCurrentQuestion(data.lobby.currentQuestion as QuizQuestion))
+        } else if(data.messageToClient == "Next question") {
+          dispatch(gameActions.setCurrentQuestion(data.lobby.currentQuestion as QuizQuestion))
+        } else if(data.messageToClient == "Game completed") {
+          dispatch(gameActions.setGameStatus(data.lobby.status))
         }
         else {
           console.error("Issue with updating the clients in lobby")
@@ -51,7 +55,7 @@ export default function LobbyRoom() {
       ) : (
         <PlayerGameView />
       )
-    ) : lobbyStatus === "Finished" ? (
+    ) : lobbyStatus === "Completed" ? (
       <Box>
         {/* TODO: implement a leaderboard */}
           <Typography variant="h5" gutterBottom>
