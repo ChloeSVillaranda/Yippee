@@ -51,13 +51,8 @@ func handleCreateLobby(conn *websocket.Conn, data MessageRequest) {
 
 	// send info back to the host
 	conn.WriteJSON(MessageResponse{
-		MessageToClient: "Lobby created successfully",
-		// Lobby: Lobby{
-		// 	RoomCode: roomCode,
-		// 	Quiz:     lobbies[roomCode].Quiz,
-		// 	Status:   lobbies[roomCode].Status,
-		// },
-		Lobby: *lobbies[roomCode], // send back the created lobby information
+		MessageToClient: "Lobby created",
+		Lobby:           *lobbies[roomCode], // send back the created lobby information
 	})
 }
 

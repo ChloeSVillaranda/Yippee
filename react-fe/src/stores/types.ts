@@ -1,16 +1,3 @@
-// this file for now stores all the interfaces
-// TODO: might need to add back the player and the host because each has different actions
-// object interface stores
-// export interface Player {
-//     playerName: string;
-//     playerMessage: string;
-// }
-
-// export interface Host {
-//     hostName: string;
-//     hostMessage: string;
-// }
-
 export type Quiz = {
     quizName: string;
     quizDescription: string;
@@ -28,17 +15,31 @@ export type QuizQuestion = {
   answer: number;
 }
 
-export type GameSettings = {
-  enableMessages: boolean; 
+export type Settings = {
+  questionTime: number;
+  enableMessages: boolean;
   showMessagesDuringGame: boolean;
-  showLeaderboard: boolean; 
+  showLeaderboard: boolean;
+  shuffleQuestions: boolean;
 }
   
 export type User = {
-    userName: string;
-    userMessage: string;
-    userRole: string; 
-    points: number;
+  userName: string;
+  userMessage: string;
+  userRole: string; 
+  points: number;
+}
+
+export type Lobby  = {
+  roomCode: string;
+  quiz: Quiz;
+  clientsInLobby: User[];
+  status: string;
+  settings: Settings;
+  currentQuestionIndex: number // TODO: might need to remove as not needed in the front-end
+  currentQuestion: QuizQuestion
+  timer: number // remove as needed
+  timeRemaining: number // remove as needed
 }
 
 export type MessageRequest = {
@@ -50,8 +51,7 @@ export type MessageRequest = {
 
 export type MessageResponse = {
     messageToClient: string;
-    roomCode: string | undefined;
-    quiz: Quiz | undefined;
     error: string | undefined;
+    lobby: Lobby | undefined;
     clientsInLobby: User[] | undefined;
 }
