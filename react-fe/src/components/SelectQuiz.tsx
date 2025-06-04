@@ -42,7 +42,6 @@ export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
           throw new Error("Failed to fetch quizzes");
         }
         const data = await response.json();
-        console.log("received the response: ", data)
         setQuizzes(data);
       } catch (error) {
         console.error("Error fetching quizzes:", error);
