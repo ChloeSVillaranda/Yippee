@@ -64,8 +64,9 @@ type MessageResponse struct {
 }
 
 type User struct {
-	UserName    string `json:"userName"`
-	UserMessage string `json:"userMessage,omitempty"`
-	UserRole    string `json:"userRole,omitempty"`
-	Points      int    `json:"points,omitempty"` // default as 0
+	UserName        string `json:"userName"`
+	UserMessage     string `json:"userMessage,omitempty"`
+	UserRole        string `json:"userRole,omitempty"`
+	Points          int    `json:"points,omitempty"` // default as 0
+	SubmittedAnswer bool   `json:"submittedAnswer,omitempty"`
 }

@@ -203,8 +203,15 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 	}
 
 	if data.Answer == lobby.CurrentQuestion.Answer {
+		if user.SubmittedAnswer {
+			conn.WriteJSON(MessageResponse{
+				Error: "Player already submitted answer",
+			})
+		}
 		user.Points += 1
 	}
+
+	user.SubmittedAnswer = true
 
 	// update the lobby with the updated points
 	lobbies[data.RoomCode].ClientsInLobby[conn] = user
@@ -247,13 +254,13 @@ func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
 	lobby.CurrentQuestionIndex++
 	lobby.CurrentQuestion = lobby.Quiz.QuizQuestions[lobby.CurrentQuestionIndex]
 
-	// Reset all players' submitted status for the new question
-	// for client, clientData := range lobby.ClientsInLobby {
-	// 	if clientData.UserRole == "player" {
-	// 		clientData.HasSubmitted = false
-	// 		lobby.ClientsInLobby[client] = clientData
-	// 	}
-	// }
+	// reset submittedAnswer status for all players
+	for client, clientData := range lobby.ClientsInLobby {
+		if clientData.UserRole == "player" {
+			clientData.SubmittedAnswer = false
+			lobby.ClientsInLobby[client] = clientData
+		}
+	}
 
 	// Update lobby in global map
 	lobbies[data.RoomCode] = lobby
