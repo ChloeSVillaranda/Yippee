@@ -1,6 +1,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
 import { Quiz } from "../stores/types";
 import { RootState } from "../stores/store";
@@ -8,7 +9,6 @@ import SelectQuiz from "../components/SelectQuiz";
 import { disconnect } from "../stores/websocketSlice";
 import { gameActions } from "../stores/gameSlice";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 export default function HostGame() {
   const [hostName, setHostName] = useState<string>(""); // host name input
@@ -16,9 +16,20 @@ export default function HostGame() {
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const host = useSelector((state: RootState) => state.game.user); // get host details from Redux
 
-  useCheckConnection();
+  // get necessary states from Redux
+  const currentUser = useSelector((state: RootState) => state.game.user);
+  const roomCode = useSelector((state: RootState) => state.game.roomCode);
+  const gameStatus = useSelector((state: RootState) => state.game.gameStatus);
+  const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
+
+  useCheckConnection(); // may need to remove??
+
+  useEffect(() => {
+    if (roomCode && gameStatus === "Waiting") {
+      navigate(`/${roomCode}`);
+    }
+  }, [roomCode, gameStatus, navigate]);
 
   const handleSelectQuiz = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
@@ -37,6 +48,11 @@ export default function HostGame() {
       return;
     }
 
+    if (!isConnected) {
+      setError("Not connected to server. Please try again.");
+      return;
+    }
+
     // update redux state
     dispatch(gameActions.setUserName(hostName));
     dispatch(gameActions.setRole("host"));
@@ -49,35 +65,12 @@ export default function HostGame() {
       points: 0,
     };
 
+    console.log("sending the request of createLobby with: ", selectedQuiz, user)
+
     executeWebSocketCommand(
       "createLobby",
       { quiz: selectedQuiz, user: user },
       (errorMessage) => setError(errorMessage)
-    );
-
-    setupWebSocketHandlers(
-      (data) => {
-        console.log("Message from server from Host Game:", data);
-
-        if (data.lobby.roomCode) {
-          dispatch(gameActions.upsertClientsInLobby([user]));
-          dispatch(gameActions.setRoomCode(data.lobby.roomCode))
-          // TODO: add settings later
-          // dispatch(gameActions.setGameSettings(data.lobby.settings));
-          dispatch(gameActions.setGameStatus("Waiting"))
-          navigate(`/${data.lobby.roomCode}`);
-        } else {
-          setError("Room code not received from server.");
-          console.error("Room code not received from server:", data);
-        }
-      },
-      () => {
-        dispatch(disconnect());
-      },
-      (error) => {
-        setError("An error occurred with the WebSocket connection.");
-        dispatch(disconnect());
-      }
     );
   };
 

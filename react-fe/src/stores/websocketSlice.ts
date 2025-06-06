@@ -1,55 +1,41 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-let webSocket: WebSocket | null = null;
-
 interface WebSocketState {
   isConnected: boolean;
+  error: string | null;
 }
 
 const initialState: WebSocketState = {
   isConnected: false,
+  error: null,
 };
 
 const websocketSlice = createSlice({
   name: "websocket",
   initialState,
   reducers: {
-    connect: (state, action: PayloadAction<string>) => {
-      if (!webSocket) {
-        webSocket = new WebSocket(action.payload);
-        state.isConnected = true;
-
-        // set up global message listener
-        webSocket.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-          console.log("Message received:", data);
-        };
-
-        webSocket.onclose = () => {
-          console.log("WebSocket connection closed.");
-          state.isConnected = false;
-          webSocket = null;
-        };
-
-        webSocket.onerror = (error) => {
-          console.error("WebSocket error:", error);
-          state.isConnected = false;
-          webSocket = null;
-        };
-      }
+    connect: (_state, _action: PayloadAction<string>) => {}, // middleware handles this
+    disconnect: () => {},
+    connectionOpened: (state) => {
+      state.isConnected = true;
+      state.error = null;
     },
-    disconnect: (state) => {
-      if (webSocket) {
-        webSocket.close();
-        webSocket = null;
-        state.isConnected = false;
-      }
+    connectionClosed: (state) => {
+      state.isConnected = false;
+    },
+    connectionError: (state, action: PayloadAction<string>) => {
+      state.error = action.payload;
+      state.isConnected = false;
     },
   },
 });
 
-export const { connect, disconnect } = websocketSlice.actions;
+export const {
+  connect,
+  disconnect,
+  connectionOpened,
+  connectionClosed,
+  connectionError,
+} = websocketSlice.actions;
+
 export default websocketSlice.reducer;
- 
-// export the WebSocket instance for use in components
-export const getWebSocket = () => webSocket;

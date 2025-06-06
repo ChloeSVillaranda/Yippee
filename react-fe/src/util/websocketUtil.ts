@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { MessageResponse } from "../stores/types";
 import { RootState } from "../stores/store";
 import { connect } from "../stores/websocketSlice";
-import { getWebSocket } from "../stores/websocketSlice";
+import { getWebSocket } from "../util/websocketMiddleware";
+import { useEffect } from "react";
 
 /**
  * Checks if there is a websocket connection to the backend.
@@ -14,10 +15,12 @@ import { getWebSocket } from "../stores/websocketSlice";
 export const useCheckConnection = () => {
   const dispatch = useDispatch();
   const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
-  // Establish WebSocket connection if not already connected
-  if (!isConnected) {
-    dispatch(connect("ws://localhost:8080/ws"));
-  }
+
+  useEffect(() => {
+    if (!isConnected) {
+      dispatch(connect("ws://localhost:8080/ws"));
+    }
+  }, [isConnected, dispatch]);
 }
 
 /**

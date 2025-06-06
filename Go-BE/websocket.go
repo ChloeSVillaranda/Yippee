@@ -43,6 +43,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// websocket actions that the client can request
+		log.Println("Received the action: ", data.Action)
 		switch data.Action {
 		case "createLobby":
 			handleCreateLobby(conn, data)
