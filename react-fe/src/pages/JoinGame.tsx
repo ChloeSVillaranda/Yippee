@@ -1,11 +1,9 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { MessageResponse, User } from "../stores/types";
 import { executeWebSocketCommand, useCheckConnection } from "../util/websocketUtil";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
 import { RootState } from "../stores/store";
-import { disconnect } from "../stores/websocketSlice";
 import { gameActions } from "../stores/gameSlice";
 import { useNavigate } from "react-router-dom";
 
@@ -25,10 +23,11 @@ export default function JoinGame() {
   useCheckConnection();
 
   useEffect(() => {
+    console.log('Navigation check:', { roomCode });
     if (roomCode) {
       navigate(`/${roomCode}`)
     }
-  }, [roomCode, gameStatus, navigate]);
+  }, [roomCode, navigate]);
 
   const handleJoinGame = async () => {
     // input room code

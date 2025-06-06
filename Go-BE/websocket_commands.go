@@ -87,7 +87,7 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 
 	// send the quiz details back to the client + who is already connected
 	conn.WriteJSON(MessageResponse{
-		MessageToClient: "Joined lobby successfully",
+		MessageToClient: "Joined lobby",
 		Lobby:           *lobby,
 		ClientsInLobby:  connectedClients,
 	})
