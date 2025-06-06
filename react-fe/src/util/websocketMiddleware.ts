@@ -49,12 +49,13 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                             if (data.lobby?.roomCode) {
                                 store.dispatch(gameActions.setRoomCode(data.lobby.roomCode));
                                 store.dispatch(gameActions.setGameStatus(data.lobby.status || "Waiting"));
-                                if (data.lobby.clientsInLobby) {
-                                    store.dispatch(gameActions.upsertClientsInLobby(data.lobby.clientsInLobby));
-                                }
-                                if (data.lobby.settings) {
-                                    store.dispatch(gameActions.setGameSettings(data.lobby.settings));
-                                }
+                                store.dispatch(gameActions.upsertClientsInLobby(data.lobby.clientsInLobby));
+                                // if (data.lobby.clientsInLobby) {
+                                //     store.dispatch(gameActions.upsertClientsInLobby(data.lobby.clientsInLobby));
+                                // }
+                                // if (data.lobby.settings) {
+                                //     store.dispatch(gameActions.setGameSettings(data.lobby.settings));
+                                // }
                             }
                             break;
 

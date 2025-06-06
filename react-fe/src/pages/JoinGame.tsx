@@ -1,26 +1,38 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { MessageResponse, User } from "../stores/types";
-import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
+import { executeWebSocketCommand, useCheckConnection } from "../util/websocketUtil";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
 import { RootState } from "../stores/store";
 import { disconnect } from "../stores/websocketSlice";
 import { gameActions } from "../stores/gameSlice";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 export default function JoinGame() {
-  const [roomCode, setRoomCode] = useState("");
+  const [roomCodeToJoin, setRoomCodeToJoin] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const player = useSelector((state: RootState) => state.game.user); // get player details from Redux
+  
+  // get necessary states from Redux
+  const currentUser = useSelector((state: RootState) => state.game.user);
+  const roomCode = useSelector((state: RootState) => state.game.roomCode);
+  const gameStatus = useSelector((state: RootState) => state.game.gameStatus);
+  const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
+  
   useCheckConnection();
+
+  useEffect(() => {
+    if (roomCode) {
+      navigate(`/${roomCode}`)
+    }
+  }, [roomCode, gameStatus, navigate]);
 
   const handleJoinGame = async () => {
     // input room code
-    if (!roomCode.trim()) {
+    if (!roomCodeToJoin.trim()) {
       setError("Room code cannot be empty");
       return;
     }
@@ -45,35 +57,8 @@ export default function JoinGame() {
     // execute the "createLobby" WebSocket command
     executeWebSocketCommand(
       "joinLobby",
-      { roomCode: roomCode, player: user },
+      { roomCode: roomCodeToJoin, player: user },
       (errorMessage) => setError(errorMessage)
-    );
-
-    // set up WebSocket event handlers
-    setupWebSocketHandlers(
-      (data) => {
-        console.log("Message from server for Join Game:", data as MessageResponse);
-
-        if (data.lobby.roomCode) { // TODO: this ran like 3 times because multiple instances of the websocket are being called, 
-          // so need to figure out how to handle only one instance of the websocket working
-          if (data.clientsInLobby) {
-            dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
-          }
-          dispatch(gameActions.setGameSettings(data.lobby.settings));
-          dispatch(gameActions.setGameStatus(data.lobby.status))
-          dispatch(gameActions.setRoomCode(data.lobby.roomCode))
-          navigate(`/${data.lobby.roomCode}`);
-        } else {
-          console.error("Could not connect to the server:", data);
-        }
-      },
-      () => {
-        dispatch(disconnect());
-      },
-      (error) => {
-        setError("An error occurred with the WebSocket connection.");
-        dispatch(disconnect());
-      }
     );
   };
 
@@ -96,8 +81,8 @@ export default function JoinGame() {
         label="Enter Room Code"
         variant="outlined"
         fullWidth
-        value={roomCode}
-        onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+        value={roomCodeToJoin}
+        onChange={(e) => setRoomCodeToJoin(e.target.value.toUpperCase())}
         sx={{ marginBottom: 2 }}
       />
       {error && (

@@ -106,36 +106,3 @@ const callCommandFunction = (
     }
   }
 };
-
-/**
- * Sets up WebSocket event handlers.
- * @param onMessage - Callback for handling incoming messages.
- * @param onClose - Callback for handling WebSocket closure.
- * @param onError - Callback for handling WebSocket errors.
- */
-export const setupWebSocketHandlers = (
-  onMessage: (data: any) => void,
-  onClose: () => void,
-  onError: (error: any) => void
-) => {
-  const webSocket = getWebSocket();
-
-  if (webSocket) {
-    webSocket.onmessage = (event) => {
-      const data = JSON.parse(event.data) as MessageResponse;
-      onMessage(data);
-    };
-
-    webSocket.onclose = () => {
-      console.log("WebSocket connection closed");
-      onClose();
-    };
-
-    webSocket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      onError(error);
-    };
-  } else {
-    console.error("WebSocket instance is not available.");
-  }
-};

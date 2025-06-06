@@ -1,12 +1,11 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { executeWebSocketCommand, setupWebSocketHandlers, useCheckConnection } from "../util/websocketUtil";
+import { executeWebSocketCommand, useCheckConnection } from "../util/websocketUtil";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
 import { Quiz } from "../stores/types";
 import { RootState } from "../stores/store";
 import SelectQuiz from "../components/SelectQuiz";
-import { disconnect } from "../stores/websocketSlice";
 import { gameActions } from "../stores/gameSlice";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +22,7 @@ export default function HostGame() {
   const gameStatus = useSelector((state: RootState) => state.game.gameStatus);
   const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
 
-  useCheckConnection(); // may need to remove??
+  useCheckConnection();
 
   useEffect(() => {
     if (roomCode && gameStatus === "Waiting") {
@@ -48,10 +47,10 @@ export default function HostGame() {
       return;
     }
 
-    if (!isConnected) {
-      setError("Not connected to server. Please try again.");
-      return;
-    }
+    // if (!isConnected) {
+    //   setError("Not connected to server. Please try again.");
+    //   return;
+    // }
 
     // update redux state
     dispatch(gameActions.setUserName(hostName));
