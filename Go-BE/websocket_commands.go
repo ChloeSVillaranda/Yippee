@@ -49,10 +49,13 @@ func handleCreateLobby(conn *websocket.Conn, data MessageRequest) {
 
 	log.Printf("Lobby created: %+v\n", lobbies[roomCode])
 
+	connectedClients := getConnectedClients(lobbies[roomCode]) // TODO: might not need to get all the clients, because it is just host at the moment
+
 	// send info back to the host
 	conn.WriteJSON(MessageResponse{
 		MessageToClient: "Lobby created",
 		Lobby:           *lobbies[roomCode], // send back the created lobby information
+		ClientsInLobby:  connectedClients,
 	})
 }
 
@@ -80,10 +83,7 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 	log.Printf("Client joined lobby: %s with name: %s\n", data.RoomCode, data.User.UserName)
 
 	// prepare the list of connected players by typecasting it first
-	connectedClients := []User{}
-	for _, client := range lobby.ClientsInLobby {
-		connectedClients = append(connectedClients, client)
-	}
+	connectedClients := getConnectedClients(lobby)
 
 	// send the quiz details back to the client + who is already connected
 	conn.WriteJSON(MessageResponse{
@@ -96,12 +96,26 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 	notifyAllClientsInRoom(lobby, "Lobby updated")
 }
 
+func getConnectedClients(lobby *Lobby) []User {
+	// TODO: make as util function
+	connectedClients := []User{}
+	for _, client := range lobby.ClientsInLobby {
+		connectedClients = append(connectedClients, client)
+	}
+
+	return connectedClients
+}
+
 // send a message to all clients in a room
 func notifyAllClientsInRoom(lobby *Lobby, messageToSendOut string) {
+	// TODO: figure out a way to make this less redundant
+	connectedClients := getConnectedClients(lobby)
+
 	// Notify all clients in the lobby that the game has started
 	message := MessageResponse{
 		MessageToClient: messageToSendOut,
 		Lobby:           *lobby,
+		ClientsInLobby:  connectedClients,
 	}
 
 	for client := range lobby.ClientsInLobby {

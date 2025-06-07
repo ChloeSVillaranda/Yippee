@@ -36,8 +36,8 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                             if (data.lobby?.roomCode) {
                                 store.dispatch(gameActions.setRoomCode(data.lobby.roomCode));
                                 store.dispatch(gameActions.setGameStatus("Waiting"));
-                                if (data.lobby.clientsInLobby) {
-                                    store.dispatch(gameActions.upsertClientsInLobby(data.lobby.clientsInLobby));
+                                if (data.clientsInLobby) {
+                                    store.dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
                                 }
                                 if (data.lobby.settings) {
                                     store.dispatch(gameActions.setGameSettings(data.lobby.settings));
@@ -60,8 +60,8 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                             break;
 
                         case "Lobby updated":
-                            if (data.lobby?.clientsInLobby) {
-                                store.dispatch(gameActions.upsertClientsInLobby(data.lobby.clientsInLobby));
+                            if (data.clientsInLobby) {
+                                store.dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
                             }
                             break;
 
