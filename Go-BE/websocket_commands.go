@@ -228,6 +228,11 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 	notifyAllClientsInRoom(lobbies[data.RoomCode], "Lobby updated")
 }
 
+// display the points
+func handleShowLeaderboard(conn *websocket.Conn, data MessageRequest) {
+
+}
+
 // handler for dealing with answers
 func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
 	mutex.Lock()

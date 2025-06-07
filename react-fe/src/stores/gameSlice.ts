@@ -18,6 +18,7 @@ const initialState = {
         userMessage: "",
         userRole: "",
         points: 0, 
+        submittedAnswer: false,
     }, 
     roomCode: "", 
     clientsInLobby: [], 
@@ -33,7 +34,7 @@ const gameSlice = createSlice({
         setUserName: (state, action: PayloadAction<string>) => {
             console.log('setUserName:', { before: { ...state.user }, after: { ...state.user, userName: action.payload } });
             state.user.userName = action.payload;
-        }, 
+        },
         setRoomCode: (state, action: PayloadAction<string>) => {
             console.log('setRoomCode:', { before: state.roomCode, after: action.payload });
             state.roomCode = action.payload;
@@ -45,6 +46,10 @@ const gameSlice = createSlice({
         setMessage: (state, action: PayloadAction<string>) => {
             console.log('setMessage:', { before: { ...state.user }, after: { ...state.user, userMessage: action.payload } });
             state.user.userMessage = action.payload;
+        },
+        setSubmittedAnswer: (state, action: PayloadAction<boolean>) => {
+            console.log('setSubmittedAnswer:', { before: { ...state.user }, after: { ...state.user, userMessage: action.payload } });
+            state.user.submittedAnswer = action.payload;
         },
         upsertClientsInLobby: (state, action: PayloadAction<User[]>) => {
             console.log('upsertClientsInLobby:', { before: [...state.clientsInLobby], after: action.payload });

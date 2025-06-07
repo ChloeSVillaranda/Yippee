@@ -1,15 +1,16 @@
 import { Box, Button, Typography } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "../stores/store";
 import { executeWebSocketCommand } from "../util/websocketUtil";
-import { useSelector } from "react-redux";
+import { gameActions } from "../stores/gameSlice";
 import { useState } from "react";
 
 export default function PlayerGameView() {
   const game = useSelector((state: RootState) => state.game);
-  const [submittedAnswer, setSubmittedAnswer] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
-
+  const dispatch = useDispatch();
+  
   const handleAnswerSelect = (option: string) => {
     setSelectedAnswers(prev => {
       return prev.includes(option) 
@@ -20,7 +21,6 @@ export default function PlayerGameView() {
 
   const handleSubmitAnswers = () => {
     console.log("Submitted answers:", selectedAnswers);
-    setSubmittedAnswer(true);
 
     executeWebSocketCommand(
       "submitAnswer",
@@ -31,6 +31,8 @@ export default function PlayerGameView() {
       },
       (errorMessage) => console.log(errorMessage)
     );
+
+    dispatch(gameActions.setSubmittedAnswer(true))
   };
 
   return (
@@ -41,7 +43,7 @@ export default function PlayerGameView() {
       <Typography variant="h5" gutterBottom>
         Quiz: {game.currentQuestion?.question}
       </Typography>
-      {submittedAnswer ? (
+      {game.user.submittedAnswer ? (
         <Typography variant="h5" gutterBottom>
           Answer Submitted
         </Typography>

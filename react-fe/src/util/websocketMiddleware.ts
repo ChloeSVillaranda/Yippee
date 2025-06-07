@@ -53,9 +53,9 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                                 if (data.clientsInLobby) {
                                     store.dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
                                 }
-                                // if (data.lobby.settings) {
-                                //     store.dispatch(gameActions.setGameSettings(data.lobby.settings));
-                                // }
+                                if (data.lobby.settings) {
+                                    store.dispatch(gameActions.setGameSettings(data.lobby.settings));
+                                }
                             }
                             break;
 
@@ -78,6 +78,8 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                             if (data.lobby?.currentQuestion) {
                                 store.dispatch(gameActions.setCurrentQuestion(data.lobby.currentQuestion));
                             }
+                            // reset the submittedAnswer back to false for user
+                            store.dispatch(gameActions.setSubmittedAnswer(false))
                             break;
 
                         case "Game completed":

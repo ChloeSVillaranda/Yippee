@@ -28,6 +28,7 @@ export type User = {
   userMessage: string;
   userRole: string; 
   points: number;
+  submittedAnswer: boolean;
 }
 
 export type Lobby  = {
