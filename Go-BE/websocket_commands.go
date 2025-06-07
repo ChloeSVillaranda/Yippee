@@ -188,6 +188,36 @@ func handleStartGame(conn *websocket.Conn, data MessageRequest) {
 	notifyAllClientsInRoom(lobby, "Game start")
 }
 
+// TODO: move to util file
+// Helper function to check if two string slices have the same elements
+func stringSlicesEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	// Create maps for O(1) lookup
+	aMap := make(map[string]bool)
+	bMap := make(map[string]bool)
+
+	// Add all elements to maps
+	for _, val := range a {
+		aMap[val] = true
+	}
+	for _, val := range b {
+		if !aMap[val] {
+			return false
+		}
+		bMap[val] = true
+	}
+
+	// Check if all elements in a are in b
+	for val := range aMap {
+		if !bMap[val] {
+			return false
+		}
+	}
+	return true
+}
+
 // handler for dealing with answers
 func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 	mutex.Lock()
@@ -211,13 +241,14 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 		return
 	}
 
-	if data.Answer == lobby.CurrentQuestion.Answer {
+	if stringSlicesEqual(data.Answer, lobby.CurrentQuestion.CorrectAnswers) {
 		if user.SubmittedAnswer {
 			conn.WriteJSON(MessageResponse{
 				Error: "Player already submitted answer",
 			})
+			return
 		}
-		user.Points += 1
+		user.Points += lobby.CurrentQuestion.Points
 	}
 
 	user.SubmittedAnswer = true

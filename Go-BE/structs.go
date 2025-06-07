@@ -15,13 +15,14 @@ type Quiz struct {
 }
 
 type QuizQuestion struct {
-	Question   string   `json:"question"`
-	Points     int      `json:"points"`
-	Difficulty int      `json:"difficulty"`
-	Hint       string   `json:"hint"`
-	Category   []string `json:"category"`
-	Options    []string `json:"options"`
-	Answer     int      `json:"answer"`
+	Question         string   `json:"question"`
+	Points           int      `json:"points"`
+	Difficulty       int      `json:"difficulty"`
+	Hint             string   `json:"hint"`
+	Category         []string `json:"category"`
+	IncorrectAnswers []string `json:"incorrectAnswers"`
+	CorrectAnswers   []string `json:"correctAnswers"`
+	Type             string   `json:"type"`
 }
 
 // lobby structure
@@ -48,11 +49,11 @@ type Settings struct {
 // Message structure
 // Json requests (sent by client to server)
 type MessageRequest struct {
-	Action   string `json:"action"` // requested action client wants to carry out
-	User     User   `json:"user"`   // user who makes the request
-	RoomCode string `json:"roomCode,omitempty"`
-	Quiz     Quiz   `json:"quiz,omitempty"`   // TODO: need to send the quiz id for the backend to retrieve from dB
-	Answer   int    `json:"answer,omitempty"` // plays submit an int as an answer to a question
+	Action   string   `json:"action"` // requested action client wants to carry out
+	User     User     `json:"user"`   // user who makes the request
+	RoomCode string   `json:"roomCode,omitempty"`
+	Quiz     Quiz     `json:"quiz,omitempty"` // TODO: need to send the quiz id for the backend to retrieve from dB
+	Answer   []string `json:"answer,omitempty"`
 }
 
 // Json responses (sent by server to client)

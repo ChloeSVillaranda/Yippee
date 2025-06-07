@@ -167,19 +167,12 @@ func parseQuizQuestions(questionsToParse interface{}) []QuizQuestion {
 			q.Category = toStringSlice(val)
 		}
 
-		if val, ok := qMap["options"].(bson.A); ok {
-			q.Options = toStringSlice(val)
+		if val, ok := qMap["incorrectAnswers"].(bson.A); ok {
+			q.IncorrectAnswers = toStringSlice(val)
 		}
 
-		if val, ok := qMap["answer"]; ok {
-			switch v := val.(type) {
-			case int32:
-				q.Answer = int(v)
-			case int64:
-				q.Answer = int(v)
-			case int:
-				q.Answer = v
-			}
+		if val, ok := qMap["correctAnswers"].(bson.A); ok {
+			q.CorrectAnswers = toStringSlice(val)
 		}
 
 		questionsParsed = append(questionsParsed, q)
