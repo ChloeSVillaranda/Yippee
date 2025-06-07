@@ -1,1 +1,5 @@
-**/*.exe
+*.exe
+*.exe~
+Go-BE/*.exe
+Go-BE/*.exe~
+Go-BE/yippee.exe
