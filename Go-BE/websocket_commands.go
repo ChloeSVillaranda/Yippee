@@ -168,9 +168,6 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	log.Printf("Received answer submission. Room: %s, User: %s", data.RoomCode, data.User.UserName)
-	log.Printf("Submitted answers: %v", data.Answer)
-
 	// check if the lobby exists
 	lobby, exists := lobbies[data.RoomCode]
 	if !exists {
@@ -179,8 +176,6 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 		})
 		return
 	}
-
-	log.Printf("Current question correct answers: %v", lobby.CurrentQuestion.CorrectAnswers)
 
 	// check if user exists in lobby and is a player
 	user, exists := lobby.ClientsInLobby[conn]
@@ -191,7 +186,6 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 		return
 	}
 
-	log.Printf("Comparing answers - Submitted: %v, Correct: %v", data.Answer, lobby.CurrentQuestion.CorrectAnswers)
 	if stringSlicesEqual(data.Answer, lobby.CurrentQuestion.CorrectAnswers) {
 		if user.SubmittedAnswer {
 			conn.WriteJSON(MessageResponse{
@@ -204,7 +198,6 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 	} else {
 		log.Printf("❌ %s answered incorrectly. Submitted: %v, Expected: %v",
 			user.UserName, data.Answer, lobby.CurrentQuestion.CorrectAnswers)
-		log.Printf("Current score: %d points\n", user.Points)
 	}
 
 	user.SubmittedAnswer = true
