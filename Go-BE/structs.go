@@ -19,10 +19,11 @@ type QuizQuestion struct {
 	Points           int      `json:"points"`
 	Difficulty       int      `json:"difficulty"`
 	Hint             string   `json:"hint"`
+	Type             string   `json:"type"`
 	Category         []string `json:"category"`
 	IncorrectAnswers []string `json:"incorrectAnswers"`
 	CorrectAnswers   []string `json:"correctAnswers"`
-	Type             string   `json:"type"`
+	Options          []string `json:"options"` // correct answers and incorrect answers combined in one
 }
 
 // lobby structure

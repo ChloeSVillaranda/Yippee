@@ -11,8 +11,9 @@ export type QuizQuestion = {
   difficulty: number;
   hint: string;
   category: string[];
-  incorrectAnswers: string[];
-  correctAnswers: string[];
+  // incorrectAnswers: string[];
+  // correctAnswers: string[];
+  options: string[];
   type: string;
 }
 

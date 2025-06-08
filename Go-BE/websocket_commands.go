@@ -30,6 +30,8 @@ func handleCreateLobby(conn *websocket.Conn, data MessageRequest) {
 
 	log.Println("Created a new room:", roomCode)
 
+	prepareQuizOptions(&data.Quiz)
+
 	// create a new lobby
 	lobbies[roomCode] = &Lobby{
 		RoomCode:             roomCode,
@@ -96,33 +98,6 @@ func handleJoinLobby(conn *websocket.Conn, data MessageRequest) {
 	notifyAllClientsInRoom(lobby, "Lobby updated")
 }
 
-func getConnectedClients(lobby *Lobby) []User {
-	// TODO: make as util function
-	connectedClients := []User{}
-	for _, client := range lobby.ClientsInLobby {
-		connectedClients = append(connectedClients, client)
-	}
-
-	return connectedClients
-}
-
-// send a message to all clients in a room
-func notifyAllClientsInRoom(lobby *Lobby, messageToSendOut string) {
-	// TODO: figure out a way to make this less redundant
-	connectedClients := getConnectedClients(lobby)
-
-	// Notify all clients in the lobby that the game has started
-	message := MessageResponse{
-		MessageToClient: messageToSendOut,
-		Lobby:           *lobby,
-		ClientsInLobby:  connectedClients,
-	}
-
-	for client := range lobby.ClientsInLobby {
-		client.WriteJSON(message)
-	}
-}
-
 // handler for dealing when a user sends a message
 func handleSendLobbyMessage(conn *websocket.Conn, data MessageRequest) {
 	mutex.Lock()
@@ -186,36 +161,6 @@ func handleStartGame(conn *websocket.Conn, data MessageRequest) {
 	lobbies[data.RoomCode] = lobby
 
 	notifyAllClientsInRoom(lobby, "Game start")
-}
-
-// TODO: move to util file
-// Helper function to check if two string slices have the same elements
-func stringSlicesEqual(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	// Create maps for O(1) lookup
-	aMap := make(map[string]bool)
-	bMap := make(map[string]bool)
-
-	// Add all elements to maps
-	for _, val := range a {
-		aMap[val] = true
-	}
-	for _, val := range b {
-		if !aMap[val] {
-			return false
-		}
-		bMap[val] = true
-	}
-
-	// Check if all elements in a are in b
-	for val := range aMap {
-		if !bMap[val] {
-			return false
-		}
-	}
-	return true
 }
 
 // handler for dealing with answers
