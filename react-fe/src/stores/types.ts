@@ -11,8 +11,9 @@ export type QuizQuestion = {
   difficulty: number;
   hint: string;
   category: string[];
-  options: string[];
-  answer: number;
+  incorrectAnswers: string[];
+  correctAnswers: string[];
+  type: string;
 }
 
 export type Settings = {
