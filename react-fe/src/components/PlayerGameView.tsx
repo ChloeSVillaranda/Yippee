@@ -20,7 +20,9 @@ export default function PlayerGameView() {
   };
 
   const handleSubmitAnswers = () => {
-    console.log("Submitted answers:", selectedAnswers);
+    console.log("Submitting answers...");
+    console.log("Selected answers:", selectedAnswers);
+    console.log("Current question:", game.currentQuestion);
 
     executeWebSocketCommand(
       "submitAnswer",
@@ -29,9 +31,11 @@ export default function PlayerGameView() {
         user: game.user, 
         answer: selectedAnswers
       },
-      (errorMessage) => console.log(errorMessage)
+      (errorMessage) => console.log("Error submitting answer:", errorMessage)
     );
 
+    // reset selected answers
+    setSelectedAnswers([]);
     dispatch(gameActions.setSubmittedAnswer(true))
   };
 
