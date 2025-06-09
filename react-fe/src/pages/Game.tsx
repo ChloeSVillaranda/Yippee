@@ -24,7 +24,8 @@ export default function LobbyRoom() {
       )
     ) : lobbyStatus === "Completed" ? (
       <Box>
-        {/* TODO: implement a leaderboard */}
+        {/* TODO: implement a final leaderboard */}
+          {/* <FinalLeaderBoard /> */}
           <Typography variant="h5" gutterBottom>
             Game has ended.
           </Typography>

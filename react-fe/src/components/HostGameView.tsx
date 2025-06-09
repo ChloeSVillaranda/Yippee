@@ -8,12 +8,16 @@ import { useState } from "react";
 
 export default function HostGameView() {
   const game = useSelector((state: RootState) => state.game);
-  const [currentView, setCurrentView] = useState<'question' | 'leaderboard'>('question');
+  // const [currentView, setCurrentView] = useState<'question' | 'leaderboard'>('question');
 
 
   const handleViewLeaderboard = () => {
     console.log("Viewing the leaderboard")
-    setCurrentView('leaderboard')
+    executeWebSocketCommand(
+      "showLeaderboard",
+      { roomCode: game.roomCode, user: game.user},
+      (errorMessage) => console.log(errorMessage)
+    );
   }
 
   const handleNextQuestion = () => {
@@ -23,7 +27,6 @@ export default function HostGameView() {
       { roomCode: game.roomCode, user: game.user},
       (errorMessage) => console.log(errorMessage)
     );
-    setCurrentView('question')
   }
 
   return (
@@ -32,7 +35,8 @@ export default function HostGameView() {
         You are the host and the game has started
       </Typography>
 
-      {currentView === 'question' ? (
+      {!game.showLeaderboard ? (
+        // show question
         <>
           <Typography variant="h5" gutterBottom>
             Quiz: {game.currentQuestion?.question}
@@ -50,14 +54,15 @@ export default function HostGameView() {
             View Leaderboard
           </Button>
         </>
-      ) : currentView === 'leaderboard' ? (
+      ) : (
+        // show leaderboard
         <>
           <Leaderboard />
           <Button onClick={handleNextQuestion}>
             Next Question
           </Button>
         </>
-      ) : ( <Typography variant="h5" gutterBottom> Unknown View </Typography> ) // TODO: might remove because not really needed
+      )
       } 
     </>
   );

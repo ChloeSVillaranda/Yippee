@@ -10,6 +10,7 @@ interface GameState {
     gameSettings: Settings | undefined;
     currentQuestion: QuizQuestion | undefined;  
     gameStatus: string;
+    showLeaderboard: boolean;
 }
 
 const initialState = {
@@ -25,6 +26,7 @@ const initialState = {
     gameSettings: undefined,
     currentQuestion: undefined, 
     gameStatus: "",
+    showLeaderboard: false
 } satisfies GameState as GameState
 
 const gameSlice = createSlice({
@@ -50,6 +52,10 @@ const gameSlice = createSlice({
         setSubmittedAnswer: (state, action: PayloadAction<boolean>) => {
             console.log('setSubmittedAnswer:', { before: { ...state.user }, after: { ...state.user, userMessage: action.payload } });
             state.user.submittedAnswer = action.payload;
+        },
+        setShowLeaderboard: (state, action: PayloadAction<boolean>) => {
+            console.log('setShowLeaderboard:', { before: state.showLeaderboard , after: action.payload });
+            state.showLeaderboard = action.payload;
         },
         upsertClientsInLobby: (state, action: PayloadAction<User[]>) => {
             console.log('upsertClientsInLobby:', { before: [...state.clientsInLobby], after: action.payload });

@@ -55,6 +55,8 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleStartGame(conn, data)
 		case "submitAnswer":
 			handleSubmitAnswer(conn, data)
+		case "showLeaderboard":
+			handleShowLeaderboard(conn, data)
 		case "nextQuestion":
 			handleNextQuestion(conn, data)
 		default:

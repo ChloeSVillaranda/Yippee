@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 // TODO: would it be better to implement this??
@@ -63,6 +66,21 @@ func prepareQuizOptions(quiz *Quiz) {
 			question.Options[i], question.Options[j] = question.Options[j], question.Options[i]
 		})
 	}
+}
+
+// helper function to validate lobby and user
+func validateLobbyAndUser(conn *websocket.Conn, roomCode string, requiredRole string) (*Lobby, *User, error) {
+	lobby, exists := lobbies[roomCode]
+	if !exists {
+		return nil, nil, fmt.Errorf("Lobby not found")
+	}
+
+	user, exists := lobby.ClientsInLobby[conn]
+	if !exists || user.UserRole != requiredRole {
+		return nil, nil, fmt.Errorf("Only %s can perform this action", requiredRole)
+	}
+
+	return lobby, &user, nil
 }
 
 // Helper function to check if two string slices have the same elements

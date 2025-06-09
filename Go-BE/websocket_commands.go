@@ -135,20 +135,10 @@ func handleStartGame(conn *websocket.Conn, data MessageRequest) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	// check if the lobby exists
-	lobby, exists := lobbies[data.RoomCode]
-	if !exists {
+	lobby, user, err := validateLobbyAndUser(conn, data.RoomCode, "host")
+	if err != nil {
 		conn.WriteJSON(MessageResponse{
-			Error: "Lobby not found",
-		})
-		return
-	}
-
-	// check if user exists in lobby and is the host
-	user, exists := lobby.ClientsInLobby[conn]
-	if !exists || user.UserRole != "host" {
-		conn.WriteJSON(MessageResponse{
-			Error: "Only the host can start the game",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -168,23 +158,16 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	// check if the lobby exists
-	lobby, exists := lobbies[data.RoomCode]
-	if !exists {
+	lobby, userPtr, err := validateLobbyAndUser(conn, data.RoomCode, "player")
+	if err != nil {
 		conn.WriteJSON(MessageResponse{
-			Error: "Lobby not found",
+			Error: err.Error(),
 		})
 		return
 	}
 
-	// check if user exists in lobby and is a player
-	user, exists := lobby.ClientsInLobby[conn]
-	if !exists || user.UserRole != "player" {
-		conn.WriteJSON(MessageResponse{
-			Error: "Player unable to submit answer",
-		})
-		return
-	}
+	// Dereference the user pointer
+	user := *userPtr
 
 	if stringSlicesEqual(data.Answer, lobby.CurrentQuestion.CorrectAnswers) {
 		if user.SubmittedAnswer {
@@ -209,29 +192,15 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 }
 
 // display the points
+// TODO: different leaderboard display at the end of the game
 func handleShowLeaderboard(conn *websocket.Conn, data MessageRequest) {
-
-}
-
-// handler for dealing with answers
-func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	// check if the lobby exists
-	lobby, exists := lobbies[data.RoomCode]
-	if !exists {
+	lobby, _, err := validateLobbyAndUser(conn, data.RoomCode, "host")
+	if err != nil {
 		conn.WriteJSON(MessageResponse{
-			Error: "Lobby not found",
-		})
-		return
-	}
-
-	// check if user exists in lobby and is a host (fixed role check)
-	user, exists := lobby.ClientsInLobby[conn]
-	if !exists || user.UserRole != "host" {
-		conn.WriteJSON(MessageResponse{
-			Error: "Only host can advance to next question",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -243,6 +212,34 @@ func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
 		notifyAllClientsInRoom(lobby, "Game completed")
 		return
 	}
+
+	// update lobby in global map
+	lobbies[data.RoomCode] = lobby
+
+	notifyAllClientsInRoom(lobby, "Show leaderboard")
+
+}
+
+// handler for dealing with answers
+func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	lobby, _, err := validateLobbyAndUser(conn, data.RoomCode, "host")
+	if err != nil {
+		conn.WriteJSON(MessageResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	// check if we've reached the end of questions
+	// if lobby.CurrentQuestionIndex >= len(lobby.Quiz.QuizQuestions)-1 {
+	// 	lobby.Status = "Completed"
+	// 	lobbies[data.RoomCode] = lobby
+	// 	notifyAllClientsInRoom(lobby, "Game completed")
+	// 	return
+	// }
 
 	// advance to next question by incrementing the current question index
 	lobby.CurrentQuestionIndex++
