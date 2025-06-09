@@ -1,16 +1,13 @@
-import * as wsMessage from "./websocketMessages";
-
+import { Quiz, User } from "../stores/types";
 import { useDispatch, useSelector } from "react-redux";
 
-import { MessageResponse } from "../stores/types";
 import { RootState } from "../stores/store";
 import { connect } from "../stores/websocketSlice";
 import { getWebSocket } from "../util/websocketMiddleware";
 import { useEffect } from "react";
 
 /**
- * Checks if there is a websocket connection to the backend.
- * Create a connection if non-existent
+ * Hook to check and establish WebSocket connection
  */
 export const useCheckConnection = () => {
   const dispatch = useDispatch();
@@ -21,88 +18,129 @@ export const useCheckConnection = () => {
       dispatch(connect("ws://localhost:8080/ws"));
     }
   }, [isConnected, dispatch]);
+};
+
+// Define command types for better type safety
+type WebSocketCommandType = 
+  | "createLobby"
+  | "joinLobby"
+  | "sendLobbyMessage"
+  | "startGame"
+  | "submitAnswer"
+  | "showLeaderboard"
+  | "nextQuestion";
+
+// Define the structure for WebSocket commands
+interface WebSocketCommand {
+  action: WebSocketCommandType;
+  handler: (webSocket: WebSocket, ...args: any[]) => void;
 }
 
+// webSocket commands
+const WebSocketCommands: Record<WebSocketCommandType, WebSocketCommand> = {
+  createLobby: {
+    action: "createLobby",
+    handler: (webSocket: WebSocket, quiz: Quiz, user: User) => {
+      webSocket.send(JSON.stringify({ action: "createLobby", quiz, user }));
+    }
+  },
+  joinLobby: {
+    action: "joinLobby",
+    handler: (webSocket: WebSocket, roomCode: string, user: User) => {
+      webSocket.send(JSON.stringify({ action: "joinLobby", roomCode, user }));
+    }
+  },
+  sendLobbyMessage: {
+    action: "sendLobbyMessage",
+    handler: (webSocket: WebSocket, roomCode: string, user: User) => {
+      webSocket.send(JSON.stringify({ action: "sendLobbyMessage", roomCode, user }));
+    }
+  },
+  startGame: {
+    action: "startGame",
+    handler: (webSocket: WebSocket, roomCode: string, user: User) => {
+      webSocket.send(JSON.stringify({ action: "startGame", roomCode, user }));
+    }
+  },
+  submitAnswer: {
+    action: "submitAnswer",
+    handler: (webSocket: WebSocket, roomCode: string, user: User, answer: number) => {
+      webSocket.send(JSON.stringify({ action: "submitAnswer", roomCode, user, answer }));
+    }
+  },
+  showLeaderboard: {
+    action: "showLeaderboard",
+    handler: (webSocket: WebSocket, roomCode: string, user: User) => {
+      webSocket.send(JSON.stringify({ action: "showLeaderboard", roomCode, user }));
+    }
+  },
+  nextQuestion: {
+    action: "nextQuestion",
+    handler: (webSocket: WebSocket, roomCode: string, user: User) => {
+      webSocket.send(JSON.stringify({ action: "nextQuestion", roomCode, user }));
+    }
+  }
+};
+
 /**
- * Executes a WebSocket command by automatically retrieving the WebSocket instance
- * and calling the respective WebSocket message function.
- * @param command - The WebSocket command to execute (e.g., "createLobby").
- * @param payload - The payload to send with the command.
- * @param onError - Optional callback for handling errors.
+ * Execute a WebSocket command with proper error handling
  */
 export const executeWebSocketCommand = (
-  command: string,
+  command: WebSocketCommandType,
   payload: Record<string, any>,
   onError?: (error: string) => void
 ) => {
   const webSocket = getWebSocket();
+  
+  if (!webSocket) {
+    handleError("WebSocket instance is not available.", onError);
+    return;
+  }
 
-  if (webSocket) {
-    if (webSocket.readyState === WebSocket.CONNECTING) {
-      // Wait for the WebSocket connection to open
-      webSocket.onopen = () => {
-        console.log("WebSocket connection established.");
-        callCommandFunction(command, webSocket, payload, onError);
-      };
-    } else if (webSocket.readyState === WebSocket.OPEN) {
-      // If already open, call the command function
-      callCommandFunction(command, webSocket, payload, onError);
-    } else {
-      const errorMessage = "WebSocket connection is not available. Please try again.";
-      console.error(errorMessage);
-      if (onError) {
-        onError(errorMessage);
-      }
-    }
+  if (webSocket.readyState === WebSocket.CONNECTING) {
+    webSocket.onopen = () => {
+      console.log("WebSocket connection established.");
+      executeCommand(command, webSocket, payload, onError);
+    };
+  } else if (webSocket.readyState === WebSocket.OPEN) {
+    executeCommand(command, webSocket, payload, onError);
   } else {
-    const errorMessage = "WebSocket instance is not available.";
-    console.error(errorMessage);
-    if (onError) {
-      onError(errorMessage);
-    }
+    handleError("WebSocket connection is not available. Please try again.", onError);
   }
 };
 
-
 /**
- * Calls the respective WebSocket message function based on the command.
- * @param command - The WebSocket command to execute.
- * @param webSocket - The WebSocket connection.
- * @param payload - The payload to send with the command.
- * @param onError - Optional callback for handling errors.
+ * Execute the specific command with its handler
  */
-const callCommandFunction = (
-  command: string,
+const executeCommand = (
+  command: WebSocketCommandType,
   webSocket: WebSocket,
   payload: Record<string, any>,
   onError?: (error: string) => void
 ) => {
-    // commands to send to the backend
-  const commandMap: Record<string, Function> = {
-    createLobby: wsMessage.sendCreateLobbyMessage,
-    joinLobby: wsMessage.sendJoinLobbyMessage,
-    sendLobbyMessage: wsMessage.sendLobbyMessage,
-    startGame: wsMessage.startGameMessage,
-    submitAnswer: wsMessage.submitAnswer,
-    nextQuestion: wsMessage.nextQuestion,
-  };
+  const commandConfig = WebSocketCommands[command];
 
-  const commandFunction = commandMap[command];
+  if (!commandConfig) {
+    handleError(`Unknown WebSocket command: "${command}".`, onError);
+    return;
+  }
 
-  if (commandFunction) {
-    try {
-      commandFunction(webSocket, ...Object.values(payload));
-    } catch (error) {
-      console.error(`Error executing command "${command}":`, error);
-      if (onError) {
-        onError(`Error executing command "${command}".`);
-      }
-    }
-  } else {
-    const errorMessage = `Unknown WebSocket command: "${command}".`;
-    console.error(errorMessage);
-    if (onError) {
-      onError(errorMessage);
-    }
+  try {
+    commandConfig.handler(webSocket, ...Object.values(payload));
+  } catch (error) {
+    handleError(`Error executing command "${command}": ${error}`, onError);
   }
 };
+
+/**
+ * Helper function to handle errors consistently
+ */
+const handleError = (message: string, onError?: (error: string) => void) => {
+  console.error(message);
+  if (onError) {
+    onError(message);
+  }
+};
+
+export { WebSocketCommands };
+export type { WebSocketCommandType };

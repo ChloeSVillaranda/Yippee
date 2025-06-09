@@ -74,12 +74,17 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                             }
                             break;
 
+                        case "Show leaderboard":
+                            store.dispatch(gameActions.setShowLeaderboard(true))
+                            break;
+
                         case "Next question":
                             if (data.lobby?.currentQuestion) {
                                 store.dispatch(gameActions.setCurrentQuestion(data.lobby.currentQuestion));
                             }
                             // reset the submittedAnswer back to false for user
                             store.dispatch(gameActions.setSubmittedAnswer(false))
+                            store.dispatch(gameActions.setShowLeaderboard(false))
                             break;
 
                         case "Game completed":
