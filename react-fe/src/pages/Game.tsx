@@ -1,12 +1,10 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { MessageResponse, QuizQuestion, User } from "../stores/types";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { Box, Typography } from "@mui/material";
 
 import HostGameView from "../components/HostGameView";
 import LobbyRoomView from "../components/LobbyRoomView";
 import PlayerGameView from "../components/PlayerGameView";
 import { RootState } from "../stores/store";
+import { useSelector } from "react-redux";
 
 export default function LobbyRoom() {
   const userDetails = useSelector((state: RootState) => state.game.user); // get current user details from Redux

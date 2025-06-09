@@ -30,12 +30,6 @@ const websocketSlice = createSlice({
   },
 });
 
-export const {
-  connect,
-  disconnect,
-  connectionOpened,
-  connectionClosed,
-  connectionError,
-} = websocketSlice.actions;
+export const { ...websocketActions } = websocketSlice.actions;
 
 export default websocketSlice.reducer;

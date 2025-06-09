@@ -17,10 +17,8 @@ export default function HostGame() {
   const navigate = useNavigate();
 
   // get necessary states from Redux
-  const currentUser = useSelector((state: RootState) => state.game.user);
   const roomCode = useSelector((state: RootState) => state.game.roomCode);
   const gameStatus = useSelector((state: RootState) => state.game.gameStatus);
-  const isConnected = useSelector((state: RootState) => state.websocket.isConnected);
 
   useCheckConnection();
 
@@ -46,11 +44,6 @@ export default function HostGame() {
       setError("Please select a quiz first!");
       return;
     }
-
-    // if (!isConnected) {
-    //   setError("Not connected to server. Please try again.");
-    //   return;
-    // }
 
     // update redux state
     dispatch(gameActions.setUserName(hostName));

@@ -1,28 +1,21 @@
-import {
-    connect,
-    connectionClosed,
-    connectionError,
-    connectionOpened,
-    disconnect,
-} from "../stores/websocketSlice";
-
 import { MessageResponse } from "../stores/types";
 import { Middleware } from "@reduxjs/toolkit";
 import { gameActions } from "../stores/gameSlice";
+import { websocketActions } from "../stores/websocketSlice";
 
 let socket: WebSocket | null = null;
 
 export const getWebSocket = () => socket;
 
 export const websocketMiddleware: Middleware = (store) => (next) => (action) => {
-    if (connect.match(action)) {
+    if (websocketActions.connect.match(action)) {
         const url = action.payload;
 
         if (!socket || socket.readyState !== WebSocket.OPEN) {
             socket = new WebSocket(url);
 
             socket.onopen = () => {
-                store.dispatch(connectionOpened());
+                store.dispatch(websocketActions.connectionOpened());
             };
 
             socket.onmessage = (event) => {
@@ -98,28 +91,28 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                     }
                 } catch (err) {
                     console.error("WebSocket message parse error:", err);
-                    store.dispatch(connectionError("Failed to parse WebSocket message"));
+                    store.dispatch(websocketActions.connectionError("Failed to parse WebSocket message"));
                 }
             };
 
             socket.onclose = () => {
-                store.dispatch(connectionClosed());
+                store.dispatch(websocketActions.connectionClosed());
                 socket = null;
             };
 
             socket.onerror = (err) => {
                 console.error("WebSocket error:", err);
-                store.dispatch(connectionError("WebSocket error occurred"));
+                store.dispatch(websocketActions.connectionError("WebSocket error occurred"));
                 socket = null;
             };
         }
     }
 
-    if (disconnect.match(action)) {
+    if (websocketActions.disconnect.match(action)) {
         if (socket) {
             socket.close();
             socket = null;
-            store.dispatch(connectionClosed());
+            store.dispatch(websocketActions.connectionClosed());
         }
     }
 

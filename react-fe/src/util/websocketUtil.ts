@@ -2,9 +2,9 @@ import { Quiz, User } from "../stores/types";
 import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "../stores/store";
-import { connect } from "../stores/websocketSlice";
 import { getWebSocket } from "../util/websocketMiddleware";
 import { useEffect } from "react";
+import { websocketActions } from "../stores/websocketSlice";
 
 /**
  * Hook to check and establish WebSocket connection
@@ -15,7 +15,7 @@ export const useCheckConnection = () => {
 
   useEffect(() => {
     if (!isConnected) {
-      dispatch(connect("ws://localhost:8080/ws"));
+      dispatch(websocketActions.connect("ws://localhost:8080/ws"));
     }
   }, [isConnected, dispatch]);
 };
