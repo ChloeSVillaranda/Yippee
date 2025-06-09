@@ -12,7 +12,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/"
           element={<Home />}/>
-        <Route path="/createquiz"
+        <Route path="/create-quiz"
           element={<CreateQuiz />}/>
         <Route path="/host"
           element={<HostGame />}/>
