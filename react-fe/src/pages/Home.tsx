@@ -16,6 +16,9 @@ export default function HomePage() {
       <Button variant="contained" onClick={() => {navigate(`/join`)}}>
         Join Game
       </Button>
+      <Button variant="contained" onClick={() => {navigate(`/create-quiz`)}}>
+        Create Quiz
+      </Button>
     </>
   );
 }
