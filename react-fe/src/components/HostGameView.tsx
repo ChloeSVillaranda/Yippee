@@ -4,7 +4,6 @@ import Leaderboard from "./Leaderboard";
 import { RootState } from "../stores/store";
 import { executeWebSocketCommand } from "../util/websocketUtil";
 import { useSelector } from "react-redux";
-import { useState } from "react";
 
 export default function HostGameView() {
   const game = useSelector((state: RootState) => state.game);
