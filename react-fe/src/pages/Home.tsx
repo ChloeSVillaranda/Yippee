@@ -14,16 +14,16 @@ export default function HomePage() {
     <>
       <BubbleBackground />
       <div className={styles.buttonContainer}>
-        <Button variant="contained" onClick={() => {navigate(`/host`)}}>
+        <Button className={styles.button} variant="contained" onClick={() => {navigate(`/host`)}}>
           Host Game
         </Button>
-        <Button variant="contained" onClick={() => {navigate(`/join`)}}>
+        <Button className={styles.button} variant="contained" onClick={() => {navigate(`/join`)}}>
           Join Game
         </Button>
-        <Button variant="contained" onClick={() => {navigate(`/create-quiz`)}}>
+        <Button className={styles.button} variant="contained" onClick={() => {navigate(`/create-quiz`)}}>
           Create Quiz
         </Button>
-        <Button variant="contained" >
+        <Button className={styles.button} variant="contained">
           Resources
         </Button>
       </div>

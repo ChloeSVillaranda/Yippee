@@ -14,14 +14,14 @@ export default function BubbleBackground() {
       init={particlesInit}
       options={{
         fullScreen: { enable: true, zIndex: -1 },
-        background: { color: { value: "#f0f8ff" } }, // Changed to a light blue color
+        background: { color: { value: "#fff5f5" } }, // Light pink background
         particles: {
           number: { value: 60, density: { enable: true, area: 800 } },
           shape: { type: "circle" },
-          opacity: { value: 0.6, random: true }, // Increased opacity
+          opacity: { value: 0.4, random: true },
           size: { value: 10, random: true },
           move: { enable: true, speed: 1, direction: "top", outMode: "out" },
-          color: { value: "#87CEEB" }, // Added light blue color for particles
+          color: { value: "#ffb6c1" }, // Light pink particles
         },
       }}
     />
