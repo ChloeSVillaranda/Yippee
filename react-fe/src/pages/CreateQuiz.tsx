@@ -1,4 +1,4 @@
-import { Box, Button, Chip, InputAdornment, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Chip, FormControlLabel, InputAdornment, TextField, Typography } from "@mui/material";
 
 import { useState } from "react";
 
@@ -9,8 +9,10 @@ type QuizQuestion = {
   hint: string;
   type: string;
   category: string[];
-  incorrectAnswers: string[];
-  correctAnswers: string[];
+  options: Array<{
+    text: string;
+    isCorrect: boolean;
+  }>;
 };
 
 type Quiz = {
@@ -23,6 +25,7 @@ type Quiz = {
 export default function CreateQuiz() {
   const [quizName, setQuizName] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
+  const [currentCategory, setCurrentCategory] = useState("");
   const [questions, setQuestions] = useState<QuizQuestion[]>([{
     question: "",
     points: 0,
@@ -30,12 +33,8 @@ export default function CreateQuiz() {
     hint: "",
     type: "multiple",
     category: [],
-    incorrectAnswers: ["", "", ""],
-    correctAnswers: [""],
+    options: Array(4).fill({ text: "", isCorrect: false }),
   }]);
-
-  // For handling category input
-  const [currentCategory, setCurrentCategory] = useState("");
 
   const handleQuestionChange = <K extends keyof QuizQuestion>(
     index: number,
@@ -44,6 +43,17 @@ export default function CreateQuiz() {
   ) => {
     const updatedQuestions = [...questions];
     updatedQuestions[index][field] = value;
+    setQuestions(updatedQuestions);
+  };
+
+  const handleOptionChange = (questionIndex: number, optionIndex: number, field: 'text' | 'isCorrect', value: string | boolean) => {
+    const updatedQuestions = [...questions];
+    const updatedOptions = [...updatedQuestions[questionIndex].options];
+    updatedOptions[optionIndex] = {
+      ...updatedOptions[optionIndex],
+      [field]: value
+    };
+    updatedQuestions[questionIndex].options = updatedOptions;
     setQuestions(updatedQuestions);
   };
 
@@ -72,18 +82,37 @@ export default function CreateQuiz() {
         hint: "",
         type: "multiple",
         category: [],
-        incorrectAnswers: ["", "", ""],
-        correctAnswers: [""],
+        options: Array(4).fill({ text: "", isCorrect: false }),
       },
     ]);
   };
 
+  const addOption = (questionIndex: number) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[questionIndex].options.push({ text: "", isCorrect: false });
+    setQuestions(updatedQuestions);
+  };
+
+  const transformQuestionForSubmission = (question: QuizQuestion) => {
+    return {
+      ...question,
+      correctAnswers: question.options
+        .filter(opt => opt.isCorrect)
+        .map(opt => opt.text),
+      incorrectAnswers: question.options
+        .filter(opt => !opt.isCorrect)
+        .map(opt => opt.text),
+    };
+  };
+
   const handleSubmit = async () => {
+    const transformedQuestions = questions.map(transformQuestionForSubmission);
+    
     const quiz: Quiz = {
       quizName,
       quizDescription,
-      createdBy: "Test_User", // TODO: replace with actual user data
-      quizQuestions: questions,
+      createdBy: "Test_User",
+      quizQuestions: transformedQuestions,
     };
 
     try {
@@ -128,16 +157,16 @@ export default function CreateQuiz() {
         value={quizDescription}
         onChange={(e) => setQuizDescription(e.target.value)}
       />
-      {questions.map((q, index) => (
-        <Box key={index} sx={{ marginBottom: 4, padding: 2, border: '1px solid #ddd', borderRadius: 2 }}>
-          <Typography variant="h6">Question {index + 1}</Typography>
+      {questions.map((q, questionIndex) => (
+        <Box key={questionIndex} sx={{ marginBottom: 4, padding: 2, border: '1px solid #ddd', borderRadius: 2 }}>
+          <Typography variant="h6">Question {questionIndex + 1}</Typography>
           <TextField
             label="Question"
             variant="outlined"
             fullWidth
             margin="normal"
             value={q.question}
-            onChange={(e) => handleQuestionChange(index, "question", e.target.value)}
+            onChange={(e) => handleQuestionChange(questionIndex, "question", e.target.value)}
           />
           <TextField
             label="Points"
@@ -146,7 +175,7 @@ export default function CreateQuiz() {
             fullWidth
             margin="normal"
             value={q.points}
-            onChange={(e) => handleQuestionChange(index, "points", parseInt(e.target.value) || 0)}
+            onChange={(e) => handleQuestionChange(questionIndex, "points", parseInt(e.target.value) || 0)}
           />
           <TextField
             label="Difficulty (1-5)"
@@ -158,7 +187,7 @@ export default function CreateQuiz() {
               inputProps: { min: 1, max: 5 }
             }}
             value={q.difficulty}
-            onChange={(e) => handleQuestionChange(index, "difficulty", parseInt(e.target.value) || 1)}
+            onChange={(e) => handleQuestionChange(questionIndex, "difficulty", parseInt(e.target.value) || 1)}
           />
           <TextField
             label="Hint"
@@ -166,7 +195,7 @@ export default function CreateQuiz() {
             fullWidth
             margin="normal"
             value={q.hint}
-            onChange={(e) => handleQuestionChange(index, "hint", e.target.value)}
+            onChange={(e) => handleQuestionChange(questionIndex, "hint", e.target.value)}
           />
           
           {/* Categories */}
@@ -179,7 +208,7 @@ export default function CreateQuiz() {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <Button onClick={() => handleCategoryAdd(index)}>Add</Button>
+                    <Button onClick={() => handleCategoryAdd(questionIndex)}>Add</Button>
                   </InputAdornment>
                 ),
               }}
@@ -189,47 +218,43 @@ export default function CreateQuiz() {
                 <Chip
                   key={catIndex}
                   label={cat}
-                  onDelete={() => handleCategoryDelete(index, catIndex)}
+                  onDelete={() => handleCategoryDelete(questionIndex, catIndex)}
                 />
               ))}
             </Box>
           </Box>
 
-          {/* Correct Answers */}
-          <Typography variant="subtitle1" sx={{ mt: 2 }}>Correct Answer(s)</Typography>
-          {q.correctAnswers.map((answer, ansIndex) => (
-            <TextField
-              key={ansIndex}
-              label={`Correct Answer ${ansIndex + 1}`}
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={answer}
-              onChange={(e) => {
-                const updatedAnswers = [...q.correctAnswers];
-                updatedAnswers[ansIndex] = e.target.value;
-                handleQuestionChange(index, "correctAnswers", updatedAnswers);
-              }}
-            />
+          {/* Options */}
+          <Typography variant="subtitle1" sx={{ mt: 2 }}>Answer Options</Typography>
+          {q.options.map((option, optionIndex) => (
+            <Box key={optionIndex} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <TextField
+                label={`Option ${optionIndex + 1}`}
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={option.text}
+                onChange={(e) => handleOptionChange(questionIndex, optionIndex, 'text', e.target.value)}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={option.isCorrect}
+                    onChange={(e) => handleOptionChange(questionIndex, optionIndex, 'isCorrect', e.target.checked)}
+                  />
+                }
+                label="Correct"
+              />
+            </Box>
           ))}
-
-          {/* Incorrect Answers */}
-          <Typography variant="subtitle1" sx={{ mt: 2 }}>Incorrect Answers</Typography>
-          {q.incorrectAnswers.map((answer, ansIndex) => (
-            <TextField
-              key={ansIndex}
-              label={`Incorrect Answer ${ansIndex + 1}`}
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={answer}
-              onChange={(e) => {
-                const updatedAnswers = [...q.incorrectAnswers];
-                updatedAnswers[ansIndex] = e.target.value;
-                handleQuestionChange(index, "incorrectAnswers", updatedAnswers);
-              }}
-            />
-          ))}
+          <Button 
+            variant="outlined" 
+            size="small" 
+            onClick={() => addOption(questionIndex)}
+            sx={{ mt: 1 }}
+          >
+            Add Option
+          </Button>
         </Box>
       ))}
       <Button variant="contained" onClick={addQuestion} sx={{ marginRight: 2 }}>
