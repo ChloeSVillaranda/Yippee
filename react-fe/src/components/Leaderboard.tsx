@@ -9,7 +9,7 @@ export default function Leaderboard() {
     const game = useSelector((state: RootState) => state.game);
 
     // sort users by points in descending order
-    const sortedUsers = Object.values(game.clientsInLobby).sort((a, b) => b.points - a.points);
+    const sortedUsers = Object.values(game.clientsInLobby).filter(user => user.userRole === "player").sort((a, b) => b.points - a.points);
 
     return (
         <Box sx={{ width: '100%', maxWidth: 600, margin: '0 auto', p: 2 }}>

@@ -7,8 +7,6 @@ import { useSelector } from "react-redux";
 
 export default function HostGameView() {
   const game = useSelector((state: RootState) => state.game);
-  // const [currentView, setCurrentView] = useState<'question' | 'leaderboard'>('question');
-
 
   const handleViewLeaderboard = () => {
     console.log("Viewing the leaderboard")

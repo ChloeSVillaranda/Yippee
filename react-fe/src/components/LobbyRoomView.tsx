@@ -68,7 +68,7 @@ export default function LobbyRoomView() {
       <Box>
         {game.clientsInLobby.length > 0 ? (
           game.clientsInLobby
-            .filter((user) => user.userRole === "player") // Filter only players
+            .filter((user) => user.userRole === "player") // filter only players
             .map((player, index) => (
               <Typography key={index} variant="body1">
                 {player.userName}

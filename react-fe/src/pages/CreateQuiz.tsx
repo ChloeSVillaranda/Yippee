@@ -36,7 +36,7 @@ export default function CreateQuiz() {
     const payload = {
       quizName,
       quizDescription,
-      user: "Test_User", // Replace with actual user data
+      user: "Test_User", // TODO: replace with actual user data (add authentication)
       questions,
     };
 

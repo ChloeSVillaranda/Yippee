@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
   }, []);
@@ -18,6 +18,9 @@ export default function HomePage() {
       </Button>
       <Button variant="contained" onClick={() => {navigate(`/create-quiz`)}}>
         Create Quiz
+      </Button>
+      <Button variant="contained" >
+        Resources
       </Button>
     </>
   );
