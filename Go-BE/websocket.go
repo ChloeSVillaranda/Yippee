@@ -59,6 +59,8 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleShowLeaderboard(conn, data)
 		case "nextQuestion":
 			handleNextQuestion(conn, data)
+		case "endGame":
+			handleEndGame(conn, data)
 		default:
 			log.Println("Unknown action:", data.Action)
 		}

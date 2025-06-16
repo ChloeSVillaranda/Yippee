@@ -71,6 +71,11 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                             store.dispatch(gameActions.setShowLeaderboard(true))
                             break;
 
+                        case "Show leaderboard - Final Question":
+                            store.dispatch(gameActions.setShowLeaderboard(true))
+                            store.dispatch(gameActions.setFinalQuestionLeaderboard(true))
+                            break;
+
                         case "Next question":
                             if (data.lobby?.currentQuestion) {
                                 store.dispatch(gameActions.setCurrentQuestion(data.lobby.currentQuestion));

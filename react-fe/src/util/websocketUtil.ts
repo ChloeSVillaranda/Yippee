@@ -28,7 +28,8 @@ type WebSocketCommandType =
   | "startGame"
   | "submitAnswer"
   | "showLeaderboard"
-  | "nextQuestion";
+  | "nextQuestion"
+  | "endGame";
 
 // Define the structure for WebSocket commands
 interface WebSocketCommand {
@@ -78,6 +79,12 @@ const WebSocketCommands: Record<WebSocketCommandType, WebSocketCommand> = {
     action: "nextQuestion",
     handler: (webSocket: WebSocket, roomCode: string, user: User) => {
       webSocket.send(JSON.stringify({ action: "nextQuestion", roomCode, user }));
+    }
+  },
+  endGame: {
+    action: "endGame",
+    handler: (webSocket: WebSocket, roomCode: string, user: User) => {
+      webSocket.send(JSON.stringify({ action: "endGame", roomCode, user }));
     }
   }
 };

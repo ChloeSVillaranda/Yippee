@@ -27,11 +27,20 @@ export default function HostGameView() {
 
   const handleNextQuestion = () => {
     console.log("Moving onto the next question")
-    executeWebSocketCommand(
-      "nextQuestion",
-      { roomCode: game.roomCode, user: game.user},
-      (errorMessage) => console.log(errorMessage)
-    );
+    if(game.finalQuestionLeaderboard) {
+      executeWebSocketCommand(
+        "endGame",
+        { roomCode: game.roomCode, user: game.user},
+        (errorMessage) => console.log(errorMessage)
+      );
+    } else {
+      executeWebSocketCommand(
+        "nextQuestion",
+        { roomCode: game.roomCode, user: game.user},
+        (errorMessage) => console.log(errorMessage)
+      );
+    }
+
   }
 
   return (

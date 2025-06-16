@@ -12,10 +12,13 @@ export default function Leaderboard() {
     const sortedUsers = Object.values(game.clientsInLobby).filter(user => user.userRole === "player").sort((a, b) => b.points - a.points);
 
     return (
+        <>
+        <Typography variant="h4" gutterBottom align="center">
+            Leaderboard
+        </Typography>
+        
+        {!game.finalQuestionLeaderboard ? (
         <Box sx={{ width: '100%', maxWidth: 600, margin: '0 auto', p: 2 }}>
-            <Typography variant="h4" gutterBottom align="center">
-                Leaderboard
-            </Typography>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -46,5 +49,11 @@ export default function Leaderboard() {
                 </Table>
             </TableContainer>
         </Box>
+        ) : (
+        <Typography variant="h4" gutterBottom align="center">
+            Final Results!
+        </Typography>
+        )}
+        </>
     );
 }

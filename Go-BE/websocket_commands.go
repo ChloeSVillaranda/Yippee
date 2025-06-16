@@ -191,35 +191,6 @@ func handleSubmitAnswer(conn *websocket.Conn, data MessageRequest) {
 	notifyAllClientsInRoom(lobbies[data.RoomCode], "Lobby updated")
 }
 
-// display the points
-// TODO: different leaderboard display at the end of the game
-func handleShowLeaderboard(conn *websocket.Conn, data MessageRequest) {
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	lobby, _, err := validateLobbyAndUser(conn, data.RoomCode, "host")
-	if err != nil {
-		conn.WriteJSON(MessageResponse{
-			Error: err.Error(),
-		})
-		return
-	}
-
-	// check if we've reached the end of questions
-	if lobby.CurrentQuestionIndex >= len(lobby.Quiz.QuizQuestions)-1 {
-		lobby.Status = "Completed"
-		lobbies[data.RoomCode] = lobby
-		notifyAllClientsInRoom(lobby, "Game completed")
-		return
-	}
-
-	// update lobby in global map
-	lobbies[data.RoomCode] = lobby
-
-	notifyAllClientsInRoom(lobby, "Show leaderboard")
-
-}
-
 // handler for dealing with answers
 func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
 	mutex.Lock()
@@ -257,4 +228,45 @@ func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
 	lobbies[data.RoomCode] = lobby
 
 	notifyAllClientsInRoom(lobby, "Next question")
+}
+
+// display the points
+// TODO: different leaderboard display at the end of the game
+func handleShowLeaderboard(conn *websocket.Conn, data MessageRequest) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	lobby, _, err := validateLobbyAndUser(conn, data.RoomCode, "host")
+	if err != nil {
+		conn.WriteJSON(MessageResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	// check if we've reached the end of questions
+	if lobby.CurrentQuestionIndex >= len(lobby.Quiz.QuizQuestions)-1 {
+		notifyAllClientsInRoom(lobby, "Show leaderboard - Final Question")
+		return
+	}
+
+	notifyAllClientsInRoom(lobby, "Show leaderboard")
+}
+
+func handleEndGame(conn *websocket.Conn, data MessageRequest) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	lobby, _, err := validateLobbyAndUser(conn, data.RoomCode, "host")
+	if err != nil {
+		conn.WriteJSON(MessageResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	lobby.Status = "Completed"
+	lobbies[data.RoomCode] = lobby
+
+	notifyAllClientsInRoom(lobby, "Game completed")
 }
