@@ -92,8 +92,6 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 			parsedQuiz.CreatedBy = user
 		}
 
-		log.Println("attempting to look through the quiz questions")
-
 		// parse quizQuestions
 		if questions, ok := quiz["quizQuestions"]; ok {
 			parsedQuiz.QuizQuestions = parseQuizQuestions(questions)
