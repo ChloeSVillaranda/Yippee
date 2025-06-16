@@ -12,7 +12,7 @@ export type QuizQuestion = {
   hint: string;
   category: string[];
   // incorrectAnswers: string[];
-  // correctAnswers: string[];
+  correctAnswers: string[];
   options: string[];
   type: string;
 }

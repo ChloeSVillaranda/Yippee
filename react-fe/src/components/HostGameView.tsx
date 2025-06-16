@@ -1,13 +1,16 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 
 import Leaderboard from "./Leaderboard";
+import { QuestionView } from "./QuestionView";
 import { RootState } from "../stores/store";
 import { executeWebSocketCommand } from "../util/websocketUtil";
 import { useSelector } from "react-redux";
+import { useState } from "react";
 
 export default function HostGameView() {
   const game = useSelector((state: RootState) => state.game);
-
+  const [leaderboardView, setLeaderboardView] = useState<'page1' | 'page2'>('page1');
+  
   const handleViewLeaderboard = () => {
     console.log("Viewing the leaderboard")
     executeWebSocketCommand(
@@ -15,6 +18,11 @@ export default function HostGameView() {
       { roomCode: game.roomCode, user: game.user},
       (errorMessage) => console.log(errorMessage)
     );
+    setLeaderboardView('page1')
+  }
+
+  const handleViewLeaderboard2 = () => {
+    setLeaderboardView('page2')
   }
 
   const handleNextQuestion = () => {
@@ -35,32 +43,31 @@ export default function HostGameView() {
       {!game.showLeaderboard ? (
         // show question
         <>
-          <Typography variant="h5" gutterBottom>
-            Quiz: {game.currentQuestion?.question}
-          </Typography>
-          <Box>
-            {Array.isArray(game.currentQuestion?.options) && 
-              game.currentQuestion?.options.map((option, index) => (
-                <Typography key={index} variant="body1">
-                  {index + 1}. {option}
-                </Typography>
-              ))
-            }
-          </Box>
+          <QuestionView displayCorrectAnswers={false} />
           <Button onClick={handleViewLeaderboard}>
-            View Leaderboard
+            Next
           </Button>
         </>
       ) : (
         // show leaderboard
-        <>
-          <Leaderboard />
-          <Button onClick={handleNextQuestion}>
-            Next Question
-          </Button>
+        <> 
+          {leaderboardView === 'page1' ? (
+            <>
+              <QuestionView displayCorrectAnswers={true} />
+              <Button onClick={handleViewLeaderboard2}>
+                View Final Results
+              </Button>
+            </>
+          ) : (
+            <>
+              <Leaderboard />
+              <Button onClick={handleNextQuestion}>
+                Next Question
+              </Button>
+            </>
+          )}
         </>
-      )
-      } 
+      )}
     </>
   );
 }
