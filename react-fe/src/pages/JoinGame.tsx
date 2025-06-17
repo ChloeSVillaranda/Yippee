@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { RootState } from "../stores/store";
 import { gameActions } from "../stores/gameSlice";
+import styles from './JoinGame.module.css';
 import { useNavigate } from "react-router-dom";
 
 export default function JoinGame() {
@@ -62,36 +63,40 @@ export default function JoinGame() {
   };
 
   return (
-    <Box sx={{ padding: 4, maxWidth: 400, margin: "0 auto", textAlign: "center" }}>
-      <Typography variant="h4" gutterBottom>
-        Join a Game
-      </Typography>
-      <TextField
-        id="player-name"
-        label="Enter Your Name"
-        variant="outlined"
-        fullWidth
-        value={playerName}
-        onChange={(e) => setPlayerName(e.target.value)}
-        sx={{ marginBottom: 2 }}
-      />
-      <TextField
-        id="room-code"
-        label="Enter Room Code"
-        variant="outlined"
-        fullWidth
-        value={roomCodeToJoin}
-        onChange={(e) => setRoomCodeToJoin(e.target.value.toUpperCase())}
-        sx={{ marginBottom: 2 }}
-      />
-      {error && (
-        <Typography color="error" sx={{ marginBottom: 2 }}>
-          {error}
+    <div className={styles.container}>
+      <div className={styles.formBox}>
+        <Typography variant="h4" gutterBottom className={styles.title}>
+          Join a Game
         </Typography>
-      )}
-      <Button variant="contained" color="primary" onClick={handleJoinGame} fullWidth>
-        Join Game
-      </Button>
-    </Box>
+        <TextField
+          id="player-name"
+          label="Enter Your Name"
+          variant="outlined"
+          fullWidth
+          value={playerName}
+          onChange={(e) => setPlayerName(e.target.value)}
+          sx={{ marginBottom: 2 }}
+        />
+        <TextField
+          id="room-code"
+          label="Enter Room Code"
+          variant="outlined"
+          fullWidth
+          value={roomCodeToJoin}
+          onChange={(e) => setRoomCodeToJoin(e.target.value.toUpperCase())}
+          sx={{ marginBottom: 2 }}
+        />
+        {error && (
+          <Typography color="error" sx={{ marginBottom: 2 }}>
+            {error}
+          </Typography>
+        )}
+        <div className={styles.buttonDiv}>
+          <Button variant="contained" color="primary" onClick={handleJoinGame} fullWidth className={styles.button}>
+            Join Game
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

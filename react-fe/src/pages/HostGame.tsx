@@ -7,6 +7,7 @@ import { Quiz } from "../stores/types";
 import { RootState } from "../stores/store";
 import SelectQuiz from "../components/SelectQuiz";
 import { gameActions } from "../stores/gameSlice";
+import styles from './HostGame.module.css';
 import { useNavigate } from "react-router-dom";
 
 export default function HostGame() {
@@ -67,38 +68,42 @@ export default function HostGame() {
   };
 
   return (
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Host a Game
-      </Typography>
-      <TextField
-        id="host-name"
-        label="Enter Your Name"
-        variant="outlined"
-        fullWidth
-        value={hostName}
-        onChange={(e) => setHostName(e.target.value)}
-        sx={{ marginBottom: 2 }}
-      />
-      <SelectQuiz onSelectQuiz={handleSelectQuiz} />
-      {selectedQuiz && (
-        <Typography variant="h6" gutterBottom>
-          Selected Quiz: {selectedQuiz.quizName}
-        </Typography>
-      )}
-      {error && (
-        <Typography color="error" sx={{ marginBottom: 2 }}>
-          {error}
-        </Typography>
-      )}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleHostGame}
-        sx={{ marginTop: 2 }}
-      >
-        Host Game
-      </Button>
-    </Box>
+  <div className={styles.container}>
+      <div className={styles.formBox}> 
+        <Typography variant="h4" gutterBottom className={styles.title}>
+            Host a Game
+          </Typography>
+          <TextField
+            id="host-name"
+            label="Enter Your Name"
+            variant="outlined"
+            fullWidth
+            value={hostName}
+            onChange={(e) => setHostName(e.target.value)}
+            sx={{ marginBottom: 2 }}
+          />
+          <SelectQuiz onSelectQuiz={handleSelectQuiz} />
+          {selectedQuiz && (
+            <Typography variant="h6" gutterBottom className={styles.selectQuizTitle}>
+              Selected Quiz: {selectedQuiz.quizName}
+            </Typography>
+          )}
+          {error && (
+            <Typography color="error" sx={{ marginBottom: 2 }}>
+              {error}
+            </Typography>
+          )}
+          <div className={styles.buttonDiv}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleHostGame}
+              className={styles.button}
+            >
+              Host Game
+            </Button>
+          </div>
+        </div>
+      </div>
   );
 }

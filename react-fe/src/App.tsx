@@ -1,17 +1,19 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-// import AnimatedCursor from "react-animated-cursor"
 import BubbleBackground from "./components/BubbleBackground";
 import CreateQuiz from "./pages/CreateQuiz"
 import Home from "./pages/Home";
 import HostGame from "./pages/HostGame";
 import JoinGame from "./pages/JoinGame";
 import LobbyRoom from "./pages/Game";
+import Resources from "./pages/Resources";
+
+// import AnimatedCursor from "react-animated-cursor"
 
 function AppRoutes() {
   return (
     <div className="App">
-      {/* <BubbleBackground /> */}
+      <BubbleBackground />
       {/* <AnimatedCursor outerSize={20} /> */}
       <Routes>
         <Route path="/"
@@ -23,6 +25,8 @@ function AppRoutes() {
         <Route path="/join"
           element={<JoinGame />}/>
         {/* TODO: make the :/roomCode protected so that you need to be a player/host to enter it */}
+        <Route path="/route"
+          element={<Resources />}/>      
         <Route path="/:roomCode" element={<LobbyRoom />} /> 
       </Routes>
     </div>

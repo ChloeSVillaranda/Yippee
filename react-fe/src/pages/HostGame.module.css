@@ -1,0 +1,55 @@
+.container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    /* TODO: figure out how to not hardcode */
+    margin-top: 15vh; 
+}
+
+
+.formBox {
+  height: 100%;
+  width: 100%;
+  background-color: white;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.title {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 16px !important;
+}
+
+.selectQuizTitle {
+    text-align: center;
+    width: 100%;
+    margin: 16px 0 !important;
+}
+
+.buttonDiv {
+    display: flex;
+    justify-content: center;
+    margin-top: 16;
+}
+
+.button {
+    align-self: center;
+    background: linear-gradient(45deg, #FF9A8B 30%, #FF6B95 90%) !important;
+    color: white !important;
+    transition: transform 0.2s !important;
+}
+
+.button:hover {
+    transform: scale(1.05) !important;
+    background: linear-gradient(45deg, #FF6B95 30%, #FF9A8B 90%) !important;
+}
