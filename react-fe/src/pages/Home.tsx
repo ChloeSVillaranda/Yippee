@@ -1,4 +1,3 @@
-import BubbleBackground from '../components/BubbleBackground';
 import { Button } from "@mui/material";
 import styles from './Home.module.css';
 import { useEffect } from "react";
@@ -12,7 +11,6 @@ export default function HomePage() {
 
   return (
     <>
-      <BubbleBackground />
       <div className={styles.buttonContainer}>
         <Button className={styles.button} variant="contained" onClick={() => {navigate(`/host`)}}>
           Host Game

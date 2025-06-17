@@ -3,14 +3,21 @@
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 
 import { RootState } from '../stores/store';
+import { User } from '../stores/types';
 import { useSelector } from 'react-redux';
 
 export default function Leaderboard() {
     const game = useSelector((state: RootState) => state.game);
 
     // sort users by points in descending order
-    const sortedUsers = Object.values(game.clientsInLobby).filter(user => user.userRole === "player").sort((a, b) => b.points - a.points);
-
+    const sortedUsers = Object.values(game.clientsInLobby)
+        .filter((user): user is User => 
+            user !== null && 
+            typeof user === 'object' && 
+            'userRole' in user && 
+            user.userRole === 'player'
+        )
+        .sort((a, b) => b.points - a.points);
     return (
         <>
         <Typography variant="h4" gutterBottom align="center">

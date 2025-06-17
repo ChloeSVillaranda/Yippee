@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import AnimatedCursor from "react-animated-cursor"
+// import AnimatedCursor from "react-animated-cursor"
+import BubbleBackground from "./components/BubbleBackground";
 import CreateQuiz from "./pages/CreateQuiz"
 import Home from "./pages/Home";
 import HostGame from "./pages/HostGame";
@@ -10,7 +11,8 @@ import LobbyRoom from "./pages/Game";
 function AppRoutes() {
   return (
     <div className="App">
-      <AnimatedCursor outerSize={20} />
+      {/* <BubbleBackground /> */}
+      {/* <AnimatedCursor outerSize={20} /> */}
       <Routes>
         <Route path="/"
           element={<Home />}/>
