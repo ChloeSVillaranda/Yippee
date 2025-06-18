@@ -37,13 +37,10 @@
 }
 
 .button {
-    background: linear-gradient(45deg, #FF9A8B 30%, #FF6B95 90%);
-    color: white;
-    transition: transform 0.2s;
-    width: fit-content;
-    min-width: 200px;
-    padding: 10px 20px;
     align-self: center;
+    background: linear-gradient(45deg, #FF9A8B 30%, #FF6B95 90%) !important;
+    color: white !important;
+    transition: transform 0.2s !important;
 }
 
 .button:hover {

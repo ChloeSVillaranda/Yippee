@@ -25,7 +25,7 @@ function AppRoutes() {
         <Route path="/join"
           element={<JoinGame />}/>
         {/* TODO: make the :/roomCode protected so that you need to be a player/host to enter it */}
-        <Route path="/route"
+        <Route path="/resources"
           element={<Resources />}/>      
         <Route path="/:roomCode" element={<LobbyRoom />} /> 
       </Routes>

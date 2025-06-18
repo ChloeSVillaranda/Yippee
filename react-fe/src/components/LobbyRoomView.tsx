@@ -82,6 +82,7 @@ export default function LobbyRoomView() {
         )}
       </Box>
         {/* TODO: add restrictions on the messages you can send*/}
+
       <TextField
           id="message"
           label="Type Message"
@@ -89,24 +90,26 @@ export default function LobbyRoomView() {
           fullWidth
           value={lobbyMessage}
           onChange={(e) => setLobbyMessage(e.target.value)}
-          InputProps={{
-              endAdornment: (
-                  <InputAdornment position="end">
-                      <IconButton
-                          onClick={handleSendMessage}
-                          disabled={!lobbyMessage.trim()}
-                          edge="end"
-                          sx={{
-                              color: lobbyMessage.trim() ? '#FF6B95' : 'rgba(0, 0, 0, 0.26)',
-                              '&:hover': {
-                                  color: '#FF9A8B'
-                              }
-                          }}
-                      >
-                          <SendIcon />
-                      </IconButton>
-                  </InputAdornment>
-              ),
+          slotProps={{
+              input: {
+                  endAdornment: (
+                      <InputAdornment position="end">
+                          <IconButton
+                              onClick={handleSendMessage}
+                              disabled={!lobbyMessage.trim()}
+                              edge="end"
+                              sx={{
+                                  color: lobbyMessage.trim() ? '#FF6B95' : 'rgba(0, 0, 0, 0.26)',
+                                  '&:hover': {
+                                      color: '#FF9A8B'
+                                  }
+                              }}
+                          >
+                              <SendIcon />
+                          </IconButton>
+                      </InputAdornment>
+                  )
+              }
           }}
       />
 
