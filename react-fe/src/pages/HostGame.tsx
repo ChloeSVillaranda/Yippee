@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Button, IconButton, TextField, Typography } from "@mui/material";
 import { executeWebSocketCommand, useCheckConnection } from "../util/websocketUtil";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Quiz } from "../stores/types";
 import { RootState } from "../stores/store";
 import SelectQuiz from "../components/SelectQuiz";
+import SettingsIcon from '@mui/icons-material/Settings';
 import { gameActions } from "../stores/gameSlice";
 import styles from './HostGame.module.css';
 import { useNavigate } from "react-router-dom";
@@ -32,6 +33,10 @@ export default function HostGame() {
   const handleSelectQuiz = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
   };
+
+  const handleModifyLobbySettings = () => {
+    console.log("modify lobby settings pressed")
+  }
 
   const handleHostGame = async () => {
     // input host name
@@ -71,39 +76,46 @@ export default function HostGame() {
   <div className={styles.container}>
       <div className={styles.formBox}> 
         <Typography variant="h4" gutterBottom className={styles.title}>
-            Host a Game
+          Host a Game
+        </Typography>
+        <IconButton 
+          onClick={handleModifyLobbySettings}
+          edge="end"
+        >
+          <SettingsIcon />
+        </IconButton>
+
+        <TextField
+          id="host-name"
+          label="Enter Your Name"
+          variant="outlined"
+          fullWidth
+          value={hostName}
+          onChange={(e) => setHostName(e.target.value)}
+          sx={{ marginBottom: 2 }}
+        />
+        <SelectQuiz onSelectQuiz={handleSelectQuiz} />
+        {selectedQuiz && (
+          <Typography variant="h6" gutterBottom className={styles.selectQuizTitle}>
+            Selected Quiz: {selectedQuiz.quizName}
           </Typography>
-          <TextField
-            id="host-name"
-            label="Enter Your Name"
-            variant="outlined"
-            fullWidth
-            value={hostName}
-            onChange={(e) => setHostName(e.target.value)}
-            sx={{ marginBottom: 2 }}
-          />
-          <SelectQuiz onSelectQuiz={handleSelectQuiz} />
-          {selectedQuiz && (
-            <Typography variant="h6" gutterBottom className={styles.selectQuizTitle}>
-              Selected Quiz: {selectedQuiz.quizName}
-            </Typography>
-          )}
-          {error && (
-            <Typography color="error" sx={{ marginBottom: 2 }}>
-              {error}
-            </Typography>
-          )}
-          <div className={styles.buttonDiv}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleHostGame}
-              className={styles.button}
-            >
-              Host Game
-            </Button>
-          </div>
+        )}
+        {error && (
+          <Typography color="error" sx={{ marginBottom: 2 }}>
+            {error}
+          </Typography>
+        )}
+        <div className={styles.buttonDiv}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleHostGame}
+            className={styles.button}
+          >
+            Host Game
+          </Button>
         </div>
       </div>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
-import { Box, Button, Checkbox, Chip, FormControlLabel, InputAdornment, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Chip, FormControlLabel, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
 import { Quiz, QuizQuestion } from "../stores/types";
 
+import DeleteIcon from '@mui/icons-material/Delete';
 import styles from './CreateQuiz.module.css';
 import { useState } from "react";
 
@@ -35,7 +36,7 @@ export default function CreateQuiz() {
     hint: "",
     type: "multiple",
     category: [],
-    options: Array(4).fill({ text: "", isCorrect: false }),
+    options: Array(2).fill({ text: "", isCorrect: false }),
   }]);
 
   const handleQuestionChange = <K extends keyof QuizQuestionForm>(
@@ -84,7 +85,7 @@ export default function CreateQuiz() {
         hint: "",
         type: "multiple",
         category: [],
-        options: Array(4).fill({ text: "", isCorrect: false }),
+        options: Array(2).fill({ text: "", isCorrect: false }),
       },
     ]);
   };
@@ -95,6 +96,24 @@ export default function CreateQuiz() {
     setQuestions(updatedQuestions);
   };
 
+  const deleteQuestion = (indexToDelete: number) => {
+    if (questions.length <= 1) {
+      alert("Cannot delete the last question");
+      return;
+    }
+    const updatedQuestions = questions.filter((_, index) => index !== indexToDelete);
+    setQuestions(updatedQuestions);
+  };
+
+  const deleteOption = (questionIndex: number, optionIndex: number) => {
+    if (questions[questionIndex].options.length <= 2) {
+      alert("Must have at least 2 options");
+      return;
+    }
+    const updatedQuestions = [...questions];
+    updatedQuestions[questionIndex].options = updatedQuestions[questionIndex].options.filter((_, index) => index !== optionIndex);
+    setQuestions(updatedQuestions);
+  };
 
   const transformQuestionForSubmission = (question: QuizQuestionForm): QuizQuestion => {
       return {
@@ -171,6 +190,12 @@ export default function CreateQuiz() {
           />
           {questions.map((q, questionIndex) => (
             <Box key={questionIndex} sx={{ marginBottom: 4, padding: 2, border: '1px solid #ddd', borderRadius: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6">Question {questionIndex + 1}</Typography>
+                <IconButton onClick={() => deleteQuestion(questionIndex)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
               <Typography variant="h6">Question {questionIndex + 1}</Typography>
               <TextField
                 label="Question"
@@ -257,6 +282,12 @@ export default function CreateQuiz() {
                     }
                     label="Correct"
                   />
+                  <IconButton 
+                    size="small"
+                    onClick={() => deleteOption(questionIndex, optionIndex)
+                  }>
+                    <DeleteIcon />
+                  </IconButton>
                 </Box>
               ))}
               <Button 

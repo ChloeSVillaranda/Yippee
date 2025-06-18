@@ -74,7 +74,6 @@ func getQuizzesHandler(w http.ResponseWriter, r *http.Request) {
 
 	for cursor.Next(r.Context()) {
 		var quiz bson.M
-		log.Printf("Raw quiz document: %+v", quiz)
 		if err := cursor.Decode(&quiz); err != nil {
 			http.Error(w, "Failed to parse quiz", http.StatusInternalServerError)
 			return

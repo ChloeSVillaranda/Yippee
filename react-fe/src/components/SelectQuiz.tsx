@@ -1,7 +1,7 @@
 import 'react-multi-carousel/lib/styles.css';
 
 import { Box, CircularProgress, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Carousel from 'react-multi-carousel';
 import { Quiz } from '../stores/types';
