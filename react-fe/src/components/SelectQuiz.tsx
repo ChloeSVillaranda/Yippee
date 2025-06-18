@@ -84,7 +84,7 @@ export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
                 {quiz.quizDescription}
               </Typography>
               <Typography variant="caption" color="textSecondary">
-                Created by: {quiz.user}
+                Created by: {quiz.createdBy}
               </Typography>
             </Box>
           ))}

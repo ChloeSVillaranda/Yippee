@@ -44,7 +44,7 @@ type Settings struct {
 	EnableMessages         bool `json:"enableMessages"`
 	ShowMessagesDuringGame bool `json:"showMessagesDuringGame"`
 	ShowLeaderboard        bool `json:"showLeaderboard"`
-	ShuffleQuestions       bool `json:"-"`
+	ShuffleQuestions       bool `json:"shuffleQuestions"`
 }
 
 // Message structure

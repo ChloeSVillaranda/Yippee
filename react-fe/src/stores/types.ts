@@ -1,8 +1,8 @@
 export type Quiz = {
     quizName: string;
     quizDescription: string;
-    user: string;
-    questions: QuizQuestion[];
+    createdBy: string;
+    quizQuestions: QuizQuestion[];
 };
 
 export type QuizQuestion = {
@@ -11,7 +11,7 @@ export type QuizQuestion = {
   difficulty: number;
   hint: string;
   category: string[];
-  // incorrectAnswers: string[];
+  incorrectAnswers: string[];
   correctAnswers: string[];
   options: string[];
   type: string;

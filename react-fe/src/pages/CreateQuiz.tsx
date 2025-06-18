@@ -1,9 +1,10 @@
 import { Box, Button, Checkbox, Chip, FormControlLabel, InputAdornment, TextField, Typography } from "@mui/material";
+import { Quiz, QuizQuestion } from "../stores/types";
 
 import styles from './CreateQuiz.module.css';
 import { useState } from "react";
 
-type QuizQuestion = {
+type QuizQuestionForm = {
   question: string;
   points: number;
   difficulty: number;
@@ -16,18 +17,18 @@ type QuizQuestion = {
   }>;
 };
 
-type Quiz = {
-  quizName: string;
-  quizDescription: string;
-  createdBy: string;
-  quizQuestions: QuizQuestion[];
-};
+// type QuizForm = {
+//   quizName: string;
+//   quizDescription: string;
+//   createdBy: string;
+//   quizQuestions: QuizQuestionForm[];
+// };
 
 export default function CreateQuiz() {
   const [quizName, setQuizName] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
   const [currentCategory, setCurrentCategory] = useState("");
-  const [questions, setQuestions] = useState<QuizQuestion[]>([{
+  const [questions, setQuestions] = useState<QuizQuestionForm[]>([{
     question: "",
     points: 0,
     difficulty: 1,
@@ -37,10 +38,10 @@ export default function CreateQuiz() {
     options: Array(4).fill({ text: "", isCorrect: false }),
   }]);
 
-  const handleQuestionChange = <K extends keyof QuizQuestion>(
+  const handleQuestionChange = <K extends keyof QuizQuestionForm>(
     index: number,
     field: K,
-    value: QuizQuestion[K]
+    value: QuizQuestionForm[K]
   ) => {
     const updatedQuestions = [...questions];
     updatedQuestions[index][field] = value;
@@ -94,16 +95,22 @@ export default function CreateQuiz() {
     setQuestions(updatedQuestions);
   };
 
-  const transformQuestionForSubmission = (question: QuizQuestion) => {
-    return {
-      ...question,
-      correctAnswers: question.options
-        .filter(opt => opt.isCorrect)
-        .map(opt => opt.text),
-      incorrectAnswers: question.options
-        .filter(opt => !opt.isCorrect)
-        .map(opt => opt.text),
-    };
+
+  const transformQuestionForSubmission = (question: QuizQuestionForm): QuizQuestion => {
+      return {
+        question: question.question,
+        points: question.points,
+        difficulty: question.difficulty,
+        hint: question.hint,
+        type: question.type,
+        category: question.category,
+        correctAnswers: question.options
+          .filter(opt => opt.isCorrect)
+          .map(opt => opt.text),
+        incorrectAnswers: question.options
+          .filter(opt => !opt.isCorrect)
+          .map(opt => opt.text),
+      } as QuizQuestion;
   };
 
   const handleSubmit = async () => {
@@ -115,6 +122,8 @@ export default function CreateQuiz() {
       createdBy: "Test_User",
       quizQuestions: transformedQuestions,
     };
+
+    console.log('Submitting quiz:', JSON.stringify(quiz, null, 2));
 
     try {
       const response = await fetch("http://localhost:8080/api/create-quiz", {
