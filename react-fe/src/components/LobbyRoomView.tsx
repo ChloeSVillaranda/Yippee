@@ -1,8 +1,10 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
 
 import { RootState } from "../stores/store";
+import SendIcon from '@mui/icons-material/Send';
 import { User } from "../stores/types";
 import { executeWebSocketCommand } from "../util/websocketUtil";
+import styles from './LobbyRoomView.module.css';
 import { useSelector } from "react-redux";
 import { useState } from "react";
 
@@ -80,11 +82,34 @@ export default function LobbyRoomView() {
         )}
       </Box>
         {/* TODO: add restrictions on the messages you can send*/}
-        <TextField id="message" label="Type Message" variant="outlined" fullWidth value={lobbyMessage} 
-          onChange={(e) => setLobbyMessage(e.target.value)} sx={{ marginBottom: 2 }}/>
-        <Button variant="contained" color="primary" onClick={handleSendMessage} fullWidth>
-            Send Message
-        </Button>
+      <TextField
+          id="message"
+          label="Type Message"
+          variant="outlined"
+          fullWidth
+          value={lobbyMessage}
+          onChange={(e) => setLobbyMessage(e.target.value)}
+          InputProps={{
+              endAdornment: (
+                  <InputAdornment position="end">
+                      <IconButton
+                          onClick={handleSendMessage}
+                          disabled={!lobbyMessage.trim()}
+                          edge="end"
+                          sx={{
+                              color: lobbyMessage.trim() ? '#FF6B95' : 'rgba(0, 0, 0, 0.26)',
+                              '&:hover': {
+                                  color: '#FF9A8B'
+                              }
+                          }}
+                      >
+                          <SendIcon />
+                      </IconButton>
+                  </InputAdornment>
+              ),
+          }}
+      />
+
       {error && (
         <Typography color="error" sx={{ marginBottom: 2 }}>
           {error}
@@ -92,22 +117,16 @@ export default function LobbyRoomView() {
       )}
       {userDetails.userRole === "host" ? (
         <Box>
-          <Typography variant="h5" gutterBottom>
-            Host View
-          </Typography>
           <Typography variant="body1">
             You are the host. Manage the game and start the quiz.
           </Typography>
-          <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={handleStartGame}>
+          <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={handleStartGame} className={styles.button}>
             Start Game
           </Button>
         </Box>
       ) : userDetails.userRole === "player" ? (
         <>
         <Box>
-          <Typography variant="h5" gutterBottom>
-            Player View
-          </Typography>
           <Typography variant="body1">
             You are a player. Wait for the host to start the game.
           </Typography>

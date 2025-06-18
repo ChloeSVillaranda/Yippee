@@ -1,0 +1,12 @@
+.button {
+    background: linear-gradient(45deg, #FF9A8B 30%, #FF6B95 90%);
+    color: white;
+    transition: transform 0.2s;
+    width: fit-content;
+    align-self: center;
+}
+
+.button:hover {
+    transform: scale(1.05) !important;
+    background: linear-gradient(45deg, #FF6B95 30%, #FF9A8B 90%) !important;
+}

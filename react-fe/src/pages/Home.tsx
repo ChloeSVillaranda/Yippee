@@ -21,7 +21,7 @@ export default function HomePage() {
         <Button className={styles.button} variant="contained" onClick={() => {navigate(`/create-quiz`)}}>
           Create Quiz
         </Button>
-        <Button className={styles.button} variant="contained">
+        <Button className={styles.button} variant="contained" onClick={() => {navigate(`/resources`)}}>
           Resources
         </Button>
       </div>

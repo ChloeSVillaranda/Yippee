@@ -4,6 +4,7 @@ import HostGameView from "../components/HostGameView";
 import LobbyRoomView from "../components/LobbyRoomView";
 import PlayerGameView from "../components/PlayerGameView";
 import { RootState } from "../stores/store";
+import styles from './Game.module.css';
 import { useSelector } from "react-redux";
 
 export default function LobbyRoom() {
@@ -11,31 +12,33 @@ export default function LobbyRoom() {
   const lobbyStatus = useSelector((state: RootState) => state.game.gameStatus);
 
   return (
-    <>
-    {lobbyStatus === "Waiting" ? (
-      <LobbyRoomView />
-    ) : lobbyStatus === "In-Progress" ? (
-      userDetails.userRole === "host" ? (
-        <HostGameView />
-      ) : (
-        <PlayerGameView />
-      )
-    ) : lobbyStatus === "Completed" ? (
-      <Box>
-        {/* TODO: implement a final leaderboard */}
-          {/* <FinalLeaderBoard /> */}
-          <Typography variant="h5" gutterBottom>
-            Game has ended.
-          </Typography>
-      </Box>
-    ) : (
-      // TODO: handle case where there is no lobbyStatus
-      <Box>
-          <Typography variant="h5" gutterBottom>
-            Error.
-          </Typography>
-      </Box>
-    )}
-    </>
+    <div className={styles.container}>
+      <div className={styles.innerBox}>
+        {lobbyStatus === "Waiting" ? (
+          <LobbyRoomView />
+        ) : lobbyStatus === "In-Progress" ? (
+          userDetails.userRole === "host" ? (
+            <HostGameView />
+          ) : (
+            <PlayerGameView />
+          )
+        ) : lobbyStatus === "Completed" ? (
+          <Box>
+            {/* TODO: implement a final leaderboard */}
+              {/* <FinalLeaderBoard /> */}
+              <Typography variant="h5" gutterBottom>
+                Game has ended.
+              </Typography>
+          </Box>
+        ) : (
+          // TODO: handle case where there is no lobbyStatus
+          <Box>
+              <Typography variant="h5" gutterBottom>
+                Error.
+              </Typography>
+          </Box>
+        )}
+      </div>
+    </div>
   );
 }
