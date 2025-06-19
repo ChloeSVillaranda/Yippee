@@ -2,6 +2,7 @@ import { Box, Button, Checkbox, Chip, FormControlLabel, IconButton, InputAdornme
 import { Quiz, QuizQuestion } from "../stores/types";
 
 import DeleteIcon from '@mui/icons-material/Delete';
+import { DifficultySlider } from '../components/DifficultySlider';
 import styles from './CreateQuiz.module.css';
 import { useState } from "react";
 
@@ -29,6 +30,7 @@ export default function CreateQuiz() {
   const [quizName, setQuizName] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
   const [currentCategory, setCurrentCategory] = useState("");
+  const [difficulty, setDifficulty] = useState(1);
   const [questions, setQuestions] = useState<QuizQuestionForm[]>([{
     question: "",
     points: 0,
@@ -98,7 +100,7 @@ export default function CreateQuiz() {
 
   const deleteQuestion = (indexToDelete: number) => {
     if (questions.length <= 1) {
-      alert("Cannot delete the last question");
+      alert("Must have at least one question");
       return;
     }
     const updatedQuestions = questions.filter((_, index) => index !== indexToDelete);
@@ -196,7 +198,6 @@ export default function CreateQuiz() {
                   <DeleteIcon />
                 </IconButton>
               </Box>
-              <Typography variant="h6">Question {questionIndex + 1}</Typography>
               <TextField
                 label="Question"
                 variant="outlined"
@@ -214,17 +215,9 @@ export default function CreateQuiz() {
                 value={q.points}
                 onChange={(e) => handleQuestionChange(questionIndex, "points", parseInt(e.target.value) || 0)}
               />
-              <TextField
-                label="Difficulty (1-5)"
-                type="number"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                InputProps={{
-                  inputProps: { min: 1, max: 5 }
-                }}
-                value={q.difficulty}
-                onChange={(e) => handleQuestionChange(questionIndex, "difficulty", parseInt(e.target.value) || 1)}
+              <DifficultySlider 
+                difficulty={difficulty} 
+                onChange={setDifficulty}
               />
               <TextField
                 label="Hint"
