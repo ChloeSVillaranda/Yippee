@@ -1,6 +1,7 @@
-import { Box, Button, Checkbox, Chip, FormControlLabel, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, IconButton, TextField, Typography } from "@mui/material";
 import { Quiz, QuizQuestion } from "../stores/types";
 
+import CategorySelector from "../components/CategorySelection";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DifficultySlider } from '../components/DifficultySlider';
 import styles from './CreateQuiz.module.css';
@@ -18,13 +19,6 @@ type QuizQuestionForm = {
     isCorrect: boolean;
   }>;
 };
-
-// type QuizForm = {
-//   quizName: string;
-//   quizDescription: string;
-//   createdBy: string;
-//   quizQuestions: QuizQuestionForm[];
-// };
 
 export default function CreateQuiz() {
   const [quizName, setQuizName] = useState("");
@@ -59,21 +53,6 @@ export default function CreateQuiz() {
       [field]: value
     };
     updatedQuestions[questionIndex].options = updatedOptions;
-    setQuestions(updatedQuestions);
-  };
-
-  const handleCategoryAdd = (index: number) => {
-    if (currentCategory.trim()) {
-      const updatedQuestions = [...questions];
-      updatedQuestions[index].category = [...updatedQuestions[index].category, currentCategory.trim()];
-      setQuestions(updatedQuestions);
-      setCurrentCategory("");
-    }
-  };
-
-  const handleCategoryDelete = (questionIndex: number, categoryIndex: number) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[questionIndex].category.splice(categoryIndex, 1);
     setQuestions(updatedQuestions);
   };
 
@@ -216,8 +195,8 @@ export default function CreateQuiz() {
                 onChange={(e) => handleQuestionChange(questionIndex, "points", parseInt(e.target.value) || 0)}
               />
               <DifficultySlider 
-                difficulty={difficulty} 
-                onChange={setDifficulty}
+                difficulty={q.difficulty} 
+                onChange={(newVal) => handleQuestionChange(questionIndex, "difficulty", newVal)}
               />
               <TextField
                 label="Hint"
@@ -227,33 +206,11 @@ export default function CreateQuiz() {
                 value={q.hint}
                 onChange={(e) => handleQuestionChange(questionIndex, "hint", e.target.value)}
               />
-              
-              {/* Categories */}
-              <Box sx={{ marginY: 2 }}>
-                <TextField
-                  label="Add Category"
-                  variant="outlined"
-                  value={currentCategory}
-                  onChange={(e) => setCurrentCategory(e.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Button onClick={() => handleCategoryAdd(questionIndex)}>Add</Button>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, marginTop: 1 }}>
-                  {q.category.map((cat, catIndex) => (
-                    <Chip
-                      key={catIndex}
-                      label={cat}
-                      onDelete={() => handleCategoryDelete(questionIndex, catIndex)}
-                    />
-                  ))}
-                </Box>
-              </Box>
-
+              <CategorySelector
+                value={q.category}
+                onChange={(newCategories) => handleQuestionChange(questionIndex, "category", newCategories)}
+                label="Categories"
+              />
               {/* Options */}
               <Typography variant="subtitle1" sx={{ mt: 2 }}>Answer Options</Typography>
               {q.options.map((option, optionIndex) => (
