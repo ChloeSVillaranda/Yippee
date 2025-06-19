@@ -32,14 +32,17 @@ export default function JoinGame() {
 
   const handleJoinGame = async () => {
     // input room code
+    const errors: string[] = [];
     if (!roomCodeToJoin.trim()) {
-      setError("Room code cannot be empty");
-      return;
+      errors.push("Room code cannot be empty");
     }
-
     // input player name
     if (!playerName.trim()) {
-      setError("Player name cannot be empty");
+      errors.push("Player name cannot be empty");
+    }
+    // Display errors if any
+    if (errors.length > 0) {
+      setError(errors.join("\n"));
       return;
     }
 
@@ -74,7 +77,13 @@ export default function JoinGame() {
           variant="outlined"
           fullWidth
           value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length <= 20) {
+              setPlayerName(e.target.value);
+            }
+          }}
+          slotProps={{ htmlInput: { maxLength: 20 }}}
+          helperText={`${playerName.length}/20 characters`}
           sx={{ marginBottom: 2 }}
         />
         <TextField
@@ -87,7 +96,7 @@ export default function JoinGame() {
           sx={{ marginBottom: 2 }}
         />
         {error && (
-          <Typography color="error" sx={{ marginBottom: 2 }}>
+          <Typography color="error" sx={{ marginBottom: 2, whiteSpace: 'pre-line' }}>
             {error}
           </Typography>
         )}
