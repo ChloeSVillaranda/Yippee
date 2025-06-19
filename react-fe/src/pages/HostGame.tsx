@@ -39,18 +39,23 @@ export default function HostGame() {
   }
 
   const handleHostGame = async () => {
+    const errors: string[] = [];
+    
     // input host name
     if (!hostName.trim()) {
-      setError("Host name cannot be empty!");
-      return;
+      errors.push("Host name cannot be empty!");
     }
-
+    
     // select quiz
     if (!selectedQuiz) {
-      setError("Please select a quiz first!");
+      errors.push("Please select a quiz first!");
+    }
+    
+    // display errors if any
+    if (errors.length > 0) {
+      setError(errors.join("\n"));
       return;
     }
-
     // update redux state
     dispatch(gameActions.setUserName(hostName));
     dispatch(gameActions.setRole("host"));
@@ -84,14 +89,19 @@ export default function HostGame() {
         >
           <SettingsIcon />
         </IconButton>
-
         <TextField
           id="host-name"
           label="Enter Your Name"
           variant="outlined"
           fullWidth
           value={hostName}
-          onChange={(e) => setHostName(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length <= 20) {
+              setHostName(e.target.value);
+            }
+          }}
+          slotProps={{ htmlInput: { maxLength: 20 }}}
+          helperText={`${hostName.length}/20 characters`}
           sx={{ marginBottom: 2 }}
         />
         <SelectQuiz onSelectQuiz={handleSelectQuiz} />
@@ -101,7 +111,7 @@ export default function HostGame() {
           </Typography>
         )}
         {error && (
-          <Typography color="error" sx={{ marginBottom: 2 }}>
+          <Typography color="error" sx={{ marginBottom: 2, whiteSpace: 'pre-line' }}>
             {error}
           </Typography>
         )}
