@@ -1,4 +1,4 @@
-import { Quiz, User } from "../stores/types";
+import { GameSettings, Quiz, User } from "../stores/types";
 import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "../stores/store";
@@ -59,8 +59,8 @@ const WebSocketCommands: Record<WebSocketCommandType, WebSocketCommand> = {
   },
   startGame: {
     action: "startGame",
-    handler: (webSocket: WebSocket, roomCode: string, user: User) => {
-      webSocket.send(JSON.stringify({ action: "startGame", roomCode, user }));
+    handler: (webSocket: WebSocket, roomCode: string, user: User, gameSettings: GameSettings) => {
+      webSocket.send(JSON.stringify({ action: "startGame", roomCode, user, gameSettings }));
     }
   },
   submitAnswer: {

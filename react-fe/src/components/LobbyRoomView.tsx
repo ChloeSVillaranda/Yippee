@@ -1,11 +1,13 @@
 import { Box, Button, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
+import { GameSettings, User } from "../stores/types";
+import { useDispatch, useSelector } from "react-redux";
 
+import ManageGameSettings from "./ManageGameSettings";
 import { RootState } from "../stores/store";
 import SendIcon from '@mui/icons-material/Send';
-import { User } from "../stores/types";
 import { executeWebSocketCommand } from "../util/websocketUtil";
+import { gameActions } from "../stores/gameSlice";
 import styles from './LobbyRoomView.module.css';
-import { useSelector } from "react-redux";
 import { useState } from "react";
 
 export default function LobbyRoomView() {
@@ -13,6 +15,14 @@ export default function LobbyRoomView() {
   const [lobbyMessage, setLobbyMessage] = useState("");
   const userDetails = useSelector((state: RootState) => state.game.user); // get current user details from Redux
   const [error, setError] = useState<string | null>(null);
+  const [gameSettings, setGameSettings] = useState<GameSettings>({
+    questionTime: 30,
+    enableMessagesDuringGame: true,
+    showLeaderboard: true,
+    shuffleQuestions: false,
+  });
+  const dispatch = useDispatch();
+
 
   const handleSendMessage = () => {
     // send a message to be displayed to the lobby
@@ -42,9 +52,10 @@ export default function LobbyRoomView() {
   const handleStartGame = () => {
     // TODO: ensure that there is at least one player
     console.log("Starting the Game")
+    dispatch(gameActions.setGameSettings(gameSettings));
     executeWebSocketCommand(
         "startGame",
-        { roomCode: game.roomCode, user: userDetails },
+        { roomCode: game.roomCode, user: userDetails, gameSettings: gameSettings},
         (errorMessage) => setError(errorMessage)
     );
   }
@@ -123,6 +134,7 @@ export default function LobbyRoomView() {
           <Typography variant="body1">
             You are the host. Manage the game and start the quiz.
           </Typography>
+          <ManageGameSettings onSettingsChange={setGameSettings} />
           <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={handleStartGame} className={styles.button}>
             Start Game
           </Button>

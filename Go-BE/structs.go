@@ -32,29 +32,30 @@ type Lobby struct {
 	Quiz                 Quiz                     `json:"-"`
 	ClientsInLobby       map[*websocket.Conn]User `json:"-"`                // won't ever be sent to the FE
 	Status               string                   `json:"status,omitempty"` //TODO: make an enum of Not Started, In-Progress, Finished
-	Settings             Settings                 `json:"settings,omitempty"`
+	GameSettings         GameSettings             `json:"gameSettings,omitempty"`
 	CurrentQuestionIndex int                      `json:"currentQuestionIndex,omitempty"`
 	CurrentQuestion      QuizQuestion             `json:"currentQuestion,omitempty"`
 	Timer                *time.Timer              `json:"-"`                       // keep timer on backend
 	TimeRemaining        int                      `json:"timeRemaining,omitempty"` // send remaining time to clients
 }
 
-type Settings struct {
-	QuestionTime           int  `json:"questionTime,omitempty"` // TODO: figure out if infinite should be set to 0 and if the timer should be kept on backend
-	EnableMessages         bool `json:"enableMessages"`
-	ShowMessagesDuringGame bool `json:"showMessagesDuringGame"`
-	ShowLeaderboard        bool `json:"showLeaderboard"`
-	ShuffleQuestions       bool `json:"shuffleQuestions"`
+type GameSettings struct {
+	QuestionTime int `json:"questionTime,omitempty"` // TODO: figure out if infinite should be set to 0 and if the timer should be kept on backend
+	// EnableMessages         bool `json:"enableMessages"` // TODO: make a lobby settings that you can toggle between having messages or no messages
+	EnableMessagesDuringGame bool `json:"enableMessagesDuringGame"`
+	ShowLeaderboard          bool `json:"showLeaderboard"`
+	ShuffleQuestions         bool `json:"shuffleQuestions"`
 }
 
 // Message structure
 // Json requests (sent by client to server)
 type MessageRequest struct {
-	Action   string   `json:"action"` // requested action client wants to carry out
-	User     User     `json:"user"`   // user who makes the request
-	RoomCode string   `json:"roomCode,omitempty"`
-	Quiz     Quiz     `json:"quiz,omitempty"` // TODO: need to send the quiz id for the backend to retrieve from dB
-	Answer   []string `json:"answer,omitempty"`
+	Action       string       `json:"action"` // requested action client wants to carry out
+	User         User         `json:"user"`   // user who makes the request
+	RoomCode     string       `json:"roomCode,omitempty"`
+	Quiz         Quiz         `json:"quiz,omitempty"` // TODO: need to send the quiz id for the backend to retrieve from dB
+	Answer       []string     `json:"answer,omitempty"`
+	GameSettings GameSettings `json:"gameSettings,omitempty"`
 }
 
 // Json responses (sent by server to client)

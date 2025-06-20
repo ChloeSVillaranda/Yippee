@@ -1,13 +1,13 @@
 // this slice handles the state of a game
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Settings, QuizQuestion, User } from "./types"; 
+import { GameSettings, QuizQuestion, User } from "./types"; 
 
 interface GameState {
     user: User; // own user
     roomCode: string;
     clientsInLobby: User[];
     // quiz: Quiz | undefined; 
-    gameSettings: Settings | undefined;
+    gameSettings: GameSettings | undefined;
     currentQuestion: QuizQuestion | undefined;  
     gameStatus: string;
     showLeaderboard: boolean;
@@ -66,7 +66,7 @@ const gameSlice = createSlice({
             // console.log('upsertClientsInLobby:', { before: [...state.clientsInLobby], after: action.payload });
             state.clientsInLobby = action.payload;
         },
-        setGameSettings: (state, action: PayloadAction<Settings>) => {
+        setGameSettings: (state, action: PayloadAction<GameSettings>) => {
             // console.log('setGameSettings:', { before: state.gameSettings, after: action.payload });
             state.gameSettings = action.payload;
         },

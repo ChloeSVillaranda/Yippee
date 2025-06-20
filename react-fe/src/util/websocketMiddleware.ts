@@ -32,9 +32,6 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                                 if (data.clientsInLobby) {
                                     store.dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
                                 }
-                                if (data.lobby.settings) {
-                                    store.dispatch(gameActions.setGameSettings(data.lobby.settings));
-                                }
                             }
                             break;
 
@@ -45,9 +42,6 @@ export const websocketMiddleware: Middleware = (store) => (next) => (action) => 
                                 // store.dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
                                 if (data.clientsInLobby) {
                                     store.dispatch(gameActions.upsertClientsInLobby(data.clientsInLobby));
-                                }
-                                if (data.lobby.settings) {
-                                    store.dispatch(gameActions.setGameSettings(data.lobby.settings));
                                 }
                             }
                             break;

@@ -145,7 +145,8 @@ func handleStartGame(conn *websocket.Conn, data MessageRequest) {
 
 	// update lobby status
 	lobby.Status = "In-Progress"
-	log.Printf("Game started in lobby: %s by host: %s\n", data.RoomCode, user.UserName)
+	lobby.GameSettings = data.GameSettings
+	log.Printf("Game started in lobby: %s by host: %s with settings: %s\n", data.RoomCode, user.UserName, lobby.GameSettings)
 
 	// update lobby in the global map
 	lobbies[data.RoomCode] = lobby
@@ -204,13 +205,13 @@ func handleNextQuestion(conn *websocket.Conn, data MessageRequest) {
 		return
 	}
 
-	// check if we've reached the end of questions
-	// if lobby.CurrentQuestionIndex >= len(lobby.Quiz.QuizQuestions)-1 {
-	// 	lobby.Status = "Completed"
-	// 	lobbies[data.RoomCode] = lobby
-	// 	notifyAllClientsInRoom(lobby, "Game completed")
-	// 	return
-	// }
+	// if showLeaderboard is false, just end the game
+	if !lobby.GameSettings.ShowLeaderboard || lobby.CurrentQuestionIndex >= len(lobby.Quiz.QuizQuestions)-1 {
+		lobby.Status = "Completed"
+		lobbies[data.RoomCode] = lobby
+		notifyAllClientsInRoom(lobby, "Game completed")
+		return
+	}
 
 	// advance to next question by incrementing the current question index
 	lobby.CurrentQuestionIndex++

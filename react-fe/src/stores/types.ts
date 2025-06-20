@@ -17,10 +17,10 @@ export type QuizQuestion = {
   type: string;
 }
 
-export type Settings = {
+export type GameSettings = {
   questionTime: number;
-  enableMessages: boolean;
-  showMessagesDuringGame: boolean;
+  // enableMessages: boolean; // TODO: implement lobby settings 
+  enableMessagesDuringGame: boolean;
   showLeaderboard: boolean;
   shuffleQuestions: boolean;
 }
@@ -38,7 +38,7 @@ export type Lobby  = {
   quiz: Quiz;
   clientsInLobby: User[];
   status: string;
-  settings: Settings;
+  gameSettings: GameSettings;
   currentQuestionIndex: number // TODO: might need to remove as not needed in the front-end
   currentQuestion: QuizQuestion
   timer: number // remove as needed
