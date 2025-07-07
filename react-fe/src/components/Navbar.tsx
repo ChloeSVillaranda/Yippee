@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 
 const pages = [
   { title: 'Sign Up', path: '/sign-up' },
-  { title: 'Log In', path: '/log-in' },
+  { title: 'Sign In', path: '/sign-in' },
 ];
 
 export default function Navbar() {

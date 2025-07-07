@@ -9,6 +9,7 @@ import JoinGame from "./pages/JoinGame";
 import LobbyRoom from "./pages/Game";
 import Navbar from "./components/Navbar";
 import Resources from "./pages/Resources";
+import SignIn from "./components/SignIn";
 import styles from './App.module.css';
 
 // import AnimatedCursor from "react-animated-cursor"
@@ -34,7 +35,10 @@ function AppRoutes() {
           {/* TODO: make the :/roomCode protected so that you need to be a player/host to enter it */}
           <Route path="/resources"
             element={<Resources />}/>      
-          <Route path="/:roomCode" element={<LobbyRoom />} /> 
+          <Route path="/:roomCode" 
+            element={<LobbyRoom />} />
+          <Route path="/sign-in"
+            element={<SignIn />}/>
         </Routes>
       </div>
     </div>
