@@ -10,6 +10,7 @@ import LobbyRoom from "./pages/Game";
 import Navbar from "./components/Navbar";
 import Resources from "./pages/Resources";
 import SignIn from "./components/SignIn";
+import SignUp from "./components/SignUp";
 import styles from './App.module.css';
 
 // import AnimatedCursor from "react-animated-cursor"
@@ -39,6 +40,8 @@ function AppRoutes() {
             element={<LobbyRoom />} />
           <Route path="/sign-in"
             element={<SignIn />}/>
+          <Route path="/sign-up"
+            element={<SignUp />}/>
         </Routes>
       </div>
     </div>
