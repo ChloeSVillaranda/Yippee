@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Grid, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import ImageIcon from '@mui/icons-material/Image';
@@ -6,14 +6,12 @@ import { Quiz } from '../stores/types';
 
 const MAX_VISIBLE = 5;
 
-type SelectQuizProps = {
-  onSelectQuiz: (quiz: Quiz) => void;
-};
-
-export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
+export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz) => void }) {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -33,6 +31,18 @@ export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
 
   const visibleQuizzes = quizzes.slice(0, MAX_VISIBLE);
   const moreQuizzes = quizzes.slice(MAX_VISIBLE);
+
+  const handleCardClick = (quiz: Quiz) => {
+    setSelectedQuiz(quiz);
+    setDetailsOpen(true);
+  };
+
+  const handleConfirm = () => {
+    if (selectedQuiz) {
+      onSelectQuiz(selectedQuiz);
+      setDetailsOpen(false);
+    }
+  };
 
   return (
     <Box sx={{ padding: 4 }}>
@@ -57,13 +67,23 @@ export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
                 '&:hover': { boxShadow: '0 4px 8px rgba(0,0,0,0.15)' },
                 p: 1
               }}
-              onClick={() => onSelectQuiz(quiz)}
+              onClick={() => handleCardClick(quiz)}
             >
               <Box sx={{ width: '100%', height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, bgcolor: '#eee', borderRadius: 1 }}>
                 <ImageIcon sx={{ fontSize: 48, color: '#bbb' }} />
               </Box>
               <Typography variant="subtitle1" noWrap>{quiz.quizName}</Typography>
-              <Typography variant="caption" color="textSecondary" noWrap>
+              <Typography
+                variant="caption"
+                color="textSecondary"
+                sx={{
+                  display: 'block',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '100%',
+                }}
+              >
                 {quiz.quizDescription}
               </Typography>
               <Typography variant="caption" color="textSecondary" display="block">
@@ -80,6 +100,7 @@ export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
       ) : (
         <Typography>No quizzes available.</Typography>
       )}
+      {/* More Quizzes Dialog */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Select a Quiz</DialogTitle>
         <DialogContent>
@@ -96,15 +117,26 @@ export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
                   '&:hover': { boxShadow: '0 4px 8px rgba(0,0,0,0.15)' },
                   p: 1,
                   width: 140,
+                  minWidth: 140,
                   m: 1
                 }}
-                onClick={() => { onSelectQuiz(quiz); setDialogOpen(false); }}
+                onClick={() => handleCardClick(quiz)}
               >
                 <Box sx={{ width: '100%', height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, bgcolor: '#eee', borderRadius: 1 }}>
                   <ImageIcon sx={{ fontSize: 48, color: '#bbb' }} />
                 </Box>
                 <Typography variant="subtitle1" noWrap>{quiz.quizName}</Typography>
-                <Typography variant="caption" color="textSecondary" noWrap>
+                <Typography
+                  variant="caption"
+                  color="textSecondary"
+                  sx={{
+                    display: 'block',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%',
+                  }}
+                >
                   {quiz.quizDescription}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" display="block">
@@ -114,6 +146,27 @@ export default function SelectQuiz({ onSelectQuiz }: SelectQuizProps) {
             ))}
           </Box>
         </DialogContent>
+      </Dialog>
+      {/* Quiz Details Dialog */}
+      <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{selectedQuiz?.quizName}</DialogTitle>
+        <DialogContent>
+          <Typography variant="subtitle1" sx={{ mb: 2 }}>{selectedQuiz?.quizDescription}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>Questions:</Typography>
+          {selectedQuiz?.quizQuestions && selectedQuiz.quizQuestions.length > 0 ? (
+            selectedQuiz.quizQuestions.map((q, i) => (
+              <Box key={i} sx={{ mb: 1 }}>
+                <Typography variant="body2">{i + 1}. {q.question}</Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography variant="body2" color="textSecondary">No questions available.</Typography>
+          )}
+        </DialogContent>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, p: 2 }}>
+          <Button onClick={() => setDetailsOpen(false)}>Cancel</Button>
+          <Button onClick={handleConfirm} variant="contained" color="primary">Select This Quiz</Button>
+        </Box>
       </Dialog>
     </Box>
   );
