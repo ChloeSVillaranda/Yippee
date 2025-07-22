@@ -1,8 +1,14 @@
 import { Box, Button, Checkbox, FormControlLabel, IconButton, TextField, Typography } from "@mui/material";
 import { Quiz, QuizQuestion } from "../stores/types";
 
+import AddIcon from '@mui/icons-material/Add';
 import CategorySelector from "../components/CategorySelection";
 import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import { DifficultySlider } from '../components/DifficultySlider';
 import styles from './CreateQuiz.module.css';
 import { useState } from "react";
@@ -34,6 +40,7 @@ export default function CreateQuiz() {
     category: [],
     options: Array(2).fill({ text: "", isCorrect: false }),
   }]);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleQuestionChange = <K extends keyof QuizQuestionForm>(
     index: number,
@@ -144,6 +151,13 @@ export default function CreateQuiz() {
     }
   };
 
+  const handleDialogOpen = () => setOpenDialog(true);
+  const handleDialogClose = () => setOpenDialog(false);
+  const handleDialogConfirm = async () => {
+    setOpenDialog(false);
+    await handleSubmit();
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.innerBox}>
@@ -245,17 +259,34 @@ export default function CreateQuiz() {
                 size="small" 
                 onClick={() => addOption(questionIndex)}
                 sx={{ mt: 1 }}
+                startIcon={<AddIcon />}
               >
                 Add Option
               </Button>
             </Box>
           ))}
-          <Button variant="contained" onClick={addQuestion} sx={{ marginRight: 2 }}>
+          <Button variant="contained" color="secondary" onClick={addQuestion} sx={{ marginRight: 2 }}>
             Add Question
           </Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
+          <Button variant="contained" color="secondary" onClick={handleDialogOpen}>
             Submit Quiz
           </Button>
+          <Dialog open={openDialog} onClose={handleDialogClose}>
+            <DialogTitle>Submit Quiz?</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to submit this quiz?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleDialogClose} color="primary">
+                Cancel
+              </Button>
+              <Button onClick={handleDialogConfirm} color="secondary" variant="contained">
+                Confirm
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </div>
     </div>

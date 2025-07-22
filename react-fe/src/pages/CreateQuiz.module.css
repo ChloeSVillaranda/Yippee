@@ -1,24 +1,31 @@
+/* Add this if you want a custom pink color for buttons */
+:root {
+  --pink-main: #ec407a;
+  --pink-dark: #b12763;
+}
+
+/* You can use these variables in your custom button styles if needed */
+
 .container {
-    height: 100%;
     width: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 20px;
+    justify-content: flex-start;
+    padding: 40px 0;
     box-sizing: border-box;
-    /* TODO: figure out how to not hardcode */
-    margin-top: 10vh; 
+    background: transparent;
 }
 
 .innerBox {
-  height: 100%;
-  width: 100%;
-  background-color: white;
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
-  width: 100%;
-  box-sizing: border-box;
+    width: 100%;
+    max-width: 800px;
+    background-color: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    min-height: 200px;
+    margin: 0 16px;
 }
