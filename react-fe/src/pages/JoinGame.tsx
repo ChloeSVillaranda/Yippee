@@ -101,7 +101,7 @@ export default function JoinGame() {
           </Typography>
         )}
         <div className={styles.buttonDiv}>
-          <Button variant="contained" color="primary" onClick={handleJoinGame} fullWidth className={styles.button}>
+          <Button variant="contained" color="primary" onClick={handleJoinGame} className={styles.button}>
             Join Game
           </Button>
         </div>
