@@ -71,17 +71,16 @@ export default function CategorySelector({
             placeholder="Add or select category"
           />
         )}
-        renderTags={(selected) => (
+        renderValue={(selected, getTagProps) => (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
             {selected.map((option: string, index: number) => (
               <Chip
-                key={index}
                 label={option}
-                onDelete={() => handleDelete(option)}
                 sx={{
                   backgroundColor: getColorForTag(option),
                   color: "white",
                 }}
+                {...getTagProps({ index })}
               />
             ))}
           </Box>
