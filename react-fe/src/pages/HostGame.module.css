@@ -50,3 +50,10 @@
     transform: scale(1.05) !important;
     background: linear-gradient(45deg, #FF6B95 30%, #FF9A8B 90%) !important;
 }
+
+.selectQuizRow {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
