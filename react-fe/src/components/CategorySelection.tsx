@@ -37,10 +37,6 @@ export default function CategorySelector({
     (option) => !value.includes(option)
   );
 
-  const handleDelete = (categoryToDelete: string) => {
-    onChange(value.filter((cat) => cat !== categoryToDelete));
-  };
-
   function getColorForTag(tag: string): string {
     // Use theme colors with different shades
     const colors: Record<string, string> = {
@@ -58,6 +54,10 @@ export default function CategorySelector({
     return colors[tag] || theme.palette.primary.main;
   }
 
+  const handleDelete = (categoryToDelete: string) => {
+    onChange(value.filter((cat) => cat !== categoryToDelete));
+  };
+
   return (
     <Box sx={{ my: 2, maxWidth: 400 }}>
       <Autocomplete
@@ -74,16 +74,23 @@ export default function CategorySelector({
             placeholder="Add or select category"
           />
         )}
-        renderValue={(selected, getTagProps) => (
+        // Use renderValue instead of renderTags
+        renderValue={(selected) => (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-            {selected.map((option: string, index: number) => (
+            {selected.map((option) => (
               <Chip
+                key={option}
                 label={option}
                 sx={{
                   backgroundColor: getColorForTag(option),
                   color: "white",
                 }}
-                {...getTagProps({ index })}
+                onDelete={() => handleDelete(option)}
+                // Prevent click behavior
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
               />
             ))}
           </Box>
