@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import ImageIcon from '@mui/icons-material/Image';
@@ -149,22 +149,30 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
       </Dialog>
       {/* Quiz Details Dialog */}
       <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{selectedQuiz?.quizName}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700, fontSize: 24, pb: 0 }}>{selectedQuiz?.quizName}</DialogTitle>
         <DialogContent>
-          <Typography variant="subtitle1" sx={{ mb: 2 }}>{selectedQuiz?.quizDescription}</Typography>
-          <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>Questions:</Typography>
-          {selectedQuiz?.quizQuestions && selectedQuiz.quizQuestions.length > 0 ? (
-            selectedQuiz.quizQuestions.map((q, i) => (
-              <Box key={i} sx={{ mb: 1 }}>
-                <Typography variant="body2">{i + 1}. {q.question}</Typography>
-              </Box>
-            ))
-          ) : (
-            <Typography variant="body2" color="textSecondary">No questions available.</Typography>
-          )}
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
+            <Box sx={{ width: 80, height: 80, bgcolor: '#eee', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+              <ImageIcon sx={{ fontSize: 48, color: '#bbb' }} />
+            </Box>
+            <Typography variant="subtitle1" sx={{ mb: 2, textAlign: 'center', color: 'text.secondary' }}>{selectedQuiz?.quizDescription}</Typography>
+          </Box>
+          <Divider sx={{ mb: 2 }} />
+          <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>Questions:</Typography>
+          <Box sx={{ bgcolor: '#fafafa', borderRadius: 2, p: 2, mb: 2 }}>
+            {selectedQuiz?.quizQuestions && selectedQuiz.quizQuestions.length > 0 ? (
+              selectedQuiz.quizQuestions.map((q, i) => (
+                <Box key={i} sx={{ mb: 1 }}>
+                  <Typography variant="body2">{i + 1}. {q.question}</Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography variant="body2" color="textSecondary">No questions available.</Typography>
+            )}
+          </Box>
         </DialogContent>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, p: 2 }}>
-          <Button onClick={() => setDetailsOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDetailsOpen(false)} variant="outlined">Cancel</Button>
           <Button onClick={handleConfirm} variant="contained" color="primary">Select This Quiz</Button>
         </Box>
       </Dialog>
