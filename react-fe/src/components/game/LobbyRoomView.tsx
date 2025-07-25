@@ -8,7 +8,7 @@ import { RootState } from "../../stores/store";
 import SendIcon from '@mui/icons-material/Send';
 import { executeWebSocketCommand } from "../../util/websocketUtil";
 import { gameActions } from "../../stores/gameSlice";
-import styles from './LobbyRoomView.module.css';
+import styles from './LobbyRoomView.module.css'; // This path now points to the correct location
 
 export default function LobbyRoomView() {
   const theme = useTheme();
