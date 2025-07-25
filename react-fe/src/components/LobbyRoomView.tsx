@@ -24,15 +24,19 @@ export default function LobbyRoomView() {
   });
   const dispatch = useDispatch();
 
-  // Set CSS variables for the module styles
+  // Set CSS variables for the module styles with improved dark mode
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--gradient-primary', 
-      `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.primary.main} 90%)`
+      theme.palette.mode === 'dark'
+        ? `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`
+        : `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.primary.main} 90%)`
     );
     document.documentElement.style.setProperty(
       '--gradient-secondary', 
-      `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`
+      theme.palette.mode === 'dark'
+        ? `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.dark} 90%)`
+        : `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`
     );
   }, [theme]);
 
@@ -147,7 +151,17 @@ export default function LobbyRoomView() {
             You are the host. Manage the game and start the quiz.
           </Typography>
           <ManageGameSettings onSettingsChange={setGameSettings} />
-          <Button variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={handleStartGame} className={styles.button}>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            sx={{ 
+              marginTop: 2, 
+              fontWeight: 'bold',
+              color: '#ffffff' // Ensure white text
+            }} 
+            onClick={handleStartGame} 
+            className={styles.button}
+          >
             Start Game
           </Button>
         </Box>

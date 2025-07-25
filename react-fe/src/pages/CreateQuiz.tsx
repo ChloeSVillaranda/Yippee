@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, FormControlLabel, IconButton, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, IconButton, TextField, Typography, useTheme } from "@mui/material";
 import { Quiz, QuizQuestion } from "../stores/types";
 
 import AddIcon from '@mui/icons-material/Add';
@@ -27,6 +27,7 @@ type QuizQuestionForm = {
 };
 
 export default function CreateQuiz() {
+  const theme = useTheme();
   const [quizName, setQuizName] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
   const [currentCategory, setCurrentCategory] = useState("");
@@ -160,7 +161,16 @@ export default function CreateQuiz() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.innerBox}>
+      <Box 
+        className={styles.innerBox} 
+        sx={{ 
+          backgroundColor: theme.palette.background.paper,
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0px 4px 20px rgba(0, 0, 0, 0.5)'
+            : '0px 4px 20px rgba(0, 0, 0, 0.1)',
+          color: theme.palette.text.primary, // Use theme text color
+        }}
+      >
         <Box sx={{ padding: 4 }}>
           <Typography variant="h4" gutterBottom>
             Create a Quiz
@@ -172,6 +182,12 @@ export default function CreateQuiz() {
             margin="normal"
             value={quizName}
             onChange={(e) => setQuizName(e.target.value)}
+            InputLabelProps={{
+              style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+            }}
+            InputProps={{
+              style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+            }}
           />
           <TextField
             label="Quiz Description"
@@ -182,12 +198,33 @@ export default function CreateQuiz() {
             rows={2}
             value={quizDescription}
             onChange={(e) => setQuizDescription(e.target.value)}
+            InputLabelProps={{
+              style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+            }}
+            InputProps={{
+              style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+            }}
           />
           {questions.map((q, questionIndex) => (
-            <Box key={questionIndex} sx={{ marginBottom: 4, padding: 2, border: '1px solid #ddd', borderRadius: 2 }}>
+            <Box 
+              key={questionIndex} 
+              sx={{ 
+                marginBottom: 4, 
+                padding: 2, 
+                border: `1px solid ${theme.palette.divider}`, 
+                borderRadius: 2,
+                backgroundColor: theme.palette.mode === 'dark' 
+                  ? theme.palette.background.default 
+                  : '#f8f8f8',
+                color: theme.palette.text.primary,
+              }}
+            >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6">Question {questionIndex + 1}</Typography>
-                <IconButton onClick={() => deleteQuestion(questionIndex)}>
+                <IconButton 
+                  onClick={() => deleteQuestion(questionIndex)}
+                  sx={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.main }}
+                >
                   <DeleteIcon />
                 </IconButton>
               </Box>
@@ -198,6 +235,12 @@ export default function CreateQuiz() {
                 margin="normal"
                 value={q.question}
                 onChange={(e) => handleQuestionChange(questionIndex, "question", e.target.value)}
+                InputLabelProps={{
+                  style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+                }}
+                InputProps={{
+                  style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+                }}
               />
               <TextField
                 label="Points"
@@ -207,6 +250,12 @@ export default function CreateQuiz() {
                 margin="normal"
                 value={q.points}
                 onChange={(e) => handleQuestionChange(questionIndex, "points", parseInt(e.target.value) || 0)}
+                InputLabelProps={{
+                  style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+                }}
+                InputProps={{
+                  style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+                }}
               />
               <DifficultySlider 
                 difficulty={q.difficulty} 
@@ -219,6 +268,12 @@ export default function CreateQuiz() {
                 margin="normal"
                 value={q.hint}
                 onChange={(e) => handleQuestionChange(questionIndex, "hint", e.target.value)}
+                InputLabelProps={{
+                  style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+                }}
+                InputProps={{
+                  style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+                }}
               />
               <CategorySelector
                 value={q.category}
@@ -226,7 +281,7 @@ export default function CreateQuiz() {
                 label="Categories"
               />
               {/* Options */}
-              <Typography variant="subtitle1" sx={{ mt: 2 }}>Answer Options</Typography>
+              <Typography variant="subtitle1" sx={{ mt: 2, color: theme.palette.text.primary }}>Answer Options</Typography>
               {q.options.map((option, optionIndex) => (
                 <Box key={optionIndex} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                   <TextField
@@ -236,20 +291,34 @@ export default function CreateQuiz() {
                     margin="normal"
                     value={option.text}
                     onChange={(e) => handleOptionChange(questionIndex, optionIndex, 'text', e.target.value)}
+                    InputLabelProps={{
+                      style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+                    }}
+                    InputProps={{
+                      style: { color: theme.palette.mode === 'dark' ? theme.palette.text.primary : undefined }
+                    }}
                   />
                   <FormControlLabel
                     control={
                       <Checkbox
                         checked={option.isCorrect}
                         onChange={(e) => handleOptionChange(questionIndex, optionIndex, 'isCorrect', e.target.checked)}
+                        sx={{
+                          color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.main,
+                          '&.Mui-checked': {
+                            color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.main,
+                          },
+                        }}
                       />
                     }
                     label="Correct"
+                    sx={{ color: theme.palette.text.primary }}
                   />
                   <IconButton 
                     size="small"
-                    onClick={() => deleteOption(questionIndex, optionIndex)
-                  }>
+                    onClick={() => deleteOption(questionIndex, optionIndex)}
+                    sx={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.main }}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </Box>
@@ -258,37 +327,92 @@ export default function CreateQuiz() {
                 variant="outlined" 
                 size="small" 
                 onClick={() => addOption(questionIndex)}
-                sx={{ mt: 1 }}
+                sx={{ 
+                  mt: 1, 
+                  borderColor: theme.palette.mode === 'dark' ? theme.palette.primary.light : undefined,
+                  color: theme.palette.mode === 'dark' ? theme.palette.primary.light : undefined,
+                }}
                 startIcon={<AddIcon />}
               >
                 Add Option
               </Button>
             </Box>
           ))}
-          <Button variant="contained" color="secondary" onClick={addQuestion} sx={{ marginRight: 2 }}>
+          <Button 
+            variant="contained" 
+            color="secondary" 
+            onClick={addQuestion} 
+            sx={{ 
+              marginRight: 2,
+              bgcolor: theme.palette.secondary.main,
+              color: '#ffffff', // Always white for contrast
+              fontWeight: 'bold',
+              '&:hover': {
+                bgcolor: theme.palette.secondary.dark,
+              }
+            }}
+          >
             Add Question
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleDialogOpen}>
+          <Button 
+            variant="contained" 
+            color="secondary" 
+            onClick={handleDialogOpen}
+            sx={{ 
+              bgcolor: theme.palette.secondary.main,
+              color: '#ffffff', // Always white for contrast
+              fontWeight: 'bold',
+              '&:hover': {
+                bgcolor: theme.palette.secondary.dark,
+              }
+            }}
+          >
             Submit Quiz
           </Button>
-          <Dialog open={openDialog} onClose={handleDialogClose}>
+          <Dialog 
+            open={openDialog} 
+            onClose={handleDialogClose}
+            PaperProps={{
+              sx: {
+                bgcolor: theme.palette.background.paper,
+              }
+            }}
+          >
             <DialogTitle>Submit Quiz?</DialogTitle>
             <DialogContent>
-              <DialogContentText>
+              <DialogContentText sx={{ color: theme.palette.text.secondary }}>
                 Are you sure you want to submit this quiz?
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleDialogClose} color="primary">
+              <Button 
+                onClick={handleDialogClose} 
+                color="primary"
+                sx={{
+                  color: theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.primary.main,
+                }}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleDialogConfirm} color="secondary" variant="contained">
+              <Button 
+                onClick={handleDialogConfirm} 
+                color="secondary" 
+                variant="contained"
+                sx={{ 
+                  bgcolor: theme.palette.secondary.main,
+                  color: '#ffffff', // Always white for contrast
+                  fontWeight: 'bold',
+                  '&:hover': {
+                    bgcolor: theme.palette.secondary.dark,
+                  }
+                }}
+              >
                 Confirm
               </Button>
             </DialogActions>
           </Dialog>
         </Box>
-      </div>
+      </Box>
     </div>
   );
 }

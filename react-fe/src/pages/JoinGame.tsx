@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography, useTheme } from "@mui/material";
 import { executeWebSocketCommand, useCheckConnection } from "../util/websocketUtil";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -14,7 +14,8 @@ export default function JoinGame() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+  const theme = useTheme();
+
   // get necessary states from Redux
   const currentUser = useSelector((state: RootState) => state.game.user);
   const roomCode = useSelector((state: RootState) => state.game.roomCode);
@@ -67,7 +68,15 @@ export default function JoinGame() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.formBox}>
+      <Box 
+        className={styles.formBox}
+        sx={{ 
+          backgroundColor: theme.palette.background.paper,
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0px 4px 20px rgba(0, 0, 0, 0.5)'
+            : '0px 4px 20px rgba(0, 0, 0, 0.1)',
+        }}
+      >
         <Typography variant="h4" gutterBottom className={styles.title}>
           Join a Game
         </Typography>
@@ -101,11 +110,27 @@ export default function JoinGame() {
           </Typography>
         )}
         <div className={styles.buttonDiv}>
-          <Button variant="contained" color="primary" onClick={handleJoinGame} className={styles.button}>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleJoinGame} 
+            sx={{
+              background: theme.palette.mode === 'dark'
+                ? `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`
+                : `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.primary.main} 90%)`,
+              color: '#ffffff',
+              fontWeight: 'bold',
+              '&:hover': {
+                background: theme.palette.mode === 'dark'
+                  ? `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.dark} 90%)`
+                  : `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
+              }
+            }}
+          >
             Join Game
           </Button>
         </div>
-      </div>
+      </Box>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import { useTheme } from '@mui/material';
 
 interface ForgotPasswordProps {
   open: boolean;
@@ -14,6 +15,8 @@ interface ForgotPasswordProps {
 }
 
 export default function ForgotPassword({ open, handleClose }: ForgotPasswordProps) {
+  const theme = useTheme();
+
   return (
     <Dialog
       open={open}
@@ -25,7 +28,10 @@ export default function ForgotPassword({ open, handleClose }: ForgotPasswordProp
             event.preventDefault();
             handleClose();
           },
-          sx: { backgroundImage: 'none' },
+          sx: { 
+            backgroundImage: 'none',
+            bgcolor: theme.palette.background.paper,
+          },
         },
       }}
     >
@@ -50,8 +56,25 @@ export default function ForgotPassword({ open, handleClose }: ForgotPasswordProp
         />
       </DialogContent>
       <DialogActions sx={{ pb: 3, px: 3 }}>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button variant="contained" type="submit">
+        <Button 
+          onClick={handleClose}
+          sx={{
+            color: theme.palette.mode === 'dark' ? theme.palette.common.white : undefined,
+          }}
+        >
+          Cancel
+        </Button>
+        <Button 
+          variant="contained" 
+          type="submit"
+          sx={{
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.mode === 'dark' ? theme.palette.common.white : undefined,
+            '&:hover': {
+              bgcolor: theme.palette.primary.dark,
+            },
+          }}
+        >
           Continue
         </Button>
       </DialogActions>

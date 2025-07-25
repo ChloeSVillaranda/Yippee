@@ -1,3 +1,5 @@
+import { styled, useTheme } from '@mui/material/styles';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,7 +11,6 @@ import Link from '@mui/material/Link';
 import MuiCard from '@mui/material/Card';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
 import { useState } from "react";
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -20,12 +21,14 @@ const Card = styled(MuiCard)(({ theme }) => ({
   padding: theme.spacing(4),
   gap: theme.spacing(2),
   margin: 'auto',
-[theme.breakpoints.up('sm')]: {
+  backgroundColor: theme.palette.background.paper,
+  [theme.breakpoints.up('sm')]: {
     maxWidth: '450px',
   },
 }));
 
 export default function SignUp(props: { disableCustomTheme?: boolean }) {
+  const theme = useTheme();
   const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState(false);
@@ -150,6 +153,13 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
               fullWidth
               variant="contained"
               onClick={validateInputs}
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.mode === 'dark' ? theme.palette.common.white : undefined,
+                '&:hover': {
+                  bgcolor: theme.palette.primary.dark,
+                },
+              }}
             >
               Sign up
             </Button>
@@ -163,6 +173,10 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
               variant="outlined"
               onClick={() => alert('Sign up with Google')}
               startIcon={<GoogleIcon />}
+              sx={{
+                borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : undefined,
+                color: theme.palette.mode === 'dark' ? theme.palette.common.white : undefined,
+              }}
             >
               Sign up with Google
             </Button>
@@ -171,7 +185,10 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
               <Link
                 href="/sign-in"
                 variant="body2"
-                sx={{ alignSelf: 'center' }}
+                sx={{ 
+                  alignSelf: 'center',
+                  color: theme.palette.primary.main
+                }}
               >
                 Sign in
               </Link>

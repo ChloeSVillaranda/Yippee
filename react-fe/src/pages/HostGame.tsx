@@ -1,4 +1,4 @@
-import { Button, IconButton, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, TextField, Typography, useTheme } from "@mui/material";
 import { executeWebSocketCommand, useCheckConnection } from "../util/websocketUtil";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ export default function HostGame() {
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   // get necessary states from Redux
   const roomCode = useSelector((state: RootState) => state.game.roomCode);
@@ -79,7 +80,15 @@ export default function HostGame() {
 
   return (
   <div className={styles.container}>
-      <div className={styles.formBox}> 
+      <Box 
+        className={styles.formBox}
+        sx={{ 
+          backgroundColor: theme.palette.background.paper,
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0px 4px 20px rgba(0, 0, 0, 0.5)'
+            : '0px 4px 20px rgba(0, 0, 0, 0.1)',
+        }}
+      > 
         <Typography variant="h4" gutterBottom className={styles.title}>
           Host a Game
         </Typography>
@@ -120,12 +129,25 @@ export default function HostGame() {
             variant="contained"
             color="primary"
             onClick={handleHostGame}
-            className={styles.button}
+            sx={{
+              background: theme.palette.mode === 'dark'
+                ? `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`
+                : `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.primary.main} 90%)`,
+              color: '#ffffff',
+              fontWeight: 'bold',
+              transition: 'transform 0.2s',
+              '&:hover': {
+                background: theme.palette.mode === 'dark'
+                  ? `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.dark} 90%)`
+                  : `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
+                transform: 'scale(1.05)',
+              },
+            }}
           >
             Host Game
           </Button>
         </div>
-      </div>
+      </Box>
     </div>
   );
 }

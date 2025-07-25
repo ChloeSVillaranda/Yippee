@@ -9,10 +9,10 @@
     background: transparent;
 }
 
+/* Remove background-color from formBox */
 .formBox {
     width: 100%;
     max-width: 800px;
-    background-color: white;
     padding: 32px;
     border-radius: 16px;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);

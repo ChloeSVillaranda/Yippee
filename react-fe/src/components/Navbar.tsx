@@ -18,14 +18,17 @@ const pages = [
 const themeOptions = [
   { label: 'Pink', value: 'pink' },
   { label: 'Blue', value: 'blue' },
+  { label: 'Purple', value: 'purple' },
+  { label: 'Dark', value: 'dark' },
 ];
 
-type ThemeName = 'pink' | 'blue';
+type ThemeName = 'pink' | 'blue' | 'purple' | 'dark';
 export default function Navbar({ theme, setTheme }: { theme: ThemeName, setTheme: Dispatch<SetStateAction<ThemeName>> }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const game = useSelector((state: RootState) => state.game);
+  const muiTheme = useTheme();
   
   const handleOpenNavMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -40,13 +43,24 @@ export default function Navbar({ theme, setTheme }: { theme: ThemeName, setTheme
     navigate(path);
   };
 
+  // Get the navbar background color based on the theme
+  const getNavbarBackground = () => {
+    if (theme === 'dark') return '#272727';
+    if (theme === 'blue') return '#1976d2';
+    if (theme === 'purple') return '#7B1FA2';
+    return '#FF6B95'; // Default pink
+  };
+
   // navbar not shown when a game starts
   if (game.roomCode && game.gameStatus !== "") {
     return null;
   }
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: theme === 'blue' ? '#1976d2' : '#FF6B95', zIndex: 1100 }}>
+    <AppBar position="static" sx={{ 
+      backgroundColor: getNavbarBackground(), 
+      zIndex: 1100 
+    }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           {/* Logo and title - desktop */}
@@ -156,7 +170,16 @@ export default function Navbar({ theme, setTheme }: { theme: ThemeName, setTheme
               value={theme}
               onChange={(e) => setTheme(e.target.value as ThemeName)}
               size="small"
-              sx={{ color: 'white', borderColor: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' }, background: 'rgba(255,255,255,0.1)', borderRadius: 1, minWidth: 100 }}
+              sx={{ 
+                color: 'white', 
+                borderColor: 'white', 
+                '.MuiOutlinedInput-notchedOutline': { 
+                  borderColor: 'white' 
+                }, 
+                background: 'rgba(255,255,255,0.1)', 
+                borderRadius: 1, 
+                minWidth: 100 
+              }}
             >
               {themeOptions.map(opt => (
                 <MenuItem value={opt.value} key={opt.value}>{opt.label}</MenuItem>

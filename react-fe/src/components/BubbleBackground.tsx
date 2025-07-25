@@ -10,8 +10,8 @@ export default function BubbleBackground() {
     await loadFull(engine);
   }, []);
 
-  // Use white background instead of semi-transparent theme color
-  const backgroundColor = "#ffffff";
+  // Use theme-appropriate background color
+  const backgroundColor = theme.palette.mode === "dark" ? "#121212" : "#ffffff";
 
   // Keep particles using the theme color
   const particleColor = theme.palette.primary.main;

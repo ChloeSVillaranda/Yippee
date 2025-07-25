@@ -123,12 +123,12 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
               <Box
                 key={index}
                 sx={{
-                  border: "1px solid #ccc",
+                  border: `1px solid ${theme.palette.divider}`,
                   borderRadius: "8px",
                   textAlign: "center",
                   cursor: "pointer",
-                  background: '#fafafa',
-                  '&:hover': { boxShadow: '0 4px 8px rgba(0,0,0,0.15)' },
+                  background: theme.palette.background.paper,
+                  '&:hover': { boxShadow: `0 4px 8px ${theme.palette.action.hover}` },
                   p: 1,
                   width: 140,
                   minWidth: 140,
@@ -136,8 +136,17 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
                 }}
                 onClick={() => handleCardClick(quiz)}
               >
-                <Box sx={{ width: '100%', height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, bgcolor: '#eee', borderRadius: 1 }}>
-                  <ImageIcon sx={{ fontSize: 48, color: '#bbb' }} />
+                <Box sx={{ 
+                  width: '100%', 
+                  height: 80, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  mb: 1, 
+                  bgcolor: theme.palette.action.hover, 
+                  borderRadius: 1 
+                }}>
+                  <ImageIcon sx={{ fontSize: 48, color: theme.palette.text.disabled }} />
                 </Box>
                 <Typography variant="subtitle1" noWrap>{quiz.quizName}</Typography>
                 <Typography
@@ -162,18 +171,43 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
         </DialogContent>
       </Dialog>
       {/* Quiz Details Dialog */}
-      <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="sm" fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: theme.palette.background.paper,
+          }
+        }}
+      >
         <DialogTitle sx={{ fontWeight: 700, fontSize: 24, pb: 0 }}>{selectedQuiz?.quizName}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
-            <Box sx={{ width: 80, height: 80, bgcolor: '#eee', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <ImageIcon sx={{ fontSize: 48, color: '#bbb' }} />
+            <Box sx={{ 
+              width: 80, 
+              height: 80, 
+              bgcolor: theme.palette.action.hover, 
+              borderRadius: 2, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              mb: 2 
+            }}>
+              <ImageIcon sx={{ fontSize: 48, color: theme.palette.text.disabled }} />
             </Box>
-            <Typography variant="subtitle1" sx={{ mb: 2, textAlign: 'center', color: 'text.secondary' }}>{selectedQuiz?.quizDescription}</Typography>
+            <Typography variant="subtitle1" sx={{ mb: 2, textAlign: 'center', color: theme.palette.text.secondary }}>{selectedQuiz?.quizDescription}</Typography>
           </Box>
           <Divider sx={{ mb: 2 }} />
           <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>Questions:</Typography>
-          <Box sx={{ bgcolor: '#fafafa', borderRadius: 2, p: 2, mb: 2, minHeight: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+          <Box sx={{ 
+            bgcolor: theme.palette.action.hover, 
+            borderRadius: 2, 
+            p: 2, 
+            mb: 2, 
+            minHeight: 100, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            position: 'relative' 
+          }}>
             {selectedQuiz?.quizQuestions && selectedQuiz.quizQuestions.length > 0 ? (
               <>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -217,8 +251,30 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
           </Box>
         </DialogContent>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, p: 2 }}>
-          <Button onClick={() => setDetailsOpen(false)} variant="outlined">Cancel</Button>
-          <Button onClick={handleConfirm} variant="contained" color="primary">Select This Quiz</Button>
+          <Button 
+            onClick={() => setDetailsOpen(false)} 
+            variant="outlined"
+            sx={{
+              borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : undefined,
+              color: theme.palette.mode === 'dark' ? theme.palette.common.white : undefined,
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirm} 
+            variant="contained" 
+            color="primary"
+            sx={{
+              bgcolor: theme.palette.primary.main,
+              color: theme.palette.mode === 'dark' ? theme.palette.common.white : undefined,
+              '&:hover': {
+                bgcolor: theme.palette.primary.dark,
+              },
+            }}
+          >
+            Select This Quiz
+          </Button>
         </Box>
       </Dialog>
     </Box>

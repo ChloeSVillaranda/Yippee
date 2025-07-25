@@ -1,23 +1,26 @@
-import { Box, Button, useTheme } from "@mui/material";
-
+import { Button, Box, useTheme } from "@mui/material";
 import styles from './Home.module.css';
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  // Create dynamic styles based on theme
+  // Create dynamic styles based on theme with improved dark mode visibility
   const buttonStyle = {
-    background: `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.primary.main} 90%)`,
-    color: 'white',
+    background: theme.palette.mode === 'dark' 
+      ? `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`
+      : `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.primary.main} 90%)`,
+    color: '#ffffff',  // Always white text for best contrast
     transition: 'transform 0.2s',
     width: '200px',
     padding: '10px 20px',
+    fontWeight: 'bold',
     '&:hover': {
       transform: 'scale(1.05)',
-      background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
+      background: theme.palette.mode === 'dark'
+        ? `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.dark} 90%)`
+        : `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
     }
   };
 

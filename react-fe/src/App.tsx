@@ -54,9 +54,48 @@ const themes = {
       },
     },
   }),
+  purple: createTheme({
+    palette: {
+      primary: { main: '#7B1FA2', light: '#9C27B0', dark: '#6A1B9A' },
+      secondary: { main: '#BA68C8', light: '#CE93D8', dark: '#8E24AA' },
+      success: { main: '#66bb6a', light: '#81c784', dark: '#388e3c' },
+      error: { main: '#f44336', light: '#e57373', dark: '#d32f2f' },
+      warning: { main: '#ffa726', light: '#ffb74d', dark: '#f57c00' },
+      info: { main: '#29b6f6', light: '#4fc3f7', dark: '#0288d1' },
+      background: {
+        default: '#f5f0ff',
+        paper: '#ffffff',
+      },
+      text: {
+        primary: '#3a3a3a',
+        secondary: '#666666',
+        disabled: '#999999',
+      },
+    },
+  }),
+  dark: createTheme({
+    palette: {
+      mode: 'dark',
+      primary: { main: '#2196f3', light: '#64b5f6', dark: '#0d47a1' }, // More saturated blue
+      secondary: { main: '#f48fb1', light: '#f8bbd0', dark: '#c2185b' },
+      success: { main: '#81c784', light: '#a5d6a7', dark: '#388e3c' },
+      error: { main: '#f44336', light: '#e57373', dark: '#d32f2f' },
+      warning: { main: '#ffb74d', light: '#ffe0b2', dark: '#f57c00' },
+      info: { main: '#64b5f6', light: '#bbdefb', dark: '#1976d2' },
+      background: {
+        default: '#121212',
+        paper: '#1f1f1f',
+      },
+      text: {
+        primary: '#ffffff',
+        secondary: '#b0bec5',
+        disabled: '#6c7a89',
+      },
+    },
+  }),
 };
 
-type ThemeName = 'pink' | 'blue';
+type ThemeName = 'pink' | 'blue' | 'purple' | 'dark';
 function AppRoutes({ theme, setTheme }: { theme: ThemeName, setTheme: Dispatch<SetStateAction<ThemeName>> }) {
   return (
     <div className="App">
