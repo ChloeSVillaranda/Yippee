@@ -83,12 +83,12 @@ export default function HostGame() {
         <Typography variant="h4" gutterBottom className={styles.title}>
           Host a Game
         </Typography>
-        <IconButton 
+        {/* <IconButton 
           onClick={handleModifyLobbySettings}
           edge="end"
         >
           <SettingsIcon />
-        </IconButton>
+        </IconButton> */}
         <TextField
           id="host-name"
           label="Enter Your Name"

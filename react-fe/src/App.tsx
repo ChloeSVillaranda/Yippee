@@ -1,8 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Button, ThemeProvider, createTheme } from "@mui/material";
+import type { Dispatch, SetStateAction } from 'react';
 
 import BubbleBackground from "./components/BubbleBackground";
-import { Button } from "@mui/material";
-import CreateQuiz from "./pages/CreateQuiz"
+import CreateQuiz from "./pages/CreateQuiz";
 import Home from "./pages/Home";
 import HostGame from "./pages/HostGame";
 import JoinGame from "./pages/JoinGame";
@@ -12,36 +13,41 @@ import Resources from "./pages/Resources";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import styles from './App.module.css';
+import { useState } from "react";
 
-// import AnimatedCursor from "react-animated-cursor"
+const themes = {
+  pink: createTheme({
+    palette: {
+      primary: { main: '#FF6B95' },
+      secondary: { main: '#ec407a' },
+    },
+  }),
+  blue: createTheme({
+    palette: {
+      primary: { main: '#1976d2' },
+      secondary: { main: '#64b5f6' },
+    },
+  }),
+};
 
-function AppRoutes() {
+type ThemeName = 'pink' | 'blue';
+function AppRoutes({ theme, setTheme }: { theme: ThemeName, setTheme: Dispatch<SetStateAction<ThemeName>> }) {
   return (
     <div className="App">
       <BubbleBackground />
       <div className="navbar">
-        <Navbar />
+        <Navbar theme={theme} setTheme={setTheme} />
       </div>
-      {/* <AnimatedCursor outerSize={20} /> */}
       <div className={styles.contentContainer}>
         <Routes>
-          <Route path="/"
-            element={<Home />}/>
-          <Route path="/create-quiz"
-            element={<CreateQuiz />}/>
-          <Route path="/host"
-            element={<HostGame />}/>
-          <Route path="/join"
-            element={<JoinGame />}/>
-          {/* TODO: make the :/roomCode protected so that you need to be a player/host to enter it */}
-          <Route path="/resources"
-            element={<Resources />}/>      
-          <Route path="/:roomCode" 
-            element={<LobbyRoom />} />
-          <Route path="/sign-in"
-            element={<SignIn />}/>
-          <Route path="/sign-up"
-            element={<SignUp />}/>
+          <Route path="/" element={<Home />} />
+          <Route path="/create-quiz" element={<CreateQuiz />} />
+          <Route path="/host" element={<HostGame />} />
+          <Route path="/join" element={<JoinGame />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/:roomCode" element={<LobbyRoom />} />
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/sign-up" element={<SignUp />} />
         </Routes>
       </div>
     </div>
@@ -49,10 +55,13 @@ function AppRoutes() {
 }
 
 function App() {
+  const [theme, setTheme] = useState<ThemeName>('pink');
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <ThemeProvider theme={themes[theme]}>
+      <BrowserRouter>
+        <AppRoutes theme={theme} setTheme={setTheme} />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

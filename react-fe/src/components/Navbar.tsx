@@ -1,18 +1,27 @@
-import { AppBar, Box, Button, Container, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Container, IconButton, Menu, Toolbar, Typography } from '@mui/material';
+import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { MouseEvent, useState } from 'react';
 
 import MenuIcon from '@mui/icons-material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { RootState } from '../stores/store';
+import { Select } from '@mui/material';
 import { useSelector } from 'react-redux';
+import { useTheme } from '@mui/material/styles';
 
 const pages = [
   { title: 'Sign Up', path: '/sign-up' },
   { title: 'Sign In', path: '/sign-in' },
 ];
 
-export default function Navbar() {
+const themeOptions = [
+  { label: 'Pink', value: 'pink' },
+  { label: 'Blue', value: 'blue' },
+];
+
+type ThemeName = 'pink' | 'blue';
+export default function Navbar({ theme, setTheme }: { theme: ThemeName, setTheme: Dispatch<SetStateAction<ThemeName>> }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -37,7 +46,7 @@ export default function Navbar() {
   }
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#FF6B95', zIndex: 1100 }}>
+    <AppBar position="static" sx={{ backgroundColor: theme === 'blue' ? '#1976d2' : '#FF6B95', zIndex: 1100 }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           {/* Logo and title - desktop */}
@@ -140,6 +149,19 @@ export default function Navbar() {
                 {page.title}
               </Button>
             ))}
+          </Box>
+
+          <Box sx={{ flexGrow: 0, ml: 2 }}>
+            <Select
+              value={theme}
+              onChange={(e) => setTheme(e.target.value as ThemeName)}
+              size="small"
+              sx={{ color: 'white', borderColor: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' }, background: 'rgba(255,255,255,0.1)', borderRadius: 1, minWidth: 100 }}
+            >
+              {themeOptions.map(opt => (
+                <MenuItem value={opt.value} key={opt.value}>{opt.label}</MenuItem>
+              ))}
+            </Select>
           </Box>
         </Toolbar>
       </Container>
