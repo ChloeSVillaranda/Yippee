@@ -1,11 +1,12 @@
 import { Box, Typography, useTheme } from "@mui/material";
 
-import HostGameView from "../components/HostGameView";
-import LobbyRoomView from "../components/LobbyRoomView";
-import PlayerGameView from "../components/PlayerGameView";
+// Updated imports to match the new component organization
+import { HostGameView, PlayerGameView, Leaderboard, LobbyRoomView, QuestionView } from "../components/game";
+// Remove QuestionView and LobbyRoomView from quiz import since they're now in game folder
+import { SelectQuiz, ManageGameSettings } from "../components/quiz";
 import { RootState } from "../stores/store";
-import styles from './Game.module.css';
 import { useSelector } from "react-redux";
+import styles from './Game.module.css';
 
 export default function LobbyRoom() {
   const userDetails = useSelector((state: RootState) => state.game.user); // get current user details from Redux

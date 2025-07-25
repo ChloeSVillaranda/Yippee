@@ -1,18 +1,51 @@
-# Yippee 
+# Yippee Quiz Application
 
-Yippee is a web-application made for students and trivia enthusiasts. It is very similar to other web app trivia websites such as Kahoot.
+A real-time multiplayer quiz application built with React, TypeScript, and WebSockets.
 
-## How to run
-### Go backend
-1. Compile into an executable using: `go build .`.
-2. Run the executable: `./yippee.exe`.
+## Features
 
-### Go frontend 
-1. Run `npm install` to install all dependencies.
-2. Run `npm start dev`.
-<br>
-*Note: can specify the port by creating an .env file*
+- Host and join quiz games
+- Create custom quizzes
+- Real-time gameplay with leaderboards
+- Multiple themes and customization options
 
-## About
-This project implements websocket connections between the go backend and go front-end for real-time communication. This project also utilizes MongoDB to store quiz data and REST Apis are created and hosted on the go backend. 
+## Project Structure
+
+- `react-fe/` - Frontend React application
+- `backend/` - Backend server (if applicable)
+
+## Setup Instructions
+
+### Frontend
+
+1. Navigate to the frontend directory:
+```bash
+cd react-fe
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm start
+```
+
+## Theme System
+
+The application supports multiple themes:
+- Pink (default)
+- Blue
+- Purple
+- Dark
+
+## Contributing
+
+When adding new components:
+1. Place them in the appropriate directory based on their purpose
+2. Follow the existing naming conventions
+3. Create proper tests
+4. Update the documentation
 

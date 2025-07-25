@@ -2,16 +2,15 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Button, ThemeProvider, createTheme } from "@mui/material";
 import type { Dispatch, SetStateAction } from 'react';
 
-import BubbleBackground from "./components/BubbleBackground";
+import { BubbleBackground } from "./components/common";
 import CreateQuiz from "./pages/CreateQuiz";
 import Home from "./pages/Home";
 import HostGame from "./pages/HostGame";
 import JoinGame from "./pages/JoinGame";
 import LobbyRoom from "./pages/Game";
-import Navbar from "./components/Navbar";
+import { Navbar } from "./components/layout";
 import Resources from "./pages/Resources";
-import SignIn from "./components/SignIn";
-import SignUp from "./components/SignUp";
+import { SignIn, SignUp } from "./components/user";
 import styles from './App.module.css';
 import { useState } from "react";
 

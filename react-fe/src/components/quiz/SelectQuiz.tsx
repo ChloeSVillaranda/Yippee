@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ImageIcon from '@mui/icons-material/Image';
-import { Quiz } from '../stores/types';
+import { Quiz } from '../../stores/types';
 
 const MAX_VISIBLE = 5;
 

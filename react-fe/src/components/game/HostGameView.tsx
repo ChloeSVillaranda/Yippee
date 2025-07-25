@@ -2,9 +2,9 @@ import { Button, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 
 import Leaderboard from "./Leaderboard";
-import { QuestionView } from "./QuestionView";
-import { RootState } from "../stores/store";
-import { executeWebSocketCommand } from "../util/websocketUtil";
+import QuestionView from "./QuestionView";
+import { RootState } from "../../stores/store";
+import { executeWebSocketCommand } from "../../util/websocketUtil";
 import { useSelector } from "react-redux";
 
 export default function HostGameView() {

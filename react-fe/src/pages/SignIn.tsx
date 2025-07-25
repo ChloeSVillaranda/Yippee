@@ -1,4 +1,4 @@
-import SignIn from '../components/SignIn';
+import SignIn from '../components/user/SignIn';
 import styles from './Resources.module.css';
 
 export default function SignInPage() {

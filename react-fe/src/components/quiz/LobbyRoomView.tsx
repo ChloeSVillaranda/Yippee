@@ -1,13 +1,13 @@
 import { Box, Button, IconButton, InputAdornment, TextField, Typography, useTheme } from "@mui/material";
-import { GameSettings, User } from "../stores/types";
+import { GameSettings, User } from "../../stores/types";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
 import ManageGameSettings from "./ManageGameSettings";
-import { RootState } from "../stores/store";
+import { RootState } from "../../stores/store";
 import SendIcon from '@mui/icons-material/Send';
-import { executeWebSocketCommand } from "../util/websocketUtil";
-import { gameActions } from "../stores/gameSlice";
+import { executeWebSocketCommand } from "../../util/websocketUtil";
+import { gameActions } from "../../stores/gameSlice";
 import styles from './LobbyRoomView.module.css';
 
 export default function LobbyRoomView() {

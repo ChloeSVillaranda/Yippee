@@ -2,14 +2,14 @@ import { Box, Button, Checkbox, FormControlLabel, IconButton, TextField, Typogra
 import { Quiz, QuizQuestion } from "../stores/types";
 
 import AddIcon from '@mui/icons-material/Add';
-import CategorySelector from "../components/CategorySelection";
+import CategorySelector from "../components/common/CategorySelection";
 import DeleteIcon from '@mui/icons-material/Delete';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { DifficultySlider } from '../components/DifficultySlider';
+import { DifficultySlider } from '../components/common/DifficultySlider';
 import styles from './CreateQuiz.module.css';
 import { useState } from "react";
 

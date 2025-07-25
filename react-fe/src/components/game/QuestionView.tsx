@@ -4,14 +4,14 @@
 
 import { Box, Typography, useTheme } from "@mui/material";
 
-import { RootState } from "../stores/store";
+import { RootState } from "../../stores/store";
 import { useSelector } from "react-redux";
 
 interface QuestionViewProps {
   displayCorrectAnswers: boolean;
 }
 
-export function QuestionView({ displayCorrectAnswers }: QuestionViewProps) {
+export default function QuestionView({ displayCorrectAnswers }: QuestionViewProps) {
     const game = useSelector((state: RootState) => state.game);
     const theme = useTheme();
     console.log('Current Question:', game.currentQuestion);

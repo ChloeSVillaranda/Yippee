@@ -1,9 +1,9 @@
 import { Alert, Box, Button, CircularProgress, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 
-import { RootState } from "../stores/store";
-import { executeWebSocketCommand } from "../util/websocketUtil";
-import { gameActions } from "../stores/gameSlice";
+import { RootState } from "../../stores/store";
+import { executeWebSocketCommand } from "../../util/websocketUtil";
+import { gameActions } from "../../stores/gameSlice";
 import { useState } from "react";
 
 export default function PlayerGameView() {

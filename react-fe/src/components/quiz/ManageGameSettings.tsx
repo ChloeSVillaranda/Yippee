@@ -1,6 +1,6 @@
 import { Box, FormControlLabel, Slider, Switch, Typography } from '@mui/material';
 
-import { GameSettings } from '../stores/types';
+import { GameSettings } from '../../stores/types';
 import { useState } from 'react';
 
 interface ManageGameSettingsProps {

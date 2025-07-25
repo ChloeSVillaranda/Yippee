@@ -2,8 +2,8 @@
 
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 
-import { RootState } from '../stores/store';
-import { User } from '../stores/types';
+import { RootState } from '../../stores/store';
+import { User } from '../../stores/types';
 import { useSelector } from 'react-redux';
 
 export default function Leaderboard() {

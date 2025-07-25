@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import QuizIcon from '@mui/icons-material/Quiz';
-import { RootState } from '../stores/store';
+import { RootState } from '../../stores/store';
 import { Select } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { useTheme } from '@mui/material/styles';

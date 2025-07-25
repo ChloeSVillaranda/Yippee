@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import { Quiz } from "../stores/types";
 import { RootState } from "../stores/store";
-import SelectQuiz from "../components/SelectQuiz";
+import { ManageGameSettings, SelectQuiz } from "../components/quiz";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { gameActions } from "../stores/gameSlice";
 import styles from './HostGame.module.css';
