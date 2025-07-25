@@ -1,4 +1,4 @@
-import { Box, Slider, Typography } from '@mui/material';
+import { Box, Slider, Typography, useTheme } from '@mui/material';
 
 import React from 'react';
 
@@ -11,6 +11,8 @@ export const DifficultySlider: React.FC<DifficultySliderProps> = ({
     difficulty, 
     onChange 
 }) => {
+    const theme = useTheme();
+
     const handleChange = (_event: Event, newValue: number | number[]) => {
         onChange(newValue as number);
     };
@@ -22,20 +24,18 @@ export const DifficultySlider: React.FC<DifficultySliderProps> = ({
     };
 
     const getDifficultyColor = (value: number) => {
-        // Create gradient from light pink to dark pink
+        // Create gradient based on theme primary color
+        const baseColor = theme.palette.primary;
         const colors = [
-            '#FFE4E8', // Very light pink (Easy)
-            '#FFD0D9',
-            '#FFBCCA',
-            '#FFA8BB',
-            '#FF94AC',
-            '#FF809D',
-            '#FF6B8E',
-            '#FF577F',
-            '#FF4370',
-            '#FF2F61'  // Dark pink (Hard)
+            theme.palette.primary.light,
+            theme.palette.primary.main,
+            theme.palette.primary.dark,
         ];
-        return colors[value - 1];
+        
+        // Calculate color based on difficulty value
+        if (value <= 3) return colors[0];
+        if (value <= 6) return colors[1];
+        return colors[2];
     };
 
     return (
@@ -50,6 +50,7 @@ export const DifficultySlider: React.FC<DifficultySliderProps> = ({
                 gutterBottom 
                 sx={{ 
                     textAlign: 'center',
+                    color: getDifficultyColor(difficulty)
                 }}
             >
                 Difficulty: {difficulty} - {getDifficultyLabel(difficulty)}
@@ -73,21 +74,21 @@ export const DifficultySlider: React.FC<DifficultySliderProps> = ({
                         }
                     },
                     '& .MuiSlider-track': {
-                        background: `linear-gradient(to right, #FFE4E8, ${getDifficultyColor(difficulty)})`,
+                        background: `linear-gradient(to right, ${theme.palette.primary.light}, ${getDifficultyColor(difficulty)})`,
                         height: 8,
                         border: 'none'
                     },
                     '& .MuiSlider-rail': {
-                        background: 'linear-gradient(to right, #FFE4E8, #FF2F61)',
+                        background: `linear-gradient(to right, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`,
                         height: 8,
                         opacity: 0.5
                     },
                     '& .MuiSlider-mark': {
-                        backgroundColor: '#fff',
+                        backgroundColor: theme.palette.background.paper,
                         height: 8,
                         width: 2,
                         '&.MuiSlider-markActive': {
-                            backgroundColor: '#fff',
+                            backgroundColor: theme.palette.background.paper,
                             opacity: 0.8
                         }
                     }

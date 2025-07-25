@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -15,6 +15,7 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
   const [questionPage, setQuestionPage] = useState(0);
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -63,18 +64,27 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
               sx={{
                 width: 140,
                 minWidth: 140,
-                border: "1px solid #ccc",
+                border: `1px solid ${theme.palette.divider}`,
                 borderRadius: "8px",
                 textAlign: "center",
                 cursor: "pointer",
-                background: '#fafafa',
-                '&:hover': { boxShadow: '0 4px 8px rgba(0,0,0,0.15)' },
+                background: theme.palette.background.paper,
+                '&:hover': { boxShadow: `0 4px 8px ${theme.palette.action.hover}` },
                 p: 1
               }}
               onClick={() => handleCardClick(quiz)}
             >
-              <Box sx={{ width: '100%', height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, bgcolor: '#eee', borderRadius: 1 }}>
-                <ImageIcon sx={{ fontSize: 48, color: '#bbb' }} />
+              <Box sx={{ 
+                width: '100%', 
+                height: 80, 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                mb: 1, 
+                bgcolor: theme.palette.action.hover, 
+                borderRadius: 1 
+              }}>
+                <ImageIcon sx={{ fontSize: 48, color: theme.palette.text.disabled }} />
               </Box>
               <Typography variant="subtitle1" noWrap>{quiz.quizName}</Typography>
               <Typography

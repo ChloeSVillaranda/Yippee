@@ -1,5 +1,5 @@
 .button {
-    background: linear-gradient(45deg, #FF9A8B 30%, #FF6B95 90%);
+    background: var(--gradient-primary);
     color: white;
     transition: transform 0.2s;
     width: fit-content;
@@ -8,5 +8,5 @@
 
 .button:hover {
     transform: scale(1.05) !important;
-    background: linear-gradient(45deg, #FF6B95 30%, #FF9A8B 90%) !important;
+    background: var(--gradient-secondary) !important;
 }

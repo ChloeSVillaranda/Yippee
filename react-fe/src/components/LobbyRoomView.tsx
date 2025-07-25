@@ -1,6 +1,7 @@
-import { Box, Button, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, TextField, Typography, useTheme } from "@mui/material";
 import { GameSettings, User } from "../stores/types";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
 import ManageGameSettings from "./ManageGameSettings";
 import { RootState } from "../stores/store";
@@ -8,9 +9,9 @@ import SendIcon from '@mui/icons-material/Send';
 import { executeWebSocketCommand } from "../util/websocketUtil";
 import { gameActions } from "../stores/gameSlice";
 import styles from './LobbyRoomView.module.css';
-import { useState } from "react";
 
 export default function LobbyRoomView() {
+  const theme = useTheme();
   const game = useSelector((state: RootState) => state.game); // get the clientsInLobby from Redux
   const [lobbyMessage, setLobbyMessage] = useState("");
   const userDetails = useSelector((state: RootState) => state.game.user); // get current user details from Redux
@@ -23,6 +24,17 @@ export default function LobbyRoomView() {
   });
   const dispatch = useDispatch();
 
+  // Set CSS variables for the module styles
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--gradient-primary', 
+      `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.primary.main} 90%)`
+    );
+    document.documentElement.style.setProperty(
+      '--gradient-secondary', 
+      `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`
+    );
+  }, [theme]);
 
   const handleSendMessage = () => {
     // send a message to be displayed to the lobby
@@ -110,9 +122,9 @@ export default function LobbyRoomView() {
                               disabled={!lobbyMessage.trim()}
                               edge="end"
                               sx={{
-                                  color: lobbyMessage.trim() ? '#FF6B95' : 'rgba(0, 0, 0, 0.26)',
+                                  color: lobbyMessage.trim() ? theme.palette.primary.main : 'rgba(0, 0, 0, 0.26)',
                                   '&:hover': {
-                                      color: '#FF9A8B'
+                                      color: theme.palette.primary.light
                                   }
                               }}
                           >

@@ -2,7 +2,7 @@
 // displays all options 
 // after question time is over, displays all the correct answers + stats on who chose each answer
 
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 
 import { RootState } from "../stores/store";
 import { useSelector } from "react-redux";
@@ -13,6 +13,7 @@ interface QuestionViewProps {
 
 export function QuestionView({ displayCorrectAnswers }: QuestionViewProps) {
     const game = useSelector((state: RootState) => state.game);
+    const theme = useTheme();
     console.log('Current Question:', game.currentQuestion);
     console.log('Correct Answers:', game.currentQuestion?.correctAnswers);
 
@@ -51,7 +52,7 @@ export function QuestionView({ displayCorrectAnswers }: QuestionViewProps) {
                             variant="body1"
                             sx={{ 
                                 color: game.currentQuestion?.correctAnswers.includes(option) 
-                                    ? 'green' 
+                                    ? theme.palette.success.main 
                                     : 'inherit'
                             }}
                         >

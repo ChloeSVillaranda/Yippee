@@ -18,14 +18,40 @@ import { useState } from "react";
 const themes = {
   pink: createTheme({
     palette: {
-      primary: { main: '#FF6B95' },
-      secondary: { main: '#ec407a' },
+      primary: { main: '#FF6B95', light: '#FF9A8B', dark: '#E64A79' },
+      secondary: { main: '#ec407a', light: '#f48fb1', dark: '#c2185b' },
+      success: { main: '#66bb6a', light: '#81c784', dark: '#388e3c' },
+      error: { main: '#f44336', light: '#e57373', dark: '#d32f2f' },
+      warning: { main: '#ffa726', light: '#ffb74d', dark: '#f57c00' },
+      info: { main: '#29b6f6', light: '#4fc3f7', dark: '#0288d1' },
+      background: {
+        default: '#fff5f5',
+        paper: '#ffffff',
+      },
+      text: {
+        primary: '#333333',
+        secondary: '#666666',
+        disabled: '#999999',
+      },
     },
   }),
   blue: createTheme({
     palette: {
-      primary: { main: '#1976d2' },
-      secondary: { main: '#64b5f6' },
+      primary: { main: '#1976d2', light: '#64b5f6', dark: '#0d47a1' },
+      secondary: { main: '#03a9f4', light: '#4fc3f7', dark: '#01579b' },
+      success: { main: '#4caf50', light: '#81c784', dark: '#2e7d32' },
+      error: { main: '#e53935', light: '#ef5350', dark: '#c62828' },
+      warning: { main: '#ff9800', light: '#ffb74d', dark: '#e65100' },
+      info: { main: '#2196f3', light: '#64b5f6', dark: '#0d47a1' },
+      background: {
+        default: '#f5f8fa',
+        paper: '#ffffff',
+      },
+      text: {
+        primary: '#2c3e50',
+        secondary: '#546e7a',
+        disabled: '#90a4ae',
+      },
     },
   }),
 };

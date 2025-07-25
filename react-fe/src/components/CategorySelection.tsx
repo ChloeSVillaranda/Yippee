@@ -2,9 +2,9 @@ import {
   Autocomplete,
   Box,
   Chip,
-  Paper,
   TextField,
   autocompleteClasses,
+  useTheme,
 } from "@mui/material";
 
 interface CategorySelectorProps {
@@ -26,27 +26,13 @@ const PREDEFINED_CATEGORIES = [
   "Music",
 ];
 
-function getColorForTag(tag: string): string {
-  const colors: Record<string, string> = {
-    Math: "#64b5f6",
-    Science: "#81c784",
-    History: "#ffb74d",
-    Geography: "#4dd0e1",
-    Literature: "#ba68c8",
-    Sports: "#e57373",
-    Entertainment: "#f06292",
-    Technology: "#7986cb",
-    Art: "#a1887f",
-    Music: "#90a4ae",
-  };
-  return colors[tag] || "#f48fb1";
-}
-
 export default function CategorySelector({
   value,
   onChange,
   label = "Categories",
 }: CategorySelectorProps) {
+  const theme = useTheme();
+
   const availableOptions = PREDEFINED_CATEGORIES.filter(
     (option) => !value.includes(option)
   );
@@ -54,6 +40,23 @@ export default function CategorySelector({
   const handleDelete = (categoryToDelete: string) => {
     onChange(value.filter((cat) => cat !== categoryToDelete));
   };
+
+  function getColorForTag(tag: string): string {
+    // Use theme colors with different shades
+    const colors: Record<string, string> = {
+      Math: theme.palette.info.main,
+      Science: theme.palette.success.main,
+      History: theme.palette.warning.main,
+      Geography: theme.palette.info.light,
+      Literature: theme.palette.secondary.main,
+      Sports: theme.palette.error.light,
+      Entertainment: theme.palette.secondary.light,
+      Technology: theme.palette.primary.dark,
+      Art: theme.palette.warning.dark,
+      Music: theme.palette.info.dark,
+    };
+    return colors[tag] || theme.palette.primary.main;
+  }
 
   return (
     <Box sx={{ my: 2, maxWidth: 400 }}>
