@@ -1,6 +1,8 @@
 import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ImageIcon from '@mui/icons-material/Image';
 import { Quiz } from '../stores/types';
 
@@ -12,6 +14,7 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
   const [dialogOpen, setDialogOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
+  const [questionPage, setQuestionPage] = useState(0);
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -35,6 +38,7 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
   const handleCardClick = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
     setDetailsOpen(true);
+    setQuestionPage(0);
   };
 
   const handleConfirm = () => {
@@ -159,13 +163,44 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
           </Box>
           <Divider sx={{ mb: 2 }} />
           <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>Questions:</Typography>
-          <Box sx={{ bgcolor: '#fafafa', borderRadius: 2, p: 2, mb: 2 }}>
+          <Box sx={{ bgcolor: '#fafafa', borderRadius: 2, p: 2, mb: 2, minHeight: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
             {selectedQuiz?.quizQuestions && selectedQuiz.quizQuestions.length > 0 ? (
-              selectedQuiz.quizQuestions.map((q, i) => (
-                <Box key={i} sx={{ mb: 1 }}>
-                  <Typography variant="body2">{i + 1}. {q.question}</Typography>
+              <>
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                  <Button
+                    onClick={() => setQuestionPage((prev) => Math.max(prev - 1, 0))}
+                    disabled={questionPage === 0}
+                    sx={{ minWidth: 0, p: 1 }}
+                  >
+                    <ArrowBackIosNewIcon fontSize="small" />
+                  </Button>
+                  <Box sx={{ flex: 1, px: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      {questionPage + 1}. {selectedQuiz.quizQuestions[questionPage].question}
+                    </Typography>
+                    {/* Show answers if available */}
+                    {selectedQuiz.quizQuestions[questionPage].correctAnswers && selectedQuiz.quizQuestions[questionPage].incorrectAnswers ? (
+                      <Box>
+                        {[...(selectedQuiz.quizQuestions[questionPage].correctAnswers || []), ...(selectedQuiz.quizQuestions[questionPage].incorrectAnswers || [])].map((ans, idx) => (
+                          <Typography key={idx} variant="body2" sx={{ ml: 2, color: selectedQuiz.quizQuestions[questionPage].correctAnswers.includes(ans) ? 'success.main' : 'text.secondary' }}>
+                            - {ans}
+                          </Typography>
+                        ))}
+                      </Box>
+                    ) : null}
+                  </Box>
+                  <Button
+                    onClick={() => setQuestionPage((prev) => Math.min(prev + 1, selectedQuiz.quizQuestions.length - 1))}
+                    disabled={questionPage === selectedQuiz.quizQuestions.length - 1}
+                    sx={{ minWidth: 0, p: 1 }}
+                  >
+                    <ArrowForwardIosIcon fontSize="small" />
+                  </Button>
                 </Box>
-              ))
+                <Typography variant="caption" sx={{ mt: 1 }}>
+                  Question {questionPage + 1} of {selectedQuiz.quizQuestions.length}
+                </Typography>
+              </>
             ) : (
               <Typography variant="body2" color="textSecondary">No questions available.</Typography>
             )}
