@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Typography, useTheme } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Paper, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -15,6 +15,8 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
   const [questionPage, setQuestionPage] = useState(0);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const theme = useTheme();
 
   useEffect(() => {
@@ -38,14 +40,26 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
 
   const handleCardClick = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
-    setDetailsOpen(true);
-    setQuestionPage(0);
+    setPreviewOpen(true);
+    setCurrentQuestionIndex(0); // Reset to first question
   };
 
-  const handleConfirm = () => {
+  const handleSelectQuiz = () => {
     if (selectedQuiz) {
       onSelectQuiz(selectedQuiz);
-      setDetailsOpen(false);
+      setPreviewOpen(false);
+    }
+  };
+  
+  const handleNextQuestion = () => {
+    if (selectedQuiz && currentQuestionIndex < selectedQuiz.quizQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
+  };
+  
+  const handlePrevQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
     }
   };
 
@@ -262,7 +276,7 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
             Cancel
           </Button>
           <Button 
-            onClick={handleConfirm} 
+            onClick={handleSelectQuiz} 
             variant="contained" 
             color="primary"
             sx={{
@@ -276,6 +290,183 @@ export default function SelectQuiz({ onSelectQuiz }: { onSelectQuiz: (quiz: Quiz
             Select This Quiz
           </Button>
         </Box>
+      </Dialog>
+      
+      {/* Quiz Preview Dialog */}
+      <Dialog 
+        open={previewOpen} 
+        onClose={() => setPreviewOpen(false)}
+        maxWidth="md"
+        PaperProps={{
+          sx: { 
+            borderRadius: 2,
+            minWidth: { xs: '90%', sm: '80%', md: '600px' },
+            maxWidth: '800px',
+            bgcolor: theme.palette.background.paper
+          }
+        }}
+      >
+        {selectedQuiz && (
+          <>
+            <DialogTitle sx={{ 
+              pt: 3, 
+              pb: 0, 
+              fontSize: { xs: '1.5rem', sm: '2rem' },
+              textAlign: 'center',
+              fontWeight: 'bold'
+            }}>
+              {selectedQuiz.quizName}
+            </DialogTitle>
+            
+            <DialogContent sx={{ p: 4 }}>
+              <Box sx={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center', 
+                mb: 3 
+              }}>
+                <Paper 
+                  elevation={0}
+                  sx={{ 
+                    width: '100%',
+                    maxWidth: 120,
+                    height: 120,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                    borderRadius: 2,
+                    mb: 2
+                  }}
+                >
+                  <ImageIcon sx={{ fontSize: 60, color: theme.palette.text.secondary }} />
+                </Paper>
+                
+                <Typography variant="body1" sx={{ textAlign: 'center', color: theme.palette.text.secondary }}>
+                  {selectedQuiz.quizDescription || "This is a quiz on " + selectedQuiz.quizName.toLowerCase()}
+                </Typography>
+              </Box>
+              
+              <Divider sx={{ my: 2 }} />
+              
+              <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
+                Questions:
+              </Typography>
+              
+              <Paper 
+                elevation={0} 
+                sx={{ 
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                  p: 3,
+                  borderRadius: 2,
+                  position: 'relative',
+                  minHeight: 150,
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
+              >
+                {/* Question Navigation */}
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  width: '100%',
+                  justifyContent: 'space-between',
+                  mb: 2
+                }}>
+                  <IconButton 
+                    onClick={handlePrevQuestion}
+                    disabled={currentQuestionIndex === 0}
+                    sx={{ 
+                      bgcolor: currentQuestionIndex > 0 ? 
+                        (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)') : 
+                        'transparent' 
+                    }}
+                  >
+                    <ArrowBackIosNewIcon fontSize="small" />
+                  </IconButton>
+                  
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+                    Question {currentQuestionIndex + 1} of {selectedQuiz.quizQuestions.length}
+                  </Typography>
+                  
+                  <IconButton 
+                    onClick={handleNextQuestion}
+                    disabled={currentQuestionIndex >= selectedQuiz.quizQuestions.length - 1}
+                    sx={{ 
+                      bgcolor: currentQuestionIndex < selectedQuiz.quizQuestions.length - 1 ? 
+                        (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)') : 
+                        'transparent' 
+                    }}
+                  >
+                    <ArrowForwardIosIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+                
+                {/* Question Content */}
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    {selectedQuiz.quizQuestions[currentQuestionIndex]?.question || "No question available"}
+                  </Typography>
+                  
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                    Options:
+                  </Typography>
+                  
+                  <Box sx={{ ml: 2 }}>
+                    {(selectedQuiz.quizQuestions[currentQuestionIndex]?.options || 
+                     [...(selectedQuiz.quizQuestions[currentQuestionIndex]?.correctAnswers || []),
+                      ...(selectedQuiz.quizQuestions[currentQuestionIndex]?.incorrectAnswers || [])]
+                    ).map((option, idx) => (
+                      <Typography 
+                        key={idx} 
+                        variant="body2" 
+                        sx={{ 
+                          mb: 0.5,
+                          py: 0.5,
+                          px: 1,
+                          borderRadius: 1,
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                        }}
+                      >
+                        {idx + 1}. {option}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Box>
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  mt: 'auto',
+                  pt: 1
+                }}>
+                  <Typography variant="caption" color="text.secondary">
+                    {currentQuestionIndex + 1} of {selectedQuiz.quizQuestions.length}
+                  </Typography>
+                </Box>
+              </Paper>
+            </DialogContent>
+            
+            <DialogActions sx={{ p: 3, pt: 0 }}>
+              <Button 
+                onClick={() => setPreviewOpen(false)} 
+                variant="outlined" 
+                sx={{ px: 3 }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSelectQuiz} 
+                variant="contained" 
+                color="primary" 
+                sx={{ px: 3 }}
+              >
+                Select This Quiz
+              </Button>
+            </DialogActions>
+          </>
+        )}
       </Dialog>
     </Box>
   );
