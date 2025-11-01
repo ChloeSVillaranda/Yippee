@@ -1,10 +1,7 @@
-/* Add this if you want a custom pink color for buttons */
 :root {
   --pink-main: #ec407a;
   --pink-dark: #b12763;
 }
-
-/* You can use these variables in your custom button styles if needed */
 
 .container {
     width: 100%;

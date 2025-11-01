@@ -1,4 +1,5 @@
-import { Button, Box, useTheme } from "@mui/material";
+import { Box, Button, useTheme } from "@mui/material";
+
 import styles from './Home.module.css';
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +12,7 @@ export default function HomePage() {
     background: theme.palette.mode === 'dark' 
       ? `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`
       : `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.primary.main} 90%)`,
-    color: '#ffffff',  // Always white text for best contrast
+    color: '#ffffff',
     transition: 'transform 0.2s',
     width: '200px',
     padding: '10px 20px',

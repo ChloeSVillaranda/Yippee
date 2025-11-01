@@ -168,7 +168,7 @@ export default function CreateQuiz() {
           boxShadow: theme.palette.mode === 'dark'
             ? '0px 4px 20px rgba(0, 0, 0, 0.5)'
             : '0px 4px 20px rgba(0, 0, 0, 0.1)',
-          color: theme.palette.text.primary, // Use theme text color
+          color: theme.palette.text.primary,
         }}
       >
         <Box sx={{ padding: 4 }}>
@@ -345,7 +345,7 @@ export default function CreateQuiz() {
             sx={{ 
               marginRight: 2,
               bgcolor: theme.palette.secondary.main,
-              color: '#ffffff', // Always white for contrast
+              color: '#ffffff',
               fontWeight: 'bold',
               '&:hover': {
                 bgcolor: theme.palette.secondary.dark,
@@ -360,7 +360,7 @@ export default function CreateQuiz() {
             onClick={handleDialogOpen}
             sx={{ 
               bgcolor: theme.palette.secondary.main,
-              color: '#ffffff', // Always white for contrast
+              color: '#ffffff',
               fontWeight: 'bold',
               '&:hover': {
                 bgcolor: theme.palette.secondary.dark,
@@ -400,7 +400,7 @@ export default function CreateQuiz() {
                 variant="contained"
                 sx={{ 
                   bgcolor: theme.palette.secondary.main,
-                  color: '#ffffff', // Always white for contrast
+                  color: '#ffffff',
                   fontWeight: 'bold',
                   '&:hover': {
                     bgcolor: theme.palette.secondary.dark,

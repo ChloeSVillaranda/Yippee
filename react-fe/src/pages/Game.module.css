@@ -9,7 +9,6 @@
     box-sizing: border-box;
 }
 
-/* Remove the background-color definition from here - we'll use theme-based styling in the component */
 .innerBox {
   height: 100%;
   width: 100%;
